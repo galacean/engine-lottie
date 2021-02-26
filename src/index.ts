@@ -85,19 +85,16 @@ export class LottieRenderer extends o3.Script {
 			},
 		};
 
-		this._buildElements(session);
+		this.root = new CompLottieLayer(this.keyframes, session);
+		this._buildLottieTree(this.root, session);
+		console.log(this.root)
 	}
 
-	private _buildElements(session: any) {
-		this.root = this._extraComp(this.keyframes, session, true);
-		const layersMap = this._prepareChildComp(this.root, session);
-		console.log(layersMap)
-	}
-
-	private _prepareChildComp(comp: any, session: any) {
+	private _buildLottieTree(comp, lastSession) {
 		const { layers, w, h, ip, op, st = 0 } = comp.data;
-		const newSession = {
-			global: session.global,
+
+		const session = {
+			global: lastSession.global,
 			local: {
 				w, h, ip, op, st,
 				childCompsArray: [],
@@ -105,10 +102,6 @@ export class LottieRenderer extends o3.Script {
 			},
 		};
 
-		return this._buildLottieTree(comp, layers, newSession);
-	}
-
-	_buildLottieTree(comp, layers, session) {
 		const layersMap = {};
 		const { global, local } = session;
 
@@ -120,22 +113,26 @@ export class LottieRenderer extends o3.Script {
 
 			switch (layer.ty) {
 				case 0:
-					element = this._extraComp(layer, session);
+					element = new CompLottieLayer(layer, session);
+					local.childCompsArray.push(element);
 					break;
 				case 1:
-					element = this._extraSolid(layer, session);
+					element = new SolidLottieLayer(layer, session);
 					break;
 				case 2:
-					element = this._extraSprite(layer, session);
+					element = new SpriteLottieLayer(layer, session);
 					break;
 				case 3:
-					element = this._extraNull(layer, session);
+					element = new NullLottieLayer(layer, session);
 					break;
 				case 4:
-					element = this._extraShape(layer, session);
+					element = new ShapeLottieLayer(layer, session);
 					break;
 				case 13:
-					element = this._extraCamera(layer, session);
+					if (!session.global.globalCamera) {
+						element = new CameraLottieLayer(layer, session);
+						local.currentCamera = element;
+					}
 					break;
 				default:
 					continue;
@@ -166,9 +163,9 @@ export class LottieRenderer extends o3.Script {
 		}
 
 		if (local.has3D && !global.globalCamera) {
-			if (!local.currentCamera){
-				local.currentCamera = this._extraCamera(null, session);
-			} 
+			if (!local.currentCamera && !session.global.globalCamera) {
+				local.currentCamera = new CameraNullLottieLayer(null, session);
+			}
 
 			global.globalCamera = local.currentCamera;
 		}
@@ -177,55 +174,10 @@ export class LottieRenderer extends o3.Script {
 
 		for (let i = 0; i < childCompsArray.length; i++) {
 			const comp = childCompsArray[i];
-			this._prepareChildComp(comp, session);
+			this._buildLottieTree(comp, session);
 		}
 
 		return layersMap;
-	}
-
-	private _extraComp(layer: any, session: any, isRoot: boolean = false) {
-		const lottieLayer = new CompLottieLayer(layer, session);
-
-		if (!isRoot) {
-			session.local.childCompsArray.push(lottieLayer);
-		}
-
-		return lottieLayer;
-	}
-
-	private _extraSolid(layer, session) {
-		const lottieLayer = new SolidLottieLayer(layer, session);
-		return lottieLayer;
-	}
-
-	private _extraSprite(layer, session) {
-		const asset = Tools.getAssets(layer.refId, this.assets);
-		const texture = this._textures[asset.id];
-		return new SpriteLottieLayer(layer, session);
-	}
-
-	private _extraNull(layer, session) {
-		return new NullLottieLayer(layer, session);
-	}
-
-	private _extraShape(layer, session) {
-		return new ShapeLottieLayer(layer, session);
-	}
-
-	private _extraCamera(layer, session) {
-		if (session.global.globalCamera) return;
-
-		let lottieLayer = null;
-
-		if (layer) {
-			lottieLayer = new CameraLottieLayer(layer, session);
-		} else {
-			lottieLayer = new CameraNullLottieLayer(layer, session);
-		}
-
-		session.local.currentCamera = lottieLayer;
-
-		return lottieLayer;
 	}
 
 	private async _loadTextures(assets) {
