@@ -7,15 +7,11 @@ import {
 	ShapeLottieLayer,
 	SolidLottieLayer,
 	SpriteLottieLayer,
-	DataManager,
 	Tools
 } from '@ali/lottie-core';
-import data from './json/test.json';
 
+export { LottieLoader } from './LottieLoader';
 export class LottieRenderer extends o3.Script {
-	private _defaultSegment: any;
-	private _segmentName: string;
-	private _timePerFrame: number;
 	private _lastFrame = -Infinity;
 	private _repeatsCut = 0;
 	private _delayCut = 0;
@@ -25,59 +21,20 @@ export class LottieRenderer extends o3.Script {
 	private _justDisplayOnImagesLoaded: boolean = true;
 	private _maskComp: boolean = false;
 	private _copyJSON: boolean = false;
-	private _textures: any = {};
 
-	keyframes: any;
+	root: any = null;
 	frameRate: number;
 	frameMult: number;
-	segments: any = {};
-	beginFrame: number;
-	endFrame: number;
-	duration: number;
-	assets: any;
-	living: boolean = true;
-	infinite: boolean = false;
-	repeats: number = 0;
-	alternate: boolean = false;
-	wait: number = 0;
-	delay: number = 0;
-	overlapMode: boolean = false;
-	timeScale: number = 1;
-	frameNum: number = 0;
-	isPaused: boolean = true;
-	direction: number = 1;
-	isDisplayLoaded: boolean = false;
-	isImagesLoaded: boolean = false;
-	root: any = null;
 
-	async onAwake() {
-		DataManager.completeData(data);
-
-		this.keyframes = data;
-
-		const { w, h, st, fr, ip, op, assets } = data;
-
-		console.log(data);
-
-		this.frameRate = fr;
-		this.frameMult = fr / 1000;
-		this._defaultSegment = [ip, op];
-		const segment = (this._segmentName && this.segments[this._segmentName]) || this._defaultSegment;
-
-		this.beginFrame = segment[0];
-		this.endFrame = segment[1];
-		this._timePerFrame = 1000 / fr;
-		this.duration = Math.floor(this.endFrame - this.beginFrame);
-		this.assets = assets;
-
-		this._loadTextures(assets);
+	set res (value) {
+		const { w, h, frameRate, ip, op, st } = value;
 
 		const session: any = {
 			global: {
 				w, h,
-				frameRate: fr,
+				frameRate,
 				maskComp: this._maskComp,
-				overlapMode: this.overlapMode,
+				overlapMode: value.overlapMode,
 				globalCamera: null,
 			},
 			local: {
@@ -85,9 +42,14 @@ export class LottieRenderer extends o3.Script {
 			},
 		};
 
-		this.root = new CompLottieLayer(this.keyframes, session);
+		this.frameRate = value.res.fr;
+		this.frameMult = this.frameRate / 1000;
+
+		this.root = new CompLottieLayer(value.res, session);
 		this._buildLottieTree(this.root, session);
-		console.log(this.root)
+
+		console.log('layers:', this.root)
+		console.log('textures:', value.textures)
 	}
 
 	private _buildLottieTree(comp, lastSession) {
@@ -180,34 +142,7 @@ export class LottieRenderer extends o3.Script {
 		return layersMap;
 	}
 
-	private async _loadTextures(assets) {
-		const images = [];
-		const ids: string[] = [];
-
-		for (let i = 0; i < assets.length; i++) {
-			const asset = assets[i];
-
-			if (asset.u || asset.p) {
-				images.push({
-					url: asset.u || asset.p,
-					type: o3.AssetType.Texture2D,
-				});
-
-				ids.push(asset.id);
-			}
-		}
-
-		const textures = await this.engine.resourceManager.load(images);
-
-		for (let i = 0; i < images.length; i++) {
-			this._textures[ids[i]] = textures[i];
-		}
-
-		this.isImagesLoaded = true;
-		console.log(this._textures)
-	}
 
 	onStart() {
-		console.log("script on start");
 	}
 }

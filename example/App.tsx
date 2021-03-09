@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { LottieRenderer } from "../src";
+import { LottieLoader, LottieRenderer } from "../src";
 import * as o3 from "oasis-engine";
 import "./App.css";
 
@@ -21,8 +21,16 @@ function App() {
 		cameraEntity.transform.setPosition(10, 10, 10);
 		cameraEntity.transform.lookAt(new o3.Vector3(0, 0, 0));
 
+		engine.resourceManager.load({
+			url: 'https://gw.alipayobjects.com/os/OasisHub/20759aba-867f-4256-8504-935743240c78/data.json',
+			type: 100
+		}).then((res) => {
+			const lottie = root.createChild("lottie");
+			const lottieRenderer = lottie.addComponent(LottieRenderer);
+			lottieRenderer.res = res;
+		});
 
-		root.addComponent(LottieRenderer);
+
 
 		engine.run();
 	}, []);
