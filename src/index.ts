@@ -94,7 +94,7 @@ export class LottieRenderer extends Script {
 	}
 
 	private _buildLottieTree(comp, lastSession) {
-		const { layers, w, h, ip, op, st = 0, parent} = comp.data;
+		const { layers, w, h, ip, op, st = 0, parent } = comp.data;
 
 		// console.log('layers', layers)
 		const session = {
@@ -156,20 +156,9 @@ export class LottieRenderer extends Script {
 				if (layer.ind === undefined) layer.ind = i;
 				this.layersMap[layer.ind] = element;
 
-				// if (!Tools.isUndefined(layer.parent)) {
-				// 	const parent = this.layersMap[layer.parent];
-
-				// 	if (parent) {
-				// 		// 矩阵暂时不能混合使用，3D和2D的图层不能有父子节点关系
-				// 		if (element.is3D === parent.is3D) {
-				// 			element.setTransformHierarchy(parent);
-				// 		}
-				// 	}
-				// }
-
 				if (layer.parent) {
 					session.local.childCompsArray.push(element);
-				}else {
+				} else {
 					comp.addChild(element);
 				}
 
@@ -177,14 +166,6 @@ export class LottieRenderer extends Script {
 					local.currentCamera.hadShipped = true;
 				}
 			}
-		}
-
-		if (local.has3D && !global.globalCamera) {
-			if (!local.currentCamera && !session.global.globalCamera) {
-				local.currentCamera = new CameraNullLottieLayer(null, session);
-			}
-
-			global.globalCamera = local.currentCamera;
 		}
 
 		const childCompsArray = session.local.childCompsArray;
@@ -238,9 +219,6 @@ export class LottieRenderer extends Script {
 	}
 
 	private createLayer(layer, i, vertices, voffset, indices, ioffset) {
-		if (layer.fullname === '左耳朵.png' || layer.fullname === '狮子头.png') {
-			console.log(layer.fullname, layer.transform)
-		}
 
 		const width = this._texture.width;
 		const height = this._texture.height;
@@ -351,14 +329,19 @@ export class LottieRenderer extends Script {
 		vertexBuffer.setData(new Float32Array([lt.x, lt.y]), (i * 36 + 27) * 4);
 	}
 
-	matrix (out, transform) {
+	matrix(out, transform, parentPivot?) {
 		const p = transform.p.v;
 		const r = transform.r.v;
 		const s = transform.s.v;;
-		const a = transform.a.v;;
 
 		const translation = new Vector3();
-		translation.setValue(p[0], -p[1], p[2]);
+
+		if (parentPivot) {
+			translation.setValue(p[0] - parentPivot[0], -p[1] + parentPivot[1], p[2]);
+		}
+		else {
+			translation.setValue(p[0], -p[1], p[2]);
+		}
 
 		const rotation = new Quaternion();
 		Quaternion.rotationEuler(0, 0, -r, rotation);
@@ -376,10 +359,9 @@ export class LottieRenderer extends Script {
 			this.matrix(parentWorldMatrix, parent.transform);
 
 			const localMatrix = new Matrix();
-			this.matrix(localMatrix, transform);
+			this.matrix(localMatrix, transform, parent.transform.a.v);
 
 			Matrix.multiply(parentWorldMatrix, localMatrix, worldMatrix);
-			console.log('worldMatrix', worldMatrix)
 		}
 		else {
 			this.matrix(worldMatrix, transform);
@@ -414,8 +396,7 @@ export class LottieRenderer extends Script {
 		this.root.updateFrame(np);
 		this.hadEnded = isEnd;
 
-
-		// this.updateLayers(this.layers);
+		this.updateLayers(this.layers);
 	}
 
 	/**
