@@ -3,7 +3,8 @@
   "browser": "dist/browser.js",
   "module": "dist/module.js",
   "dependencies": {
-    "oasis-engine": "^0.2.1"
+    "@oasis-engine/controls": "^0.3.11",
+    "oasis-engine": "^0.3.11"
   },
   "devDependencies": {
     "@ali/ci": "latest",

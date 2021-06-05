@@ -28,7 +28,7 @@ export class LottieResource extends EngineObject {
 
   w: number;
   h: number;
-  textures: any = {};
+  texture: Texture2D;
   ip: number;
   op: number;
   st: number;

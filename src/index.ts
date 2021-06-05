@@ -1,4 +1,3 @@
-import * as o3 from "oasis-engine";
 import {
 	CameraLottieLayer,
 	CameraNullLottieLayer,
@@ -9,9 +8,13 @@ import {
 	SpriteLottieLayer,
 	Tools
 } from '@ali/lottie-core';
+import { MeshBatcher } from './MeshBatcher';
+import { Matrix, Quaternion, Texture2D, Vector3 } from "oasis-engine";
+import { Script } from "oasis-engine";
 
 export { LottieLoader } from './LottieLoader';
-export class LottieRenderer extends o3.Script {
+
+export class LottieRenderer extends Script {
 	private _lastFrame = -Infinity;
 	private _repeatsCut = 0;
 	private _delayCut = 0;
@@ -21,18 +24,41 @@ export class LottieRenderer extends o3.Script {
 	private _justDisplayOnImagesLoaded: boolean = true;
 	private _maskComp: boolean = false;
 	private _copyJSON: boolean = false;
+	private _texture: Texture2D;
+	private _assets;
+	private _atlas;
+
+	// ------
+	private beginFrame: number = 0;
+	private endFrame: number = 0;
+	private duration: number = 0;
+	private direction: number = 1;
+	private timeScale: number = 1;
+	private isPaused: boolean = false;
+	private frameNum: number = 0;
+	private _defaultSegment: number[];
+	private _timePerFrame: number;
+	private infinite: boolean = false;
+	private delay: number = 0;
+	private alternate: boolean = false;
+	private living: boolean = true;
+	private repeats: number = 0;
+	private wait: number = 0;
+	private overlapMode: boolean = true;
+	private hadEnded: boolean = false;
+	private layers;
 
 	root: any = null;
 	frameRate: number;
 	frameMult: number;
 
-	set res (value) {
-		const { w, h, frameRate, ip, op, st } = value;
+	set res(value) {
+		const { w, h, res, ip, op, st } = value;
 
 		const session: any = {
 			global: {
 				w, h,
-				frameRate,
+				frameRate: res.fr,
 				maskComp: this._maskComp,
 				overlapMode: value.overlapMode,
 				globalCamera: null,
@@ -42,19 +68,35 @@ export class LottieRenderer extends o3.Script {
 			},
 		};
 
+		this.overlapMode = value.overlapMode;
 		this.frameRate = value.res.fr;
 		this.frameMult = this.frameRate / 1000;
+		this._texture = value.texture;
+		this._assets = value.assets;
+		this._atlas = value.atlas;
+		this.beginFrame = value.beginFrame;
+		this.endFrame = value.endFrame;
+		this.duration = this.endFrame - this.beginFrame;
+		this.frameRate = this.frameRate;
+		this.frameMult = this.frameRate / 1000
+		this._defaultSegment = [ip, op];
+		this._timePerFrame = 1000 / this.frameRate;
 
 		this.root = new CompLottieLayer(value.res, session);
-		this._buildLottieTree(this.root, session);
+		const layers = this._buildLottieTree(this.root, session);
 
-		console.log('layers:', this.root)
-		console.log('textures:', value.textures)
+		this.layers = Object.values(layers);
+		this.layers.sort((a, b) => {
+			return b.data.ind - a.data.ind;
+		})
+
+		this.batch = this._createBatch(this.layers);
 	}
 
 	private _buildLottieTree(comp, lastSession) {
-		const { layers, w, h, ip, op, st = 0 } = comp.data;
+		const { layers, w, h, ip, op, st = 0, parent} = comp.data;
 
+		// console.log('layers', layers)
 		const session = {
 			global: lastSession.global,
 			local: {
@@ -64,7 +106,15 @@ export class LottieRenderer extends o3.Script {
 			},
 		};
 
-		const layersMap = {};
+		if (!layers && parent && this.layersMap[parent]) {
+			comp.parent = this.layersMap[parent];
+			return;
+		}
+
+		if (!this.layersMap) {
+			this.layersMap = {};
+		}
+
 		const { global, local } = session;
 
 		for (let i = layers.length - 1; i >= 0; i--) {
@@ -83,6 +133,7 @@ export class LottieRenderer extends o3.Script {
 					break;
 				case 2:
 					element = new SpriteLottieLayer(layer, session);
+					// console.log('element', element)
 					break;
 				case 3:
 					element = new NullLottieLayer(layer, session);
@@ -103,20 +154,24 @@ export class LottieRenderer extends o3.Script {
 			if (element) {
 				// 有些动画层没有ind，比如序列帧
 				if (layer.ind === undefined) layer.ind = i;
-				layersMap[layer.ind] = element;
+				this.layersMap[layer.ind] = element;
 
-				if (!Tools.isUndefined(layer.parent)) {
-					const parent = layersMap[layer.parent];
+				// if (!Tools.isUndefined(layer.parent)) {
+				// 	const parent = this.layersMap[layer.parent];
 
-					if (parent) {
-						// 矩阵暂时不能混合使用，3D和2D的图层不能有父子节点关系
-						if (element.is3D === parent.is3D) {
-							element.setTransformHierarchy(parent);
-						}
-					}
+				// 	if (parent) {
+				// 		// 矩阵暂时不能混合使用，3D和2D的图层不能有父子节点关系
+				// 		if (element.is3D === parent.is3D) {
+				// 			element.setTransformHierarchy(parent);
+				// 		}
+				// 	}
+				// }
+
+				if (layer.parent) {
+					session.local.childCompsArray.push(element);
+				}else {
+					comp.addChild(element);
 				}
-
-				comp.addChild(element);
 
 				if (local.currentCamera && element.is3D) {
 					local.currentCamera.hadShipped = true;
@@ -139,10 +194,277 @@ export class LottieRenderer extends o3.Script {
 			this._buildLottieTree(comp, session);
 		}
 
-		return layersMap;
+		return this.layersMap;
 	}
 
+	private updateLayers(layers) {
+		for (let i = 0; i < layers.length; i++) {
+			const layer = layers[i];
+
+			// console.log('layer', layer)
+			this.updateLayer(layer, i);
+		}
+	}
+
+	private _createBatch(layers) {
+
+		const batchEntity = this.entity.createChild('batch');
+		const batch = batchEntity.addComponent(MeshBatcher);
+		// const asset = Tools.getAssets(data.refId, this._assets);
+		// let {w, h} = asset;
+
+		const l = layers.length;
+
+		batch.initMesh(4 * l);
+		batch.initMaterial();
+
+		const vertices = new Float32Array(36 * l);
+		const indices = new Float32Array(6 * l);
+
+		for (let i = 0; i < l; i++) {
+			const layer = layers[i];
+
+			this.createLayer(layer, i, vertices, i * 36, indices, i * 6);
+		}
+
+		batch.begin();
+		batch.batch(vertices, 36 * l, indices, 6 * l);
+
+		const material = batch.getMaterial();
+		material.shaderData.setTexture('map', this._texture);
+		// console.log('vertexBuffer', batch.vertexBuffer)
+
+		return batch;
+	}
+
+	private createLayer(layer, i, vertices, voffset, indices, ioffset) {
+		if (layer.fullname === '左耳朵.png' || layer.fullname === '狮子头.png') {
+			console.log(layer.fullname, layer.transform)
+		}
+
+		const width = this._texture.width;
+		const height = this._texture.height;
+		const { data } = layer;
+		let { x, y, w, h } = this._atlas.frames[data.refId + '.png'].frame;
+		const u = x / width;
+		const v = y / height;
+		const p = u + w / width;
+		const q = v + h / height;
+
+		// layer.transform.p.v[0] += (i - 18) * 100;
+		// console.log('layer', layer)
+		const { transform } = layer;
+		const a = transform.a.v;
+		const pv = transform.p.v;
+
+		const worldMatrix = this.transform(layer.transform, layer.parent);
+
+		// left bottom
+		const lb = new Vector3(0 - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
+		// const lb = this.transform(new Vector3(-w/2, -h /2, 0), layer.transform);
+		vertices[voffset] = lb.x;
+		vertices[voffset + 1] = lb.y;
+		vertices[voffset + 2] = 0;
+
+		vertices[voffset + 3] = 1;
+		vertices[voffset + 4] = 1;
+		vertices[voffset + 5] = 1;
+		vertices[voffset + 6] = 1;
+
+		vertices[voffset + 7] = u;
+		vertices[voffset + 8] = q;
+
+
+		// right bottom
+		const rb = new Vector3(w - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
+		// const rb = this.transform(new Vector3(w/2, -h/2, 0), layer.transform);
+		vertices[voffset + 9] = rb.x;
+		vertices[voffset + 10] = rb.y;
+		vertices[voffset + 11] = 0;
+
+		vertices[voffset + 12] = 1;
+		vertices[voffset + 13] = 1;
+		vertices[voffset + 14] = 1;
+		vertices[voffset + 15] = 1;
+
+		vertices[voffset + 16] = p;
+		vertices[voffset + 17] = q;
+
+		// right top
+		const rt = new Vector3(w - a[0], 0 + a[1], 0).transformToVec3(worldMatrix);
+		// const rt = this.transform(new Vector3(w/2, h/2, 0), layer.transform);
+		vertices[voffset + 18] = rt.x;
+		vertices[voffset + 19] = rt.y;
+		vertices[voffset + 20] = 0;
+
+		vertices[voffset + 21] = 1;
+		vertices[voffset + 22] = 1;
+		vertices[voffset + 23] = 1;
+		vertices[voffset + 24] = 1;
+
+		vertices[voffset + 25] = p;
+		vertices[voffset + 26] = v;
+
+		// left top
+		const lt = new Vector3(0 - a[0], 0 + a[1], 0).transformToVec3(worldMatrix);
+		// const lt = this.transform(new Vector3(-w/2, h/2, 0), layer.transform);
+		vertices[voffset + 27] = lt.x;
+		vertices[voffset + 28] = lt.y;
+		vertices[voffset + 29] = 0;
+
+		vertices[voffset + 30] = 1;
+		vertices[voffset + 31] = 1;
+		vertices[voffset + 32] = 1;
+		vertices[voffset + 33] = 1;
+
+		vertices[voffset + 34] = u;
+		vertices[voffset + 35] = v;
+
+		indices[ioffset] = 4 * i;
+		indices[ioffset + 1] = 4 * i + 1;
+		indices[ioffset + 2] = 4 * i + 2;
+		indices[ioffset + 3] = 4 * i + 0;
+		indices[ioffset + 4] = 4 * i + 2;
+		indices[ioffset + 5] = 4 * i + 3;
+	}
+
+	private updateLayer(layer, i) {
+		const { data } = layer;
+		const { transform } = layer;
+		const a = transform.a.v;
+		let { x, y, w, h } = this._atlas.frames[data.refId + '.png'].frame;
+
+		const { vertexBuffer } = this.batch;
+
+		const worldMatrix = this.transform(layer.transform, layer.parent);
+
+		const lb = new Vector3(0 - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
+		vertexBuffer.setData(new Float32Array([lb.x, lb.y]), i * 36 * 4);
+
+		const rb = new Vector3(w - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
+		vertexBuffer.setData(new Float32Array([rb.x, rb.y]), (i * 36 + 9) * 4);
+
+		const rt = new Vector3(w - a[0], 0 + a[1], 0).transformToVec3(worldMatrix);
+		vertexBuffer.setData(new Float32Array([rt.x, rt.y]), (i * 36 + 18) * 4);
+
+		const lt = new Vector3(0 - a[0], 0 + a[1], 0).transformToVec3(worldMatrix);
+		vertexBuffer.setData(new Float32Array([lt.x, lt.y]), (i * 36 + 27) * 4);
+	}
+
+	matrix (out, transform) {
+		const p = transform.p.v;
+		const r = transform.r.v;
+		const s = transform.s.v;;
+		const a = transform.a.v;;
+
+		const translation = new Vector3();
+		translation.setValue(p[0], -p[1], p[2]);
+
+		const rotation = new Quaternion();
+		Quaternion.rotationEuler(0, 0, -r, rotation);
+
+		const scale = new Vector3(s[0], s[1], 1);
+
+		Matrix.affineTransformation(scale, rotation, translation, out);
+	}
+
+	transform(transform, parent?) {
+		const worldMatrix = new Matrix();
+
+		if (parent && parent.transform) {
+			const parentWorldMatrix = new Matrix();
+			this.matrix(parentWorldMatrix, parent.transform);
+
+			const localMatrix = new Matrix();
+			this.matrix(localMatrix, transform);
+
+			Matrix.multiply(parentWorldMatrix, localMatrix, worldMatrix);
+			console.log('worldMatrix', worldMatrix)
+		}
+		else {
+			this.matrix(worldMatrix, transform);
+		}
+
+		return worldMatrix;
+	}
 
 	onStart() {
+	}
+
+	onUpdate(snippetCache, firstFrame = false) {
+		// console.log('snippetCache', snippetCache)
+		const isEnd = this._updateTime(snippetCache);
+
+		const correctedFrameNum = this.beginFrame + this.frameNum;
+		// console.log('correctedFrameNum ', this.beginFrame, this.frameNum, correctedFrameNum )
+		this.root.updateFrame(correctedFrameNum);
+
+		const np = correctedFrameNum >> 0;
+		if (this._lastFrame !== np) {
+			// this._emitFrame(this.direction > 0 ? np : this._lastFrame);
+			this._lastFrame = np;
+		}
+		if (isEnd === false) {
+			// this.emit('enterFrame', correctedFrameNum);
+			// this.emit('update', this.frameNum / this.duration);
+		} else if (this.hadEnded !== isEnd && isEnd === true) {
+			// this.emit('complete');
+		}
+
+		this.root.updateFrame(np);
+		this.hadEnded = isEnd;
+
+
+		// this.updateLayers(this.layers);
+	}
+
+	/**
+	 * is this time frameNum spill the range
+	 * @private
+	 * @return {boolean}
+	 */
+	_spill() {
+		const bottomSpill = this.frameNum <= 0 && this.direction === -1;
+		const topSpill = this.frameNum >= this.duration && this.direction === 1;
+		return bottomSpill || topSpill;
+	}
+
+	_updateTime(snippet) {
+		const snippetCache = this.direction * this.timeScale * snippet;
+		if (this._waitCut > 0) {
+			this._waitCut -= Math.abs(snippetCache);
+			return null;
+		}
+		if (this.isPaused || this._delayCut > 0) {
+			if (this._delayCut > 0) this._delayCut -= Math.abs(snippetCache);
+			return null;
+		}
+
+		this.frameNum += snippetCache / this._timePerFrame;
+		// console.log('frameNum ', this.frameNum )
+		let isEnd = false;
+
+		if (this._spill()) {
+			if (this._repeatsCut > 0 || this.infinite) {
+				if (this._repeatsCut > 0) --this._repeatsCut;
+				this._delayCut = this.delay;
+				if (this.alternate) {
+					this.direction *= -1;
+					this.frameNum = Tools.codomainBounce(this.frameNum, 0, this.duration);
+				} else {
+					this.direction = 1;
+					this.frameNum = Tools.euclideanModulo(this.frameNum, this.duration);
+				}
+				// this.emit('loopComplete');
+			} else {
+				if (!this.overlapMode) {
+					this.frameNum = Tools.clamp(this.frameNum, 0, this.duration);
+					this.living = false;
+				}
+				isEnd = true;
+			}
+		}
+
+		return isEnd;
 	}
 }

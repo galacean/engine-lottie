@@ -14,9 +14,9 @@ import {
 
 import { LottieResource } from './LottieResource';
 
-@resourceLoader(100, ["json"])
+@resourceLoader('lottie', ["json"])
 export class LottieLoader extends Loader<LottieResource> {
-  load(item: LoadItem, resourceManager: ResourceManager): AssetPromise<LottieResource> {
+  load(item: LoadItem, resourceManager: ResourceManager): P{
     return new AssetPromise((resolve, reject) => {
       this.request(item.url, resourceManager).then(async (res) => {
         DataManager.completeData(res);
@@ -42,13 +42,24 @@ export class LottieLoader extends Loader<LottieResource> {
         lottieResource.op = op;
         lottieResource.st = st;
         lottieResource.res = res;
+        lottieResource.assets = assets;
 
-        this._loadTextures(assets, resourceManager, lottieResource).then(() => {
+        this.request(item.atlas, resourceManager).then(async (atlas) => {
+          console.log('atlas', atlas)
+          lottieResource.atlas = atlas;
+
+          lottieResource.texture = await resourceManager.load({
+            url: atlas.meta.image,
+            type: AssetType.Texture2D,
+          });
           resolve(lottieResource);
+          // this._loadTextures(atlas.meta.image, resourceManager, lottieResource).then(() => {
+          //   resolve(lottieResource);
+          // });
         });
-
       })
-    });
+    })
+
   }
 
 	private async _loadTextures(assets, resourceManager: ResourceManager, lottieResource: LottieResource){
