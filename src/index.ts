@@ -1,6 +1,6 @@
 import {
-	CameraLottieLayer,
-	CameraNullLottieLayer,
+	// CameraLottieLayer,
+	// CameraNullLottieLayer,
 	CompLottieLayer,
 	NullLottieLayer,
 	ShapeLottieLayer,
@@ -23,7 +23,6 @@ export class LottieRenderer extends Script {
 	private _autoStart: boolean = true;
 	private _justDisplayOnImagesLoaded: boolean = true;
 	private _maskComp: boolean = false;
-	private _copyJSON: boolean = false;
 	private _texture: Texture2D;
 	private _assets;
 	private _atlas;
@@ -99,28 +98,15 @@ export class LottieRenderer extends Script {
 	}
 
 	private _buildLottieTree(comp, lastSession) {
-		const { layers, w, h, ip, op, st = 0, parent } = comp.data;
+		const { layers, w, h, ip, op, st = 0 } = comp.data;
+		const layersMap = {}
 
-		// console.log('layers', layers)
 		const session = {
 			global: lastSession.global,
-			local: {
-				w, h, ip, op, st,
-				childCompsArray: [],
-				currentCamera: null,
-			},
+			local: { w, h, ip, op, st },
 		};
 
-		if (!layers && parent && this.layersMap[parent]) {
-			comp.parent = this.layersMap[parent];
-			return;
-		}
-
-		if (!this.layersMap) {
-			this.layersMap = {};
-		}
-
-		const { global, local } = session;
+		let children = [];
 
 		for (let i = layers.length - 1; i >= 0; i--) {
 			const layer = layers[i];
@@ -131,14 +117,13 @@ export class LottieRenderer extends Script {
 			switch (layer.ty) {
 				case 0:
 					element = new CompLottieLayer(layer, session);
-					local.childCompsArray.push(element);
+					children.push(element);
 					break;
 				case 1:
 					element = new SolidLottieLayer(layer, session);
 					break;
 				case 2:
 					element = new SpriteLottieLayer(layer, session);
-					// console.log('element', element)
 					break;
 				case 3:
 					element = new NullLottieLayer(layer, session);
@@ -147,10 +132,10 @@ export class LottieRenderer extends Script {
 					element = new ShapeLottieLayer(layer, session);
 					break;
 				case 13:
-					if (!session.global.globalCamera) {
-						element = new CameraLottieLayer(layer, session);
-						local.currentCamera = element;
-					}
+					// if (!session.global.globalCamera) {
+					// 	element = new CameraLottieLayer(layer, session);
+					// 	local.currentCamera = element;
+					// }
 					break;
 				default:
 					continue;
@@ -159,35 +144,32 @@ export class LottieRenderer extends Script {
 			if (element) {
 				// 有些动画层没有ind，比如序列帧
 				if (layer.ind === undefined) layer.ind = i;
-				this.layersMap[layer.ind] = element;
+				layersMap[layer.ind] = element;
 
 				if (layer.parent) {
-					session.local.childCompsArray.push(element);
+					children.push(layer);
 				} else {
 					comp.addChild(element);
-				}
-
-				if (local.currentCamera && element.is3D) {
-					local.currentCamera.hadShipped = true;
 				}
 			}
 		}
 
-		const childCompsArray = session.local.childCompsArray;
+		for (let i = 0; i < children.length; i++) {
+			const layer = children[i];
+			const { parent } = layer;
 
-		for (let i = 0; i < childCompsArray.length; i++) {
-			const comp = childCompsArray[i];
-			this._buildLottieTree(comp, session);
+			if (layersMap[parent]) {
+				layersMap[layer.ind].parent = layersMap[parent];
+			}
 		}
 
-		return this.layersMap;
+		return layersMap;
 	}
 
 	private updateLayers(layers) {
 		for (let i = 0; i < layers.length; i++) {
 			const layer = layers[i];
 
-			// console.log('layer', layer)
 			this.updateLayer(layer, i);
 		}
 	}

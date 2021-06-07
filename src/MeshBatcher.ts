@@ -18,7 +18,7 @@ export class MeshBatcher extends MeshRenderer {
   private indices: Uint16Array;
 
   private indexBuffer: Buffer;
-  private vertexBuffer: Buffer;
+  vertexBuffer: Buffer;
 
   private verticesLength = 0;
   private indicesLength = 0;
