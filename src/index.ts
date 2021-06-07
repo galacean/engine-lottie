@@ -47,6 +47,9 @@ export class LottieRenderer extends Script {
 	private overlapMode: boolean = true;
 	private hadEnded: boolean = false;
 	private layers;
+	private width: number;
+	private height: number;
+	private batch: MeshBatcher;
 
 	root: any = null;
 	frameRate: number;
@@ -83,6 +86,8 @@ export class LottieRenderer extends Script {
 		this._timePerFrame = 1000 / this.frameRate;
 
 		this.root = new CompLottieLayer(value.res, session);
+		this.width = w;
+		this.height = h;
 		const layers = this._buildLottieTree(this.root, session);
 
 		this.layers = Object.values(layers);
@@ -229,7 +234,6 @@ export class LottieRenderer extends Script {
 		const p = u + w / width;
 		const q = v + h / height;
 
-		// layer.transform.p.v[0] += (i - 18) * 100;
 		// console.log('layer', layer)
 		const { transform } = layer;
 		const a = transform.a.v;
@@ -239,7 +243,6 @@ export class LottieRenderer extends Script {
 
 		// left bottom
 		const lb = new Vector3(0 - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
-		// const lb = this.transform(new Vector3(-w/2, -h /2, 0), layer.transform);
 		vertices[voffset] = lb.x;
 		vertices[voffset + 1] = lb.y;
 		vertices[voffset + 2] = 0;
@@ -255,7 +258,6 @@ export class LottieRenderer extends Script {
 
 		// right bottom
 		const rb = new Vector3(w - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
-		// const rb = this.transform(new Vector3(w/2, -h/2, 0), layer.transform);
 		vertices[voffset + 9] = rb.x;
 		vertices[voffset + 10] = rb.y;
 		vertices[voffset + 11] = 0;
@@ -270,7 +272,6 @@ export class LottieRenderer extends Script {
 
 		// right top
 		const rt = new Vector3(w - a[0], 0 + a[1], 0).transformToVec3(worldMatrix);
-		// const rt = this.transform(new Vector3(w/2, h/2, 0), layer.transform);
 		vertices[voffset + 18] = rt.x;
 		vertices[voffset + 19] = rt.y;
 		vertices[voffset + 20] = 0;
@@ -285,7 +286,6 @@ export class LottieRenderer extends Script {
 
 		// left top
 		const lt = new Vector3(0 - a[0], 0 + a[1], 0).transformToVec3(worldMatrix);
-		// const lt = this.transform(new Vector3(-w/2, h/2, 0), layer.transform);
 		vertices[voffset + 27] = lt.x;
 		vertices[voffset + 28] = lt.y;
 		vertices[voffset + 29] = 0;
@@ -340,7 +340,7 @@ export class LottieRenderer extends Script {
 			translation.setValue(p[0] - parentPivot[0], -p[1] + parentPivot[1], p[2]);
 		}
 		else {
-			translation.setValue(p[0], -p[1], p[2]);
+			translation.setValue(p[0] - this.width / 2, -p[1] + this.height / 2, p[2]);
 		}
 
 		const rotation = new Quaternion();

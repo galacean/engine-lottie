@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { LottieLoader, LottieRenderer } from "../src";
-import { Camera, Vector3, Vector4, WebGLEngine } from "oasis-engine";
+import { BlinnPhongMaterial, Camera, MeshRenderer, PrimitiveMesh, Vector3, Vector4, WebGLEngine } from "oasis-engine";
 import { OrbitControl } from "@oasis-engine/controls";
 import "./App.css";
 
@@ -11,10 +11,6 @@ function App() {
 		engine.canvas.resizeByClientSize();
 
 		const root = engine.sceneManager.activeScene.createRootEntity();
-		const box = root.createChild("box");
-		// st renderer = box.addComponent(o3.GeometryRenderer);
-		// derer.geometry = new o3.CuboidGeometry(engine);
-		// derer.material = new o3.PBRMaterial(engine);
 
 		const cameraEntity = root.createChild("camera");
 		const camera = cameraEntity.addComponent(Camera);
@@ -30,6 +26,12 @@ function App() {
 			type: 'lottie'
 		}).then((res) => {
 			const lottie = root.createChild("lottie");
+
+			// let cube = lottie.addComponent(MeshRenderer);
+			// cube.mesh = PrimitiveMesh.createCuboid(engine, 20, 20, 20);
+			// cube.setMaterial(new BlinnPhongMaterial(engine));
+			// lottie.transform.setPosition(0, 100, 0);
+
 			const lottieRenderer = lottie.addComponent(LottieRenderer);
 			lottieRenderer.res = res;
 		});
