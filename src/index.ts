@@ -1,6 +1,4 @@
 import {
-	// CameraLottieLayer,
-	// CameraNullLottieLayer,
 	CompLottieLayer,
 	NullLottieLayer,
 	ShapeLottieLayer,
@@ -26,7 +24,7 @@ export class LottieRenderer extends Script {
 	private _texture: Texture2D;
 	private _assets;
 	private _atlas;
-	static unitsPerPixel: number = 1/128;
+	static unitsPerPixel: number = 1 / 128;
 
 	// ------
 	private beginFrame: number = 0;
@@ -50,6 +48,14 @@ export class LottieRenderer extends Script {
 	private width: number;
 	private height: number;
 	private batch: MeshBatcher;
+
+	private tempPosition: Vector3 = new Vector3();
+	private tempTranslation: Vector3 = new Vector3();
+	private tempRotation: Quaternion = new Quaternion();
+	private tempScale: Vector3 = new Vector3();
+	private tempWorldMatrix: Matrix = new Matrix();
+	private tempLocalMatrix: Matrix = new Matrix();
+	private tempParentWorldMatrix: Matrix = new Matrix();
 
 	root: any = null;
 	frameRate: number;
@@ -132,12 +138,6 @@ export class LottieRenderer extends Script {
 				case 4:
 					element = new ShapeLottieLayer(layer, session);
 					break;
-				case 13:
-					// if (!session.global.globalCamera) {
-					// 	element = new CameraLottieLayer(layer, session);
-					// 	local.currentCamera = element;
-					// }
-					break;
 				default:
 					continue;
 			}
@@ -181,16 +181,10 @@ export class LottieRenderer extends Script {
 
 		const batchEntity = this.entity.createChild('batch');
 		const batch = batchEntity.addComponent(MeshBatcher);
-		// const asset = Tools.getAssets(data.refId, this._assets);
-		// let {w, h} = asset;
-
 		const l = layers.length;
 
-		batch.initMesh(4 * l);
-		batch.initMaterial();
-
-		const vertices = new Float32Array(36 * l);
-		const indices = new Float32Array(6 * l);
+		batch.init(l);
+		const { vertices, indices } = batch;
 
 		for (let i = 0; i < l; i++) {
 			const layer = layers[i];
@@ -198,12 +192,9 @@ export class LottieRenderer extends Script {
 			this.createLayer(layer, i, vertices, i * 36, indices, i * 6);
 		}
 
-		batch.begin();
-		batch.batch(vertices, 36 * l, indices, 6 * l);
+		batch.setBufferData();
 
-		const material = batch.getMaterial();
-		material.shaderData.setTexture('map', this._texture);
-		// console.log('vertexBuffer', batch.vertexBuffer)
+		batch.getMaterial().shaderData.setTexture('map', this._texture);
 
 		return batch;
 	}
@@ -244,7 +235,6 @@ export class LottieRenderer extends Script {
 
 		vertices[voffset + 7] = u;
 		vertices[voffset + 8] = q;
-
 
 		// right bottom
 		const rb = new Vector3(w - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
@@ -301,6 +291,9 @@ export class LottieRenderer extends Script {
 		const { data } = layer;
 		const { transform } = layer;
 		const a = transform.a.v;
+		const { vertices } = this.batch;
+		const { tempPosition } = this;
+		let { w, h } = this._atlas.frames[data.refId + '.png'].frame;
 
 		// TODO: if parent show
 		if (layer.parent && layer.parent.transform) {
@@ -308,30 +301,37 @@ export class LottieRenderer extends Script {
 		}
 
 		const o = layer.isInRange ? transform.o.v : 0;
-		let { w, h } = this._atlas.frames[data.refId + '.png'].frame;
 		const offset = i * 36;
 
 		const worldMatrix = this.transform(layer.transform, layer.parent);
 
-		const lb = new Vector3(0 - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
-		this.batch.vertices[offset] = lb.x * unitsPerPixel;
-		this.batch.vertices[offset + 1] = lb.y * unitsPerPixel;
-		this.batch.vertices[offset + 6] = o;
+		tempPosition.x = -a[0];
+		tempPosition.y = -h + a[1];
+		const lb = tempPosition.transformToVec3(worldMatrix);
+		vertices[offset] = lb.x * unitsPerPixel;
+		vertices[offset + 1] = lb.y * unitsPerPixel;
+		vertices[offset + 6] = o;
 
-		const rb = new Vector3(w - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
-		this.batch.vertices[offset + 9] = rb.x * unitsPerPixel;
-		this.batch.vertices[offset + 10] = rb.y * unitsPerPixel;
-		this.batch.vertices[offset + 15] = o;
+		tempPosition.x = w - a[0];
+		tempPosition.y = -h + a[1];
+		const rb = tempPosition.transformToVec3(worldMatrix);
+		vertices[offset + 9] = rb.x * unitsPerPixel;
+		vertices[offset + 10] = rb.y * unitsPerPixel;
+		vertices[offset + 15] = o;
 
-		const rt = new Vector3(w - a[0], 0 + a[1], 0).transformToVec3(worldMatrix);
-		this.batch.vertices[offset + 18] = rt.x * unitsPerPixel;
-		this.batch.vertices[offset + 19] = rt.y * unitsPerPixel;
-		this.batch.vertices[offset + 24] = o;
+		tempPosition.x = w - a[0];
+		tempPosition.y = a[1];
+		const rt = tempPosition.transformToVec3(worldMatrix);
+		vertices[offset + 18] = rt.x * unitsPerPixel;
+		vertices[offset + 19] = rt.y * unitsPerPixel;
+		vertices[offset + 24] = o;
 
-		const lt = new Vector3(0 - a[0], 0 + a[1], 0).transformToVec3(worldMatrix);
-		this.batch.vertices[offset + 27] = lt.x * unitsPerPixel;
-		this.batch.vertices[offset + 28] = lt.y * unitsPerPixel;
-		this.batch.vertices[offset + 33] = o;
+		tempPosition.x = -a[0];
+		tempPosition.y = a[1];
+		const lt = tempPosition.transformToVec3(worldMatrix);
+		vertices[offset + 27] = lt.x * unitsPerPixel;
+		vertices[offset + 28] = lt.y * unitsPerPixel;
+		vertices[offset + 33] = o;
 	}
 
 	matrix(out, transform, parentPivot?) {
@@ -339,40 +339,36 @@ export class LottieRenderer extends Script {
 		const r = transform.r.v;
 		const s = transform.s.v;;
 
-		const translation = new Vector3();
+		const translation = this.tempTranslation;
 
 		if (parentPivot) {
 			translation.setValue(p[0] - parentPivot[0], -p[1] + parentPivot[1], p[2]);
 		}
 		else {
+			// root layer
 			translation.setValue(p[0] - this.width / 2, -p[1] + this.height / 2, p[2]);
 		}
 
-		const rotation = new Quaternion();
+		const rotation = this.tempRotation;
 		Quaternion.rotationEuler(0, 0, -r, rotation);
 
-		const scale = new Vector3(s[0], s[1], 1);
+		const scale = this.tempScale;
+		scale.setValue(s[0], s[1], 1);
 
 		Matrix.affineTransformation(scale, rotation, translation, out);
 	}
 
 	transform(transform, parent?) {
-		const worldMatrix = new Matrix();
-
 		if (parent && parent.transform) {
-			const parentWorldMatrix = new Matrix();
-			this.matrix(parentWorldMatrix, parent.transform);
-
-			const localMatrix = new Matrix();
-			this.matrix(localMatrix, transform, parent.transform.a.v);
-
-			Matrix.multiply(parentWorldMatrix, localMatrix, worldMatrix);
+			this.matrix(this.tempParentWorldMatrix, parent.transform);
+			this.matrix(this.tempLocalMatrix, transform, parent.transform.a.v);
+			Matrix.multiply(this.tempParentWorldMatrix, this.tempLocalMatrix, this.tempWorldMatrix);
 		}
 		else {
-			this.matrix(worldMatrix, transform);
+			this.matrix(this.tempWorldMatrix, transform);
 		}
 
-		return worldMatrix;
+		return this.tempWorldMatrix;
 	}
 
 	onStart() {

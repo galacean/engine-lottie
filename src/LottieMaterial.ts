@@ -1,4 +1,4 @@
-import { Material, Shader, Engine, CullMode, BlendFactor, RenderQueueType, BlendOperation } from 'oasis-engine';
+import { Material, Shader, Engine, CullMode, BlendFactor, RenderQueueType } from 'oasis-engine';
 
 const vertexSource = `
   uniform mat4 u_MVPMat;
@@ -26,15 +26,6 @@ const fragmentSource = `
 Shader.create('lottie',vertexSource,fragmentSource)
 
 export class SkeletonMaterial extends Material {
-
-  get map() {
-    return this.shaderData.getTexture('map');
-  }
-
-  set map(value) {
-    this.shaderData.setTexture('map', value);
-  }
-
   constructor(engine: Engine) {
     super(engine, Shader.find('lottie'));
     const rasterState = this.renderState.rasterState;
