@@ -206,7 +206,6 @@ export class LottieRenderer extends Script {
 	}
 
 	private createLayer(layer, i, vertices, voffset, indices, ioffset) {
-
 		const width = this._texture.width;
 		const height = this._texture.height;
 		const { data } = layer;
@@ -219,8 +218,13 @@ export class LottieRenderer extends Script {
 		// console.log('layer', layer)
 		const { transform } = layer;
 		const a = transform.a.v;
-		const o = transform.o.v;
 
+		// TODO: if parent show
+		if (layer.parent && layer.parent.transform) {
+			layer.isInRange = layer.parent.isInRange;
+		}
+
+		const o = layer.isInRange ? transform.o.v : 0;
 		const worldMatrix = this.transform(layer.transform, layer.parent);
 
 		// left bottom
@@ -292,7 +296,13 @@ export class LottieRenderer extends Script {
 		const { data } = layer;
 		const { transform } = layer;
 		const a = transform.a.v;
-		const o = transform.o.v;
+
+		// TODO: if parent show
+		if (layer.parent && layer.parent.transform) {
+			layer.isInRange = layer.parent.isInRange;
+		}
+
+		const o = layer.isInRange ? transform.o.v : 0;
 		let { x, y, w, h } = this._atlas.frames[data.refId + '.png'].frame;
 
 		const { vertexBuffer } = this.batch;
