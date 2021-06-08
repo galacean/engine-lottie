@@ -219,7 +219,7 @@ export class LottieRenderer extends Script {
 		// console.log('layer', layer)
 		const { transform } = layer;
 		const a = transform.a.v;
-		const pv = transform.p.v;
+		const o = transform.o.v;
 
 		const worldMatrix = this.transform(layer.transform, layer.parent);
 
@@ -232,7 +232,7 @@ export class LottieRenderer extends Script {
 		vertices[voffset + 3] = 1;
 		vertices[voffset + 4] = 1;
 		vertices[voffset + 5] = 1;
-		vertices[voffset + 6] = 1;
+		vertices[voffset + 6] = o;
 
 		vertices[voffset + 7] = u;
 		vertices[voffset + 8] = q;
@@ -247,7 +247,7 @@ export class LottieRenderer extends Script {
 		vertices[voffset + 12] = 1;
 		vertices[voffset + 13] = 1;
 		vertices[voffset + 14] = 1;
-		vertices[voffset + 15] = 1;
+		vertices[voffset + 15] = o;
 
 		vertices[voffset + 16] = p;
 		vertices[voffset + 17] = q;
@@ -261,7 +261,7 @@ export class LottieRenderer extends Script {
 		vertices[voffset + 21] = 1;
 		vertices[voffset + 22] = 1;
 		vertices[voffset + 23] = 1;
-		vertices[voffset + 24] = 1;
+		vertices[voffset + 24] = o;
 
 		vertices[voffset + 25] = p;
 		vertices[voffset + 26] = v;
@@ -275,7 +275,7 @@ export class LottieRenderer extends Script {
 		vertices[voffset + 30] = 1;
 		vertices[voffset + 31] = 1;
 		vertices[voffset + 32] = 1;
-		vertices[voffset + 33] = 1;
+		vertices[voffset + 33] = o;
 
 		vertices[voffset + 34] = u;
 		vertices[voffset + 35] = v;
@@ -292,6 +292,7 @@ export class LottieRenderer extends Script {
 		const { data } = layer;
 		const { transform } = layer;
 		const a = transform.a.v;
+		const o = transform.o.v;
 		let { x, y, w, h } = this._atlas.frames[data.refId + '.png'].frame;
 
 		const { vertexBuffer } = this.batch;
@@ -300,15 +301,19 @@ export class LottieRenderer extends Script {
 
 		const lb = new Vector3(0 - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
 		vertexBuffer.setData(new Float32Array([lb.x, lb.y]), i * 36 * 4);
+		vertexBuffer.setData(new Float32Array([o]), (i * 36 + 6) * 4);
 
 		const rb = new Vector3(w - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
 		vertexBuffer.setData(new Float32Array([rb.x, rb.y]), (i * 36 + 9) * 4);
+		vertexBuffer.setData(new Float32Array([o]), (i * 36 + 9 + 6) * 4);
 
 		const rt = new Vector3(w - a[0], 0 + a[1], 0).transformToVec3(worldMatrix);
 		vertexBuffer.setData(new Float32Array([rt.x, rt.y]), (i * 36 + 18) * 4);
+		vertexBuffer.setData(new Float32Array([o]), (i * 36 + 18 + 6) * 4);
 
 		const lt = new Vector3(0 - a[0], 0 + a[1], 0).transformToVec3(worldMatrix);
 		vertexBuffer.setData(new Float32Array([lt.x, lt.y]), (i * 36 + 27) * 4);
+		vertexBuffer.setData(new Float32Array([o]), (i * 36 + 27 + 6) * 4);
 	}
 
 	matrix(out, transform, parentPivot?) {
