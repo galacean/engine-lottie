@@ -308,39 +308,30 @@ export class LottieRenderer extends Script {
 		}
 
 		const o = layer.isInRange ? transform.o.v : 0;
-		let { x, y, w, h } = this._atlas.frames[data.refId + '.png'].frame;
-
-		const { vertexBuffer } = this.batch;
+		let { w, h } = this._atlas.frames[data.refId + '.png'].frame;
+		const offset = i * 36;
 
 		const worldMatrix = this.transform(layer.transform, layer.parent);
 
 		const lb = new Vector3(0 - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
-		this.batch.vertices[i * 36] = lb.x * unitsPerPixel;
-		this.batch.vertices[i * 36 + 1] = lb.y * unitsPerPixel;
-		this.batch.vertices[i * 36 + 6] = o;
-		// vertexBuffer.setData(new Float32Array([lb.x * unitsPerPixel, lb.y * unitsPerPixel]), i * 36 * 4);
-		// vertexBuffer.setData(new Float32Array([o]), (i * 36 + 6) * 4);
+		this.batch.vertices[offset] = lb.x * unitsPerPixel;
+		this.batch.vertices[offset + 1] = lb.y * unitsPerPixel;
+		this.batch.vertices[offset + 6] = o;
 
 		const rb = new Vector3(w - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
-		this.batch.vertices[i * 36 + 9] = rb.x * unitsPerPixel;
-		this.batch.vertices[i * 36 + 10] = rb.y * unitsPerPixel;
-		this.batch.vertices[i * 36 + 15] = o;
-		// vertexBuffer.setData(new Float32Array([rb.x * unitsPerPixel, rb.y * unitsPerPixel]), (i * 36 + 9) * 4);
-		// vertexBuffer.setData(new Float32Array([o]), (i * 36 + 9 + 6) * 4);
+		this.batch.vertices[offset + 9] = rb.x * unitsPerPixel;
+		this.batch.vertices[offset + 10] = rb.y * unitsPerPixel;
+		this.batch.vertices[offset + 15] = o;
 
 		const rt = new Vector3(w - a[0], 0 + a[1], 0).transformToVec3(worldMatrix);
-		this.batch.vertices[i * 36 + 18] = rt.x * unitsPerPixel;
-		this.batch.vertices[i * 36 + 19] = rt.y * unitsPerPixel;
-		this.batch.vertices[i * 36 + 24] = o;
-		// vertexBuffer.setData(new Float32Array([rt.x * unitsPerPixel, rt.y * unitsPerPixel]), (i * 36 + 18) * 4);
-		// vertexBuffer.setData(new Float32Array([o]), (i * 36 + 18 + 6) * 4);
+		this.batch.vertices[offset + 18] = rt.x * unitsPerPixel;
+		this.batch.vertices[offset + 19] = rt.y * unitsPerPixel;
+		this.batch.vertices[offset + 24] = o;
 
 		const lt = new Vector3(0 - a[0], 0 + a[1], 0).transformToVec3(worldMatrix);
-		this.batch.vertices[i * 36 + 27] = lt.x * unitsPerPixel;
-		this.batch.vertices[i * 36 + 28] = lt.y * unitsPerPixel;
-		this.batch.vertices[i * 36 + 33] = o;
-		// vertexBuffer.setData(new Float32Array([lt.x * unitsPerPixel, lt.y * unitsPerPixel]), (i * 36 + 27) * 4);
-		// vertexBuffer.setData(new Float32Array([o]), (i * 36 + 27 + 6) * 4);
+		this.batch.vertices[offset + 27] = lt.x * unitsPerPixel;
+		this.batch.vertices[offset + 28] = lt.y * unitsPerPixel;
+		this.batch.vertices[offset + 33] = o;
 	}
 
 	matrix(out, transform, parentPivot?) {
