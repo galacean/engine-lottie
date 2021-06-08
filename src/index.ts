@@ -26,6 +26,7 @@ export class LottieRenderer extends Script {
 	private _texture: Texture2D;
 	private _assets;
 	private _atlas;
+	static unitsPerPixel: number = 1/128;
 
 	// ------
 	private beginFrame: number = 0;
@@ -214,6 +215,7 @@ export class LottieRenderer extends Script {
 		const v = y / height;
 		const p = u + w / width;
 		const q = v + h / height;
+		const { unitsPerPixel } = LottieRenderer;
 
 		// console.log('layer', layer)
 		const { transform } = layer;
@@ -229,8 +231,8 @@ export class LottieRenderer extends Script {
 
 		// left bottom
 		const lb = new Vector3(0 - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
-		vertices[voffset] = lb.x;
-		vertices[voffset + 1] = lb.y;
+		vertices[voffset] = lb.x * unitsPerPixel;
+		vertices[voffset + 1] = lb.y * unitsPerPixel;
 		vertices[voffset + 2] = 0;
 
 		vertices[voffset + 3] = 1;
@@ -244,8 +246,8 @@ export class LottieRenderer extends Script {
 
 		// right bottom
 		const rb = new Vector3(w - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
-		vertices[voffset + 9] = rb.x;
-		vertices[voffset + 10] = rb.y;
+		vertices[voffset + 9] = rb.x * unitsPerPixel;
+		vertices[voffset + 10] = rb.y * unitsPerPixel;
 		vertices[voffset + 11] = 0;
 
 		vertices[voffset + 12] = 1;
@@ -258,8 +260,8 @@ export class LottieRenderer extends Script {
 
 		// right top
 		const rt = new Vector3(w - a[0], 0 + a[1], 0).transformToVec3(worldMatrix);
-		vertices[voffset + 18] = rt.x;
-		vertices[voffset + 19] = rt.y;
+		vertices[voffset + 18] = rt.x * unitsPerPixel;
+		vertices[voffset + 19] = rt.y * unitsPerPixel;
 		vertices[voffset + 20] = 0;
 
 		vertices[voffset + 21] = 1;
@@ -272,8 +274,8 @@ export class LottieRenderer extends Script {
 
 		// left top
 		const lt = new Vector3(0 - a[0], 0 + a[1], 0).transformToVec3(worldMatrix);
-		vertices[voffset + 27] = lt.x;
-		vertices[voffset + 28] = lt.y;
+		vertices[voffset + 27] = lt.x * unitsPerPixel;
+		vertices[voffset + 28] = lt.y * unitsPerPixel;
 		vertices[voffset + 29] = 0;
 
 		vertices[voffset + 30] = 1;
@@ -293,6 +295,7 @@ export class LottieRenderer extends Script {
 	}
 
 	private updateLayer(layer, i) {
+		const { unitsPerPixel } = LottieRenderer;
 		const { data } = layer;
 		const { transform } = layer;
 		const a = transform.a.v;
@@ -310,19 +313,19 @@ export class LottieRenderer extends Script {
 		const worldMatrix = this.transform(layer.transform, layer.parent);
 
 		const lb = new Vector3(0 - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
-		vertexBuffer.setData(new Float32Array([lb.x, lb.y]), i * 36 * 4);
+		vertexBuffer.setData(new Float32Array([lb.x * unitsPerPixel, lb.y * unitsPerPixel]), i * 36 * 4);
 		vertexBuffer.setData(new Float32Array([o]), (i * 36 + 6) * 4);
 
 		const rb = new Vector3(w - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
-		vertexBuffer.setData(new Float32Array([rb.x, rb.y]), (i * 36 + 9) * 4);
+		vertexBuffer.setData(new Float32Array([rb.x * unitsPerPixel, rb.y * unitsPerPixel]), (i * 36 + 9) * 4);
 		vertexBuffer.setData(new Float32Array([o]), (i * 36 + 9 + 6) * 4);
 
 		const rt = new Vector3(w - a[0], 0 + a[1], 0).transformToVec3(worldMatrix);
-		vertexBuffer.setData(new Float32Array([rt.x, rt.y]), (i * 36 + 18) * 4);
+		vertexBuffer.setData(new Float32Array([rt.x * unitsPerPixel, rt.y * unitsPerPixel]), (i * 36 + 18) * 4);
 		vertexBuffer.setData(new Float32Array([o]), (i * 36 + 18 + 6) * 4);
 
 		const lt = new Vector3(0 - a[0], 0 + a[1], 0).transformToVec3(worldMatrix);
-		vertexBuffer.setData(new Float32Array([lt.x, lt.y]), (i * 36 + 27) * 4);
+		vertexBuffer.setData(new Float32Array([lt.x * unitsPerPixel, lt.y * unitsPerPixel]), (i * 36 + 27) * 4);
 		vertexBuffer.setData(new Float32Array([o]), (i * 36 + 27 + 6) * 4);
 	}
 

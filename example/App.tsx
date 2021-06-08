@@ -15,8 +15,7 @@ function App() {
 		const cameraEntity = root.createChild("camera");
 		const camera = cameraEntity.addComponent(Camera);
 		camera.backgroundColor = new Vector4(0.3, 0.3, 0.3, 1);
-		cameraEntity.transform.setPosition(0, 0, 1000);
-		camera.farClipPlane = 10000;
+		cameraEntity.transform.setPosition(0, 0, 10);
 		cameraEntity.transform.lookAt(new Vector3(0, 0, 0));
 		cameraEntity.addComponent(OrbitControl);
 
