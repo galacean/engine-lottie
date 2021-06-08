@@ -14,7 +14,7 @@ import { SkeletonMaterial } from './LottieMaterial';
 export class MeshBatcher extends MeshRenderer {
   private static VERTEX_SIZE = 9;
 
-  private vertices: Float32Array;
+  vertices: Float32Array;
   private indices: Uint16Array;
 
   private indexBuffer: Buffer;
