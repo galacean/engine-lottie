@@ -1,8 +1,8 @@
-import { createTypedArray } from './helpers/arrays';
-import BezierFactory from './lib/BezierEaser';
-import bez from './bez';
-import { initialDefaultFrame as initFrame } from '../constant/index';
-import Expression from './expression/Expression';
+import { createTypedArray } from './utils/helpers/arrays';
+import BezierFactory from './utils/lib/BezierEaser';
+import bez from './utils/bez';
+import { initialDefaultFrame as initFrame } from './constant/index';
+import Expression from './utils/expression/Expression';
 import { Quaternion, Vector3 } from 'oasis-engine';
 
 /**
@@ -16,7 +16,7 @@ class BaseProperty {
    * @param {Object} caching caching object
    * @return {Array} newValue
    */
-  interpolateValue(frameNum, caching) {
+  interpolateValue(frameNum: number, caching) {
     // const offsetTime = this.offsetTime;
     let newValue;
     if (this.propType === 'multidimensional') {
@@ -263,7 +263,7 @@ class BaseProperty {
    */
   addEffect(effectFunction) {
     this.effectsSequence.push(effectFunction);
-    this.container.addDynamicProperty(this);
+    this.container.addProperty(this);
   }
 }
 
@@ -274,12 +274,11 @@ class BaseProperty {
 class ValueProperty extends BaseProperty {
   /**
    * constructor unidimensional value property
-   * @param {*} elem element node
    * @param {*} data unidimensional value property data
    * @param {*} mult data mult scale
    * @param {*} container value property container
    */
-  constructor(elem, data, mult, container) {
+  constructor(data, mult, container) {
     super();
     this.propType = 'unidimensional';
     this.mult = mult || 1;
@@ -287,7 +286,6 @@ class ValueProperty extends BaseProperty {
     this.v = mult ? data.k * mult : data.k;
     this.pv = data.k;
     this._mdf = false;
-    this.elem = elem;
     this.container = container;
     this.k = false;
     this.kf = false;
@@ -312,20 +310,17 @@ class ValueProperty extends BaseProperty {
 class MultiDimensionalProperty extends BaseProperty {
   /**
    * constructor multidimensional value property
-   * @param {*} elem element node
    * @param {*} data multidimensional value property data
    * @param {*} mult data mult scale
    * @param {*} container value property container
    */
-  constructor(elem, data, mult, container) {
+  constructor(data, mult, container) {
     super();
     this.propType = 'multidimensional';
     this.mult = mult || 1;
     this.data = data;
     this._mdf = false;
-    this.elem = elem;
     this.container = container;
-    this.comp = elem.comp;
     this.k = false;
     this.kf = false;
     this.frameId = -1;
@@ -360,12 +355,11 @@ class MultiDimensionalProperty extends BaseProperty {
 class KeyframedValueProperty extends BaseProperty {
   /**
    * constructor keyframed unidimensional value property
-   * @param {*} elem element node
    * @param {*} data keyframed unidimensional value property data
    * @param {*} mult data mult scale
    * @param {*} container value property container
    */
-  constructor(elem, data, mult, container) {
+  constructor(data, mult, container) {
     super();
     this.propType = 'unidimensional';
     this.keyframes = data.k;
@@ -376,9 +370,7 @@ class KeyframedValueProperty extends BaseProperty {
     this.kf = true;
     this.data = data;
     this.mult = mult || 1;
-    this.elem = elem;
     this.container = container;
-    this.comp = elem.comp;
     this.v = initFrame * this.mult;
     this.pv = initFrame;
     this.getValue = this.processEffectsSequence;
@@ -399,12 +391,11 @@ class KeyframedValueProperty extends BaseProperty {
 class KeyframedMultidimensionalProperty extends BaseProperty {
   /**
    * constructor keyframed multidimensional value property
-   * @param {*} elem element node
    * @param {*} data keyframed multidimensional value property data
    * @param {*} mult data mult scale
    * @param {*} container value property container
    */
-  constructor(elem, data, mult, container) {
+  constructor(data, mult, container) {
     super();
     this.propType = 'multidimensional';
     let i; let len = data.k.length;
@@ -433,9 +424,7 @@ class KeyframedMultidimensionalProperty extends BaseProperty {
     this.k = true;
     this.kf = true;
     this.mult = mult || 1;
-    this.elem = elem;
     this.container = container;
-    this.comp = elem.comp;
     this.getValue = this.processEffectsSequence;
     this.frameId = -1;
     let arrLen = data.k[0].s.length;
@@ -457,35 +446,34 @@ class KeyframedMultidimensionalProperty extends BaseProperty {
 }
 
 /**
- * getProp by data
+ * create by data
  * @private
- * @param {*} elem element node
  * @param {*} data property data
  * @param {*} type is multidimensional value or not
  * @param {*} mult data mult scale
  * @param {*} container value property container
  * @return {ValueProperty|MultiDimensionalProperty|KeyframedValueProperty|KeyframedMultidimensionalProperty}
  */
-function getProp(elem, data, type, mult, container) {
+function create(data, type, mult, container) {
   let p;
   if (!data.k.length) {
-    p = new ValueProperty(elem, data, mult, container);
+    p = new ValueProperty(data, mult, container);
   } else if (typeof (data.k[0]) === 'number') {
-    p = new MultiDimensionalProperty(elem, data, mult, container);
+    p = new MultiDimensionalProperty(data, mult, container);
   } else {
     switch (type) {
       case 0:
-        p = new KeyframedValueProperty(elem, data, mult, container);
+        p = new KeyframedValueProperty(data, mult, container);
         break;
       case 1:
-        p = new KeyframedMultidimensionalProperty(elem, data, mult, container);
+        p = new KeyframedMultidimensionalProperty(data, mult, container);
         break;
     }
   }
   if (p.effectsSequence.length) {
-    container.addDynamicProperty(p);
+    container.addProperty(p);
   }
   return p;
 }
 
-export default { getProp };
+export default { create };

@@ -17,7 +17,7 @@ export type Layer = {
   tm: any;
   w: number;
   h: number;
-	id?: string;
+	fr: number;
 }
 
 export type Res = {

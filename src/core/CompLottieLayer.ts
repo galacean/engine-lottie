@@ -1,15 +1,20 @@
 import { initialDefaultFrame } from './constant/index';
 import BaseLottieLayer from './BaseLottieLayer';
-import PropertyFactory from './utils/PropertyFactory';
+import PropertyFactory from './PropertyFactory';
 
 export default class CompLottieLayer extends BaseLottieLayer {
   private childLayers = [];
+  private layers: any;
+  private frameRate: number;
   constructor(layer) {
     super(layer);
 
+    this.layers = layer.layers;
+    const { fr } = layer;
+    this.frameRate = fr;
+
     if (layer.timeRemapping) {
-      const { frameRate } = layer;
-      this.timeRemapping = PropertyFactory.getProp(this, layer.timeRemapping, 0, frameRate, this);
+      this.timeRemapping = PropertyFactory.create(this, layer.timeRemapping, 0, fr, this);
     }
 
     this.updateLayerFrame(initialDefaultFrame, true);

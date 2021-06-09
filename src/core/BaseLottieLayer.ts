@@ -1,5 +1,5 @@
 import { Layer } from '../LottieResource';
-import TransformFrames from './baseframes/TransformFrames';
+import TransformFrames from './TransformFrames';
 
 interface KeyFrame {
   k: any;
@@ -26,18 +26,17 @@ export default class BaseLottieLayer {
   stretch: number;
   startTime: number;
   parent: any = null;
-  id: string;
   inPoint: any;
   outPoint: any;
   private isOverlapLayer: boolean; 
   private isOverlapMode: boolean; 
-  private dynamicProperties = []; 
-  private transform: any = null;
+  private properties = []; 
+  private transform: TransformFrames;
   timeRemapping: any;
   width: number;
   height: number;
-  layers: any;
-  isInRange: boolean;
+  visible: boolean;
+  frameRate: number;
   
   constructor(layer: Layer) {
     this.is3D = !!layer.ddd;
@@ -45,18 +44,16 @@ export default class BaseLottieLayer {
     this.inPoint = layer.ip;
     this.outPoint = layer.op;
     this.startTime = layer.st || 0;
+    this.frameRate = layer.fr;
     this.name = layer.nm || '';
     this.index = layer.ind;
-    this.id = layer.refId;
     this.timeRemapping = layer.tm;
     this.width = layer.w;
     this.height = layer.h;
-    this.layers = layer.layers;
 
-    this.isOverlapLayer = layer.op >= (layer.outPoint - layer.stretch);
+    this.isOverlapLayer = layer.op >= (this.outPoint - this.stretch);
     this.isOverlapMode = layer.overlapMode;
 
-    this.transform = null;
     if (layer.ks) {
       this.transform = new TransformFrames(this, layer.ks);
 
@@ -66,29 +63,13 @@ export default class BaseLottieLayer {
     }
   }
 
-
-  /**
-   * Calculates all dynamic values
-   * @param {number} frameNum current frame number in Layer's time
-   * @param {boolean} isVisible if layers is currently in range
-   */
-  prepareProperties(frameNum, isVisible) {
-    // console.log('this.dynamicProperties', this.dynamicProperties)
-    let i; let len = this.dynamicProperties.length;
-    for (i = 0; i < len; i += 1) {
-      if (isVisible || (this.dynamicProperties[i].propType === 'transform')) {
-        this.dynamicProperties[i].getValue(frameNum);
-      }
-    }
-  }
-
   /**
    *
    * @param {*} prop a
    */
-  addDynamicProperty(prop) {
-    if (this.dynamicProperties.indexOf(prop) === -1) {
-      this.dynamicProperties.push(prop);
+  addProperty(prop) {
+    if (this.properties.indexOf(prop) === -1) {
+      this.properties.push(prop);
     }
   }
 
@@ -99,12 +80,16 @@ export default class BaseLottieLayer {
    */
   updateLayerFrame(frameNum, forceUpdate=false) {
     if (this.isOverlapMode && this.isOverlapLayer) {
-      this.isInRange = frameNum >= this.inPoint;
+      this.visible = frameNum >= this.inPoint;
     } else {
-      this.isInRange = (this.inPoint <= frameNum && this.outPoint >= frameNum);
+      this.visible = (this.inPoint <= frameNum && this.outPoint >= frameNum);
     }
 
-    this.prepareProperties(frameNum, forceUpdate || this.isInRange);
+    for (let i = 0, len = this.properties.length; i < len; i += 1) {
+      if ((forceUpdate || this.visible) || (this.properties[i].propType === 'transform')) {
+        this.properties[i].update(frameNum);
+      }
+    }
   }
 
   /**

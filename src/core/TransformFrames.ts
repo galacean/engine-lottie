@@ -1,76 +1,77 @@
-import DynamicPropertyContainer from '../utils/helpers/dynamicProperties';
-// import Matrix from './lib/transformation-matrix';
-import PropertyFactory from '../utils/PropertyFactory';
+import PropertyContainer from './PropertyContainer';
+import PropertyFactory from './PropertyFactory';
 import {
   degToRads,
   defaultVector,
   initialDefaultFrame,
-} from '../constant/index';
+} from './constant/index';
+import BaseLottieLayer from './BaseLottieLayer';
 
+type Anchor = {
+  a: number;
+  ix: number;
+  k: number[];
+}
+
+type Opacity = {
+  a: number;
+  ix: number;
+  k: number;
+}
+
+type Rotation = {
+  a: number;
+  ix: number;
+  k: number;
+}
+
+type Scale = {
+  a: number;
+  ix: number;
+  k: number[];
+}
 
 /**
  * transform property origin from tr or ks
  * @private
  */
-export default class TransformFrames extends DynamicPropertyContainer {
+export default class TransformFrames extends PropertyContainer {
+  p;
+  px;
+  py;
+  pz;
+  rx;
+  ry;
+  rz;
+  or;
+  r;
+  sk;
+  sa;
+  a;
+  s;
+  o;
+  frameId: number = -1;
+  propType: string = 'transform';
+  private autoOriented: boolean = false; 
+  private orientation: number = 0; 
+
   /**
    * constructor about transform property
    * @param {*} elem element node
    * @param {*} data multidimensional value property data
    */
   constructor(elem, data) {
-    super();
-    this.elem = elem;
-    this.frameId = -1;
-    this.propType = 'transform';
-    this.data = data;
-    this.autoOriented = false;
-    this.orientation = 0;
-    // this.v = new Matrix();
-    // // Precalculated matrix with non animated properties
-    // this.pre = new Matrix();
-    // this.appliedTransformations = 0;
-    this.initDynamicPropertyContainer(elem);
-    if (data.p && data.p.s) {
-      this.px = PropertyFactory.getProp(elem, data.p.x, 0, 0, this);
-      this.py = PropertyFactory.getProp(elem, data.p.y, 0, 0, this);
-      if (data.p.z) {
-        this.pz = PropertyFactory.getProp(elem, data.p.z, 0, 0, this);
-      }
-    } else {
-      this.p = PropertyFactory.getProp(elem, data.p || { k: [0, 0, 0] }, 1, 0, this);
-    }
-    if (data.rx) {
-      this.rx = PropertyFactory.getProp(elem, data.rx, 0, degToRads, this);
-      this.ry = PropertyFactory.getProp(elem, data.ry, 0, degToRads, this);
-      this.rz = PropertyFactory.getProp(elem, data.rz, 0, degToRads, this);
-      if (data.or.k[0].ti) {
-        let i; let len = data.or.k.length;
-        for (i=0; i<len; i+=1) {
-          data.or.k[i].to = data.or.k[i].ti = null;
-        }
-      }
-      this.or = PropertyFactory.getProp(elem, data.or, 1, degToRads, this);
-      // sh Indicates it needs to be capped between -180 and 180
-      this.or.sh = true;
-    } else {
-      this.r = PropertyFactory.getProp(elem, data.r || { k: 0 }, 0, degToRads, this);
-    }
-    if (data.sk) {
-      this.sk = PropertyFactory.getProp(elem, data.sk, 0, degToRads, this);
-      this.sa = PropertyFactory.getProp(elem, data.sa, 0, degToRads, this);
-    }
-    this.a = PropertyFactory.getProp(elem, data.a || { k: [0, 0, 0] }, 1, 0, this);
-    this.s = PropertyFactory.getProp(elem, data.s || { k: [100, 100, 100] }, 1, 0.01, this);
+    super(elem);
+    console.log('TransformFrames', elem, data)
 
-    if (data.o) {
-      this.o = PropertyFactory.getProp(elem, data.o, 0, 0.01, this);
-    } else {
-      this.o = { _mdf: false, v: 1 };
-    }
+    this.p = PropertyFactory.create(data.p || { k: [0, 0, 0] }, 1, 0, this);
+    this.r = PropertyFactory.create(data.r || { k: 0 }, 0, degToRads, this);
+    this.a = PropertyFactory.create(data.a || { k: [0, 0, 0] }, 1, 0, this);
+    this.s = PropertyFactory.create(data.s || { k: [100, 100, 100] }, 1, 0.01, this);
+    this.o = PropertyFactory.create(data.o, 0, 0.01, this);
 
-    if (!this.dynamicProperties.length) {
-      this.getValue(initialDefaultFrame, true);
+    if (!this.properties.length) {
+      this.update(initialDefaultFrame, true);
     }
   }
 
@@ -78,15 +79,14 @@ export default class TransformFrames extends DynamicPropertyContainer {
    * get transform
    * @param {number} frameNum frameNum
    */
-  getValue(frameNum) {
-    this._mdf = false;
+  update(frameNum) {
     if (frameNum === this.frameId) {
       return;
     }
 
-    this.iterateDynamicProperties(frameNum);
+    this.updateProperties(frameNum);
 
-    if (this.autoOriented && this._mdf) {
+    if (this.autoOriented) {
       this.updateOrientation();
     }
 
@@ -100,7 +100,7 @@ export default class TransformFrames extends DynamicPropertyContainer {
     let v1 = defaultVector;
     let v2 = defaultVector;
 
-    const frameRate = this.elem.session.global.frameRate;
+    const frameRate = this.elem.frameRate;
     if (this.p && this.p.keyframes && this.p.getValueAtTime) {
       if (this.p._caching.lastFrame <= this.p.keyframes[0].t) {
         v1 = this.p.getValueAtTime((this.p.keyframes[0].t + 0.01) / frameRate, 0);

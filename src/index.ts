@@ -156,10 +156,10 @@ export class LottieRenderer extends Script {
 
 		// TODO: if parent show
 		if (layer.parent && layer.parent.transform) {
-			layer.isInRange = layer.parent.isInRange;
+			layer.visible = layer.parent.visible;
 		}
 
-		const o = layer.isInRange ? transform.o.v : 0;
+		const o = layer.visible ? transform.o.v : 0;
 
 		const worldMatrix = this.transform(layer.transform, layer.parent);
 
