@@ -29,7 +29,7 @@ export class MeshBatcher extends MeshRenderer {
 
   init(l: number) {
     const mesh = new BufferMesh(this.engine, 'lottie_batch_mesh');
-    
+
     this.vertices = new Float32Array(36 * l);
     this.indicesLength = 6 * l;
     this.indices = new Uint16Array(6 * l);
@@ -72,15 +72,13 @@ export class MeshBatcher extends MeshRenderer {
   setBufferData() {
     const { indicesLength } = this;
     let indexStart = this.verticesLength / MeshBatcher.VERTEX_SIZE;
-    let i = this.verticesLength;
-    let j = 0;
 
     this.vertexBuffer.setData(this.vertices);
-    this.verticesLength = i;
+    this.verticesLength = this.verticesLength;
 
     let indicesArray = this.indices;
 
-    for (i = this.indicesLength, j = 0; j < indicesLength; i++, j++) {
+    for (let i = this.indicesLength, j = 0; j < indicesLength; i++, j++) {
       indicesArray[i] = this.indices[j] + indexStart;
     }
 

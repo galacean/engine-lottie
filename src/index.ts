@@ -31,7 +31,7 @@ export class LottieRenderer extends Script {
 	private height: number;
 	private batch: MeshBatcher;
 	private resource: LottieResource;
-	
+
 	overlapMode: any;
 
 	// Temp variables for better performance
@@ -126,7 +126,6 @@ export class LottieRenderer extends Script {
 	}
 
 	private _createBatch(layers) {
-
 		const batchEntity = this.entity.createChild('batch');
 		const batch = batchEntity.addComponent(MeshBatcher);
 		const l = layers.length;
@@ -147,17 +146,13 @@ export class LottieRenderer extends Script {
 		return batch;
 	}
 
-	private updateBuffer (layer, i, vertices) {
+	private updateBuffer(layer, i, vertices) {
 		const { unitsPerPixel } = LottieRenderer;
-		const w = layer.width;
-		const h = layer.height;
-
-		const { transform } = layer;
+		const { transform, width, height } = layer;
 		const a = transform.a.v;
 		const offset = i * 36;
 
 		const { tempPosition } = this;
-
 
 		// TODO: if parent show
 		if (layer.parent && layer.parent.transform) {
@@ -165,41 +160,41 @@ export class LottieRenderer extends Script {
 		}
 
 		const o = layer.isInRange ? transform.o.v : 0;
+
 		const worldMatrix = this.transform(layer.transform, layer.parent);
 
 		tempPosition.x = -a[0];
-		tempPosition.y = -h + a[1];
-		const lb = tempPosition.transformToVec3(worldMatrix);
-		vertices[offset] = lb.x * unitsPerPixel;
-		vertices[offset + 1] = lb.y * unitsPerPixel;
+		tempPosition.y = -height + a[1];
+		const lb = tempPosition.transformToVec3(worldMatrix).scale(unitsPerPixel);
+		vertices[offset] = lb.x;
+		vertices[offset + 1] = lb.y;
 		vertices[offset + 6] = o;
 
-		tempPosition.x = w - a[0];
-		tempPosition.y = -h + a[1];
-		const rb = tempPosition.transformToVec3(worldMatrix);
-		vertices[offset + 9] = rb.x * unitsPerPixel;
-		vertices[offset + 10] = rb.y * unitsPerPixel;
+		tempPosition.x = width - a[0];
+		tempPosition.y = -height + a[1];
+		const rb = tempPosition.transformToVec3(worldMatrix).scale(unitsPerPixel);
+		vertices[offset + 9] = rb.x;
+		vertices[offset + 10] = rb.y;
 		vertices[offset + 15] = o;
 
-		tempPosition.x = w - a[0];
+		tempPosition.x = width - a[0];
 		tempPosition.y = a[1];
-		const rt = tempPosition.transformToVec3(worldMatrix);
-		vertices[offset + 18] = rt.x * unitsPerPixel;
-		vertices[offset + 19] = rt.y * unitsPerPixel;
+		const rt = tempPosition.transformToVec3(worldMatrix).scale(unitsPerPixel);
+		vertices[offset + 18] = rt.x;
+		vertices[offset + 19] = rt.y;
 		vertices[offset + 24] = o;
 
 		tempPosition.x = -a[0];
 		tempPosition.y = a[1];
-		const lt = tempPosition.transformToVec3(worldMatrix);
-		vertices[offset + 27] = lt.x * unitsPerPixel;
-		vertices[offset + 28] = lt.y * unitsPerPixel;
+		const lt = tempPosition.transformToVec3(worldMatrix).scale(unitsPerPixel);
+		vertices[offset + 27] = lt.x;
+		vertices[offset + 28] = lt.y;
 		vertices[offset + 33] = o;
 
 	}
 
 	private createLayer(layer, i, vertices, voffset, indices, ioffset) {
-		const width = this.resource.texture.width;
-		const height = this.resource.texture.height;
+		const { width, height } = this.resource.texture;
 		const { x, y } = layer;
 		const w = layer.width;
 		const h = layer.height;
@@ -210,10 +205,15 @@ export class LottieRenderer extends Script {
 
 		this.updateBuffer(layer, i, vertices);
 
+		// These buffers will not change
+
+		// color
 		vertices[voffset + 2] = 0;
 		vertices[voffset + 3] = 1;
 		vertices[voffset + 4] = 1;
 		vertices[voffset + 5] = 1;
+
+		// uv
 		vertices[voffset + 7] = u;
 		vertices[voffset + 8] = q;
 
@@ -351,7 +351,7 @@ export class LottieRenderer extends Script {
 				}
 				// this.emit('loopComplete');
 			} else {
-				if (!this.resource.overlapMode) {
+				if (!this.overlapMode) {
 					this.frameNum = Tools.clamp(this.frameNum, 0, this.resource.duration);
 				}
 				isEnd = true;
