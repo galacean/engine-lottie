@@ -1,14 +1,12 @@
 import {
 	CompLottieLayer,
-	NullLottieLayer,
-	ShapeLottieLayer,
-	SolidLottieLayer,
 	SpriteLottieLayer,
 	Tools
-} from '@ali/lottie-core';
+} from './core';
 import { MeshBatcher } from './MeshBatcher';
 import { Matrix, Quaternion, Texture2D, Vector3 } from "oasis-engine";
 import { Script } from "oasis-engine";
+import { LottieResource } from './LottieResource';
 
 export { LottieLoader } from './LottieLoader';
 
@@ -17,38 +15,26 @@ export class LottieRenderer extends Script {
 	private _repeatsCut = 0;
 	private _delayCut = 0;
 	private _waitCut = 0;
-	private _autoLoad: boolean = true;
-	private _autoStart: boolean = true;
-	private _justDisplayOnImagesLoaded: boolean = true;
-	private _maskComp: boolean = false;
-	private _texture: Texture2D;
-	private _assets;
-	private _atlas;
 	static unitsPerPixel: number = 1 / 128;
 
 	// ------
-	private beginFrame: number = 0;
-	private endFrame: number = 0;
-	private duration: number = 0;
 	private direction: number = 1;
 	private timeScale: number = 1;
 	private isPaused: boolean = false;
 	private frameNum: number = 0;
-	private _defaultSegment: number[];
-	private _timePerFrame: number;
 	private infinite: boolean = false;
 	private delay: number = 0;
 	private alternate: boolean = false;
-	private living: boolean = true;
-	private repeats: number = 0;
-	private wait: number = 0;
-	private overlapMode: boolean = true;
 	private hadEnded: boolean = false;
 	private layers;
 	private width: number;
 	private height: number;
 	private batch: MeshBatcher;
+	private resource: LottieResource;
+	
+	overlapMode: any;
 
+	// Temp variables for better performance
 	private tempPosition: Vector3 = new Vector3();
 	private tempTranslation: Vector3 = new Vector3();
 	private tempRotation: Quaternion = new Quaternion();
@@ -58,61 +44,30 @@ export class LottieRenderer extends Script {
 	private tempParentWorldMatrix: Matrix = new Matrix();
 
 	root: any = null;
-	frameRate: number;
-	frameMult: number;
 
 	set res(value) {
-		const { w, h, res, ip, op, st } = value;
-
-		const session: any = {
-			global: {
-				w, h,
-				frameRate: res.fr,
-				maskComp: this._maskComp,
-				overlapMode: value.overlapMode,
-				globalCamera: null,
-			},
-			local: {
-				w, h, ip, op, st,
-			},
-		};
-
+		this.resource = value;
 		this.overlapMode = value.overlapMode;
-		this.frameRate = value.res.fr;
-		this.frameMult = this.frameRate / 1000;
-		this._texture = value.texture;
-		this._assets = value.assets;
-		this._atlas = value.atlas;
-		this.beginFrame = value.beginFrame;
-		this.endFrame = value.endFrame;
-		this.duration = this.endFrame - this.beginFrame;
-		this.frameRate = this.frameRate;
-		this.frameMult = this.frameRate / 1000
-		this._defaultSegment = [ip, op];
-		this._timePerFrame = 1000 / this.frameRate;
 
-		this.root = new CompLottieLayer(value.res, session);
-		this.width = w;
-		this.height = h;
-		const layers = this._buildLottieTree(this.root, session);
+		const { width, height } = value;
+
+		this.width = width;
+		this.height = height;
+
+		this.root = new CompLottieLayer(value);
+		const layers = this._buildLottieTree(this.root);
 
 		this.layers = Object.values(layers);
 		this.layers.sort((a, b) => {
-			return b.data.ind - a.data.ind;
+			return b.index - a.index;
 		})
 
 		this.batch = this._createBatch(this.layers);
 	}
 
-	private _buildLottieTree(comp, lastSession) {
-		const { layers, w, h, ip, op, st = 0 } = comp.data;
+	private _buildLottieTree(comp) {
+		const { layers } = comp;
 		const layersMap = {}
-
-		const session = {
-			global: lastSession.global,
-			local: { w, h, ip, op, st },
-		};
-
 		let children = [];
 
 		for (let i = layers.length - 1; i >= 0; i--) {
@@ -123,20 +78,11 @@ export class LottieRenderer extends Script {
 
 			switch (layer.ty) {
 				case 0:
-					element = new CompLottieLayer(layer, session);
+					element = new CompLottieLayer(layer);
 					children.push(element);
 					break;
-				case 1:
-					element = new SolidLottieLayer(layer, session);
-					break;
 				case 2:
-					element = new SpriteLottieLayer(layer, session);
-					break;
-				case 3:
-					element = new NullLottieLayer(layer, session);
-					break;
-				case 4:
-					element = new ShapeLottieLayer(layer, session);
+					element = new SpriteLottieLayer(layer, this.resource.atlas);
 					break;
 				default:
 					continue;
@@ -168,10 +114,12 @@ export class LottieRenderer extends Script {
 	}
 
 	private updateLayers(layers) {
+		const { vertices } = this.batch;
+
 		for (let i = 0; i < layers.length; i++) {
 			const layer = layers[i];
 
-			this.updateLayer(layer, i);
+			this.updateBuffer(layer, i, vertices);
 		}
 
 		this.batch.vertexBuffer.setData(this.batch.vertices);
@@ -194,115 +142,29 @@ export class LottieRenderer extends Script {
 
 		batch.setBufferData();
 
-		batch.getMaterial().shaderData.setTexture('map', this._texture);
+		batch.getMaterial().shaderData.setTexture('map', this.resource.texture);
 
 		return batch;
 	}
 
-	private createLayer(layer, i, vertices, voffset, indices, ioffset) {
-		const width = this._texture.width;
-		const height = this._texture.height;
-		const { data } = layer;
-		let { x, y, w, h } = this._atlas.frames[data.refId + '.png'].frame;
-		const u = x / width;
-		const v = y / height;
-		const p = u + w / width;
-		const q = v + h / height;
+	private updateBuffer (layer, i, vertices) {
 		const { unitsPerPixel } = LottieRenderer;
+		const w = layer.width;
+		const h = layer.height;
 
-		// console.log('layer', layer)
 		const { transform } = layer;
 		const a = transform.a.v;
-
-		// TODO: if parent show
-		if (layer.parent && layer.parent.transform) {
-			layer.isInRange = layer.parent.isInRange;
-		}
-
-		const o = layer.isInRange ? transform.o.v : 0;
-		const worldMatrix = this.transform(layer.transform, layer.parent);
-
-		// left bottom
-		const lb = new Vector3(0 - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
-		vertices[voffset] = lb.x * unitsPerPixel;
-		vertices[voffset + 1] = lb.y * unitsPerPixel;
-		vertices[voffset + 2] = 0;
-
-		vertices[voffset + 3] = 1;
-		vertices[voffset + 4] = 1;
-		vertices[voffset + 5] = 1;
-		vertices[voffset + 6] = o;
-
-		vertices[voffset + 7] = u;
-		vertices[voffset + 8] = q;
-
-		// right bottom
-		const rb = new Vector3(w - a[0], -h + a[1], 0).transformToVec3(worldMatrix);
-		vertices[voffset + 9] = rb.x * unitsPerPixel;
-		vertices[voffset + 10] = rb.y * unitsPerPixel;
-		vertices[voffset + 11] = 0;
-
-		vertices[voffset + 12] = 1;
-		vertices[voffset + 13] = 1;
-		vertices[voffset + 14] = 1;
-		vertices[voffset + 15] = o;
-
-		vertices[voffset + 16] = p;
-		vertices[voffset + 17] = q;
-
-		// right top
-		const rt = new Vector3(w - a[0], 0 + a[1], 0).transformToVec3(worldMatrix);
-		vertices[voffset + 18] = rt.x * unitsPerPixel;
-		vertices[voffset + 19] = rt.y * unitsPerPixel;
-		vertices[voffset + 20] = 0;
-
-		vertices[voffset + 21] = 1;
-		vertices[voffset + 22] = 1;
-		vertices[voffset + 23] = 1;
-		vertices[voffset + 24] = o;
-
-		vertices[voffset + 25] = p;
-		vertices[voffset + 26] = v;
-
-		// left top
-		const lt = new Vector3(0 - a[0], 0 + a[1], 0).transformToVec3(worldMatrix);
-		vertices[voffset + 27] = lt.x * unitsPerPixel;
-		vertices[voffset + 28] = lt.y * unitsPerPixel;
-		vertices[voffset + 29] = 0;
-
-		vertices[voffset + 30] = 1;
-		vertices[voffset + 31] = 1;
-		vertices[voffset + 32] = 1;
-		vertices[voffset + 33] = o;
-
-		vertices[voffset + 34] = u;
-		vertices[voffset + 35] = v;
-
-		indices[ioffset] = 4 * i;
-		indices[ioffset + 1] = 4 * i + 1;
-		indices[ioffset + 2] = 4 * i + 2;
-		indices[ioffset + 3] = 4 * i + 0;
-		indices[ioffset + 4] = 4 * i + 2;
-		indices[ioffset + 5] = 4 * i + 3;
-	}
-
-	private updateLayer(layer, i) {
-		const { unitsPerPixel } = LottieRenderer;
-		const { data } = layer;
-		const { transform } = layer;
-		const a = transform.a.v;
-		const { vertices } = this.batch;
-		const { tempPosition } = this;
-		let { w, h } = this._atlas.frames[data.refId + '.png'].frame;
-
-		// TODO: if parent show
-		if (layer.parent && layer.parent.transform) {
-			layer.isInRange = layer.parent.isInRange;
-		}
-
-		const o = layer.isInRange ? transform.o.v : 0;
 		const offset = i * 36;
 
+		const { tempPosition } = this;
+
+
+		// TODO: if parent show
+		if (layer.parent && layer.parent.transform) {
+			layer.isInRange = layer.parent.isInRange;
+		}
+
+		const o = layer.isInRange ? transform.o.v : 0;
 		const worldMatrix = this.transform(layer.transform, layer.parent);
 
 		tempPosition.x = -a[0];
@@ -332,6 +194,56 @@ export class LottieRenderer extends Script {
 		vertices[offset + 27] = lt.x * unitsPerPixel;
 		vertices[offset + 28] = lt.y * unitsPerPixel;
 		vertices[offset + 33] = o;
+
+	}
+
+	private createLayer(layer, i, vertices, voffset, indices, ioffset) {
+		const width = this.resource.texture.width;
+		const height = this.resource.texture.height;
+		const { x, y } = layer;
+		const w = layer.width;
+		const h = layer.height;
+		const u = x / width;
+		const v = y / height;
+		const p = u + w / width;
+		const q = v + h / height;
+
+		this.updateBuffer(layer, i, vertices);
+
+		vertices[voffset + 2] = 0;
+		vertices[voffset + 3] = 1;
+		vertices[voffset + 4] = 1;
+		vertices[voffset + 5] = 1;
+		vertices[voffset + 7] = u;
+		vertices[voffset + 8] = q;
+
+		vertices[voffset + 11] = 0;
+		vertices[voffset + 12] = 1;
+		vertices[voffset + 13] = 1;
+		vertices[voffset + 14] = 1;
+		vertices[voffset + 16] = p;
+		vertices[voffset + 17] = q;
+
+		vertices[voffset + 20] = 0;
+		vertices[voffset + 21] = 1;
+		vertices[voffset + 22] = 1;
+		vertices[voffset + 23] = 1;
+		vertices[voffset + 25] = p;
+		vertices[voffset + 26] = v;
+
+		vertices[voffset + 29] = 0;
+		vertices[voffset + 30] = 1;
+		vertices[voffset + 31] = 1;
+		vertices[voffset + 32] = 1;
+		vertices[voffset + 34] = u;
+		vertices[voffset + 35] = v;
+
+		indices[ioffset] = 4 * i;
+		indices[ioffset + 1] = 4 * i + 1;
+		indices[ioffset + 2] = 4 * i + 2;
+		indices[ioffset + 3] = 4 * i + 0;
+		indices[ioffset + 4] = 4 * i + 2;
+		indices[ioffset + 5] = 4 * i + 3;
 	}
 
 	matrix(out, transform, parentPivot?) {
@@ -378,7 +290,7 @@ export class LottieRenderer extends Script {
 		// console.log('snippetCache', snippetCache)
 		const isEnd = this._updateTime(snippetCache);
 
-		const correctedFrameNum = this.beginFrame + this.frameNum;
+		const correctedFrameNum = this.resource.inPoint + this.frameNum;
 		// console.log('correctedFrameNum ', this.beginFrame, this.frameNum, correctedFrameNum )
 		this.root.updateFrame(correctedFrameNum);
 
@@ -405,13 +317,13 @@ export class LottieRenderer extends Script {
 	 * @private
 	 * @return {boolean}
 	 */
-	_spill() {
+	private _spill() {
 		const bottomSpill = this.frameNum <= 0 && this.direction === -1;
-		const topSpill = this.frameNum >= this.duration && this.direction === 1;
+		const topSpill = this.frameNum >= this.resource.duration && this.direction === 1;
 		return bottomSpill || topSpill;
 	}
 
-	_updateTime(snippet) {
+	private _updateTime(snippet) {
 		const snippetCache = this.direction * this.timeScale * snippet;
 		if (this._waitCut > 0) {
 			this._waitCut -= Math.abs(snippetCache);
@@ -422,7 +334,7 @@ export class LottieRenderer extends Script {
 			return null;
 		}
 
-		this.frameNum += snippetCache / this._timePerFrame;
+		this.frameNum += snippetCache / this.resource.timePerFrame;
 		// console.log('frameNum ', this.frameNum )
 		let isEnd = false;
 
@@ -432,16 +344,15 @@ export class LottieRenderer extends Script {
 				this._delayCut = this.delay;
 				if (this.alternate) {
 					this.direction *= -1;
-					this.frameNum = Tools.codomainBounce(this.frameNum, 0, this.duration);
+					this.frameNum = Tools.codomainBounce(this.frameNum, 0, this.resource.duration);
 				} else {
 					this.direction = 1;
-					this.frameNum = Tools.euclideanModulo(this.frameNum, this.duration);
+					this.frameNum = Tools.euclideanModulo(this.frameNum, this.resource.duration);
 				}
 				// this.emit('loopComplete');
 			} else {
-				if (!this.overlapMode) {
-					this.frameNum = Tools.clamp(this.frameNum, 0, this.duration);
-					this.living = false;
+				if (!this.resource.overlapMode) {
+					this.frameNum = Tools.clamp(this.frameNum, 0, this.resource.duration);
 				}
 				isEnd = true;
 			}

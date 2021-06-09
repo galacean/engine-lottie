@@ -1,37 +1,68 @@
 import {
-  EngineObject,
-  Texture2D
+	EngineObject,
+	Texture2D
 } from "oasis-engine";
 
-export class LottieResource extends EngineObject {
-	segments: any = {};
-	beginFrame: number;
-	endFrame: number;
-	duration: number;
-	assets: any;
-	living: boolean = true;
-	infinite: boolean = false;
-	repeats: number = 0;
-	alternate: boolean = false;
-	wait: number = 0;
-	delay: number = 0;
-	overlapMode: boolean = false;
-	timeScale: number = 1;
-	frameNum: number = 0;
-	isPaused: boolean = true;
-	direction: number = 1;
-	isDisplayLoaded: boolean = false;
-
-	defaultSegment: any;
-	segmentName: string;
-	timePerFrame: number;
-
+export type Layer = {
+	ddd: number;
+	sr: number;
+  st: number;
+  nm: string;
+  op: number;
+  ks: any;
+  ao: number;
+  ip: any;
+  ind: number;
+  refId: string;
+  tm: any;
   w: number;
   h: number;
-  texture: Texture2D;
-  ip: number;
-  op: number;
-  st: number;
-  res: any;
+	id?: string;
+}
+
+export type Res = {
+	v: string;
+	nm: string;
+	ddd: number;
+	fr: number;
+	w: number;
+	h: number;
+	ip: number;
+	op: number;
+	layers: Layer[];
+}
+export class LottieResource extends EngineObject {
+	duration: number;
+	timePerFrame: number;
+	texture: Texture2D;
+	inPoint: number;
+	outPoint: number;
+	frameRate: number;
+	height: number;
+	width: number; 
+	version: string;
+	layers: Layer[];
+	atlas: any;
+
+	constructor(engine, res: Res, atlas, texture) {
+		super(engine);
+
+		console.log('res:', res)
+		console.log('atlas', atlas)
+
+  	const { w, h, fr, ip, op, layers } = res;
+
+		this.timePerFrame = 1000 / fr;
+		this.duration = Math.floor(op - ip);
+		this.width = w;
+		this.height = h;
+		this.inPoint = ip;
+		this.outPoint = op;
+		this.frameRate = fr;
+		this.atlas = atlas;
+		this.layers = layers;
+
+		this.texture = texture;
+	}
 
 }
