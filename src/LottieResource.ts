@@ -37,7 +37,6 @@ export class LottieResource extends EngineObject {
 	texture: Texture2D;
 	inPoint: number;
 	outPoint: number;
-	frameRate: number;
 	height: number;
 	width: number; 
 	version: string;
@@ -58,7 +57,6 @@ export class LottieResource extends EngineObject {
 		this.height = h;
 		this.inPoint = ip;
 		this.outPoint = op;
-		this.frameRate = fr;
 		this.atlas = atlas;
 		this.layers = layers;
 

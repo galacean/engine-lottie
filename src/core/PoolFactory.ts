@@ -1,10 +1,7 @@
-import { createSizedArray } from '../helpers/arrays';
-import pooling from './pooling';
-
-const PoolFactory = function(initialLength, _create, _release) {
+const PoolFactory = function(initialLength, _create, _release?) {
   let _length = 0;
   let _maxLength = initialLength;
-  let pool = createSizedArray(_maxLength);
+  let pool = new Array(_maxLength);
 
   const ob = {
     newElement: newElement,
@@ -32,7 +29,7 @@ const PoolFactory = function(initialLength, _create, _release) {
    */
   function release(element) {
     if (_length === _maxLength) {
-      pool = pooling.double(pool);
+      pool = pool.concat(new Array(pool.length));
       _maxLength = _maxLength*2;
     }
     if (_release) {

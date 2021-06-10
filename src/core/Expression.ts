@@ -1,4 +1,4 @@
-import Tools from '../tools';
+import Tools from './tools';
 
 const EX_REG = /(loopIn|loopOut)\(([^)]+)/;
 const STR_REG = /["']\w+["']/;

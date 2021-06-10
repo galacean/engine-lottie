@@ -1,4 +1,4 @@
-import { initialDefaultFrame } from './constant/index';
+import { initialDefaultFrame } from '../contant';
 import BaseLottieLayer from './BaseLottieLayer';
 
 export default class SpriteLottieLayer extends BaseLottieLayer {
@@ -17,6 +17,6 @@ export default class SpriteLottieLayer extends BaseLottieLayer {
       this.y = y;
     }
 
-    this.updateLayerFrame(initialDefaultFrame, true);
+    this.update(initialDefaultFrame, true);
   }
 }

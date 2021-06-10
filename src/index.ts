@@ -292,7 +292,7 @@ export class LottieRenderer extends Script {
 
 		const correctedFrameNum = this.resource.inPoint + this.frameNum;
 		// console.log('correctedFrameNum ', this.beginFrame, this.frameNum, correctedFrameNum )
-		this.root.updateFrame(correctedFrameNum);
+		this.root.update(correctedFrameNum);
 
 		const np = correctedFrameNum >> 0;
 		if (this._lastFrame !== np) {
@@ -306,7 +306,6 @@ export class LottieRenderer extends Script {
 			// this.emit('complete');
 		}
 
-		this.root.updateFrame(np);
 		this.hadEnded = isEnd;
 
 		this.updateLayers(this.layers);

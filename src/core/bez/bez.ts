@@ -1,9 +1,30 @@
 // var easingFunctions = [];
 // var math = Math;
-import { createSizedArray, createTypedArray } from './helpers/arrays';
-import BezierLengthPool from './pooling/BezierLengthPool';
-import SegmentsLengthPool from './pooling/SegmentsLengthPool';
+import PoolFactory from '../PoolFactory';
+
 const defaultCurveSegments = 200;
+
+const BezierLengthPool = PoolFactory(8, function create() {
+  return {
+    addedLength: 0,
+    percents: new Float32Array(defaultCurveSegments),
+    lengths: new Float32Array(defaultCurveSegments),
+  };
+});
+
+
+const SegmentsLengthPool = PoolFactory(8, function () {
+  return {
+    lengths: [],
+    totalLength: 0,
+  };
+}, function (element) {
+  const len = element.lengths.length;
+  for (let i = 0; i < len; i += 1) {
+    BezierLengthPool.release(element.lengths[i]);
+  }
+  element.lengths.length = 0;
+});
 
 /**
  * a
@@ -171,7 +192,7 @@ function buildBezierData(pt1, pt2, pt3, pt4) {
     const bezierData = new BezierData(curveSegments);
     const len = pt3.length;
     for (let k = 0; k < curveSegments; k += 1) {
-      point = createSizedArray(len);
+      point = new Array(len);
       const perc = k / (curveSegments - 1);
       ptDistance = 0;
       for (let i = 0; i < len; i += 1) {
@@ -254,7 +275,7 @@ function getPointInSegment(pt1, pt2, pt3, pt4, percent, bezierData) {
 
 // }
 
-const bezierSegmentPoints = createTypedArray('float32', 8);
+const bezierSegmentPoints = new Float32Array(8);
 
 /**
  * a
