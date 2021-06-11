@@ -56,7 +56,7 @@ This project is [work-in-progress](https://github.com/orgs/oasis-engine/projects
 npm i
 ```
 
-2. Run the example:
+2.Run the example:
 
 ```bash
 npm run example
