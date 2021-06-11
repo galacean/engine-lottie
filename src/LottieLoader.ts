@@ -9,10 +9,12 @@ import {
 } from "oasis-engine";
 
 import { LottieResource } from './LottieResource';
+import { LottieRenderer } from './LottieRenderer';
+import { Entity } from "oasis-engine";
 
 @resourceLoader('lottie', ['json'])
-export class LottieLoader extends Loader<LottieResource> {
-  load(item: LoadItem, resourceManager: ResourceManager): Promise<LottieResource> {
+export class LottieLoader extends Loader<Entity> {
+  load(item: LoadItem, resourceManager: ResourceManager): Promise<Entity> {
     const { urls } = item;
     const jsonPromise = this.request(urls[0], resourceManager);
     const atlasPromise = this.request(urls[1], resourceManager);
@@ -21,8 +23,16 @@ export class LottieLoader extends Loader<LottieResource> {
       type: AssetType.Texture2D,
     });
 
-    return AssetPromise.all([jsonPromise, atlasPromise, texturePromise]).then(async ([res, atlas, texture]) => {
-      return new LottieResource(resourceManager.engine, res, atlas, texture);
+    return AssetPromise.all([jsonPromise, atlasPromise, texturePromise]).then(([res, atlas, texture]) => {
+      const { engine } = resourceManager;
+      const resource = new LottieResource(engine, res, atlas, texture);
+
+      const lottieEntity = new Entity(engine);
+      const lottie = lottieEntity.addComponent(LottieRenderer);
+
+      lottie.res = resource;
+
+      return lottieEntity;
     })
   }
 }

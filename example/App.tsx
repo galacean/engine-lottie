@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { LottieRenderer } from "../src";
-import { BlinnPhongMaterial, Camera, MeshRenderer, PrimitiveMesh, Vector3, Vector4, WebGLEngine } from "oasis-engine";
+import {  Camera,  Vector3, Vector4, WebGLEngine } from "oasis-engine";
 import { OrbitControl } from "@oasis-engine/controls";
 import "./App.css";
 
@@ -26,16 +26,10 @@ function App() {
 				'https://gw.alipayobjects.com/mdn/rms_e54b79/afts/img/A*Ax4DSrekVhEAAAAAAAAAAAAAARQnAQ'
 			],
 			type: 'lottie'
-		}).then((res) => {
-			const lottie = root.createChild("lottie");
-
-			// let cube = lottie.addComponent(MeshRenderer);
-			// cube.mesh = PrimitiveMesh.createCuboid(engine, 20, 20, 20);
-			// cube.setMaterial(new BlinnPhongMaterial(engine));
-			// lottie.transform.setPosition(0, 100, 0);
-
-			const lottieRenderer = lottie.addComponent(LottieRenderer);
-			lottieRenderer.res = res;
+		}).then((lottieEntity) => {
+			root.addChild(lottieEntity);
+			const lottie = lottieEntity.getComponent(LottieRenderer);
+			lottie.play();
 		});
 
 		engine.run();

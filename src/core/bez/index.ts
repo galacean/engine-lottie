@@ -5,15 +5,8 @@ const beziers = {};
 
 /**
  * get a bezierEasing from real time or cache
- * @private
- * @param {*} a in control point x component
- * @param {*} b in control point y component
- * @param {*} c out control point x component
- * @param {*} d out control point y component
- * @param {*} [nm] curver name
- * @return {BezierEasing}
  */
-function getBezierEasing(a, b, c, d, nm) {
+function getBezierEasing(a: number, b: number, c: number, d: number, nm?:string): BezierEasing {
   const str = nm || ('bez_' + a+'_'+b+'_'+c+'_'+d).replace(/\./g, 'p');
   if (beziers[str]) {
     return beziers[str];
