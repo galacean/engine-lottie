@@ -29,14 +29,13 @@ export default class BaseProperty {
   kf: boolean = false;
 
   value: any;
-  expression: Expression;
+  expression: any;
   animated: boolean;
 
   constructor(data: TypePropery, mult?: number) {
     this.mult = mult || 1;
     this.value = data.k;
     this.animated = data.a
-    // console.log('this.value', this.value)
 
     if (Expression.hasSupportExpression(data)) {
       this.expression = Expression.getExpression(data);

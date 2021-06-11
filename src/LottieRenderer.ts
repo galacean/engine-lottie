@@ -13,22 +13,19 @@ export { LottieLoader } from './LottieLoader';
 export class LottieRenderer extends Script {
 	static unitsPerPixel: number = 1 / 128;
 
-	private _lastFrame = -Infinity;
-	private repeats = 0;
-	private direction: number = 1;
-	private timeScale: number = 1;
+	repeats = 0;
+	infinite: boolean = false;
+	alternate: boolean = false;
+	direction: number = 1;
+	timeScale: number = 1;
+
 	private isPlaying: boolean = false;
-	private frameNum: number = 0;
-	private infinite: boolean = false;
-	private alternate: boolean = false;
-	private hadEnded: boolean = false;
+	private frame: number = 0;
 	private layers;
 	private width: number;
 	private height: number;
 	private batch: MeshBatcher;
 	private resource: LottieResource;
-
-	overlapMode: any;
 
 	// Temp variables for better performance
 	private tempPosition: Vector3 = new Vector3();
@@ -43,7 +40,6 @@ export class LottieRenderer extends Script {
 
 	set res(value) {
 		this.resource = value;
-		this.overlapMode = value.overlapMode;
 
 		const { width, height } = value;
 
@@ -294,49 +290,38 @@ export class LottieRenderer extends Script {
 			return null;
 		}
 
-		this.frameNum += time / this.resource.timePerFrame;
+		this.frame += time / this.resource.timePerFrame;
 		let isEnd = false;
 
-		if (this._spill()) {
+		if (this.spill()) {
+			const { duration } = this.resource;
 			if (this.repeats > 0 || this.infinite) {
 				if (this.repeats > 0) --this.repeats;
 				if (this.alternate) {
 					this.direction *= -1;
-					this.frameNum = Tools.codomainBounce(this.frameNum, 0, this.resource.duration);
+					this.frame = Tools.codomainBounce(this.frame, 0, duration);
 				} else {
 					this.direction = 1;
-					this.frameNum = Tools.euclideanModulo(this.frameNum, this.resource.duration);
+					this.frame = Tools.euclideanModulo(this.frame, duration);
 				}
 			} else {
-				if (!this.overlapMode) {
-					this.frameNum = Tools.clamp(this.frameNum, 0, this.resource.duration);
-				}
+				this.frame = Tools.clamp(this.frame, 0, duration);
 				isEnd = true;
 			}
 		}
 
-		const correctedFrameNum = this.resource.inPoint + this.frameNum;
-		this.root.update(correctedFrameNum);
-
-		const np = correctedFrameNum >> 0;
-		if (this._lastFrame !== np) {
-			this._lastFrame = np;
-		}
-		if (isEnd === false) {
-		} else if (this.hadEnded !== isEnd && isEnd === true) {
-		}
-
-		this.hadEnded = isEnd;
+		const correctedFrame = this.resource.inPoint + this.frame;
+		this.root.update(correctedFrame);
 
 		this.updateLayers(this.layers);
 	}
 
 	/**
-	 * is this time frameNum spill the range
+	 * is this time frame spill the range
 	 */
-	private _spill(): boolean {
-		const bottomSpill = this.frameNum <= 0 && this.direction === -1;
-		const topSpill = this.frameNum >= this.resource.duration && this.direction === 1;
+	private spill(): boolean {
+		const bottomSpill = this.frame <= 0 && this.direction === -1;
+		const topSpill = this.frame >= this.resource.duration && this.direction === 1;
 		return bottomSpill || topSpill;
 	}
 }

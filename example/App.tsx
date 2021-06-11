@@ -28,7 +28,9 @@ function App() {
 			type: 'lottie'
 		}).then((lottieEntity) => {
 			root.addChild(lottieEntity);
-			const lottie = lottieEntity.getComponent(LottieRenderer);
+			const lottie:LottieRenderer = lottieEntity.getComponent(LottieRenderer);
+			lottie.infinite = true;
+			lottie.timeScale = 1;
 			lottie.play();
 		});
 

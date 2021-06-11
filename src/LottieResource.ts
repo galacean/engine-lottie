@@ -46,19 +46,14 @@ export class LottieResource extends EngineObject {
 	constructor(engine, res: Res, atlas, texture) {
 		super(engine);
 
-		console.log('res:', res)
-		console.log('atlas', atlas)
-
-  	const { w, h, fr, ip, op, layers } = res;
-
-		this.timePerFrame = 1000 / fr;
-		this.duration = Math.floor(op - ip);
-		this.width = w;
-		this.height = h;
-		this.inPoint = ip;
-		this.outPoint = op;
+		this.timePerFrame = 1000 / res.fr;
+		this.duration = Math.floor(res.op - res.ip);
+		this.width = res.w;
+		this.height = res.h;
+		this.inPoint = res.ip;
+		this.outPoint = res.op;
 		this.atlas = atlas;
-		this.layers = layers;
+		this.layers = res.layers;
 
 		this.texture = texture;
 	}
