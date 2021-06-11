@@ -27,9 +27,6 @@
   "version": "0.0.1",
   "description": "Lotte runtime of oasis engine",
   "name": "@oasis-engine/lottie",
-  "publishConfig": {
-    "registry": "https://registry.npm.alibaba-inc.com"
-  },
   "ci": {
     "type": "aci",
     "versions": "12"
