@@ -5,10 +5,10 @@ import Expression from '../Expression';
 type TypeCaching = {
   lastIndex: number;
   lastFrame: number;
-  lastKeyframeIndex: number;
-  value: Float32Array
-  lastPoint: number;
-  lastAddedLength: number;
+  value: Float32Array | number;
+  lastKeyframeIndex?: number;
+  lastPoint?: number;
+  lastAddedLength?: number;
 }
 
 type TypePropery = {

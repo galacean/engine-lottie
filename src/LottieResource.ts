@@ -1,9 +1,10 @@
 import {
+	Engine,
 	EngineObject,
 	Texture2D
 } from "oasis-engine";
 
-export type Layer = {
+export type TypeLayer = {
 	ddd: number;
 	sr: number;
   st: number;
@@ -20,7 +21,7 @@ export type Layer = {
 	fr: number;
 }
 
-export type Res = {
+export type TypeRes = {
 	v: string;
 	nm: string;
 	ddd: number;
@@ -29,7 +30,7 @@ export type Res = {
 	h: number;
 	ip: number;
 	op: number;
-	layers: Layer[];
+	layers: TypeLayer[];
 }
 export class LottieResource extends EngineObject {
 	duration: number;
@@ -40,10 +41,10 @@ export class LottieResource extends EngineObject {
 	height: number;
 	width: number; 
 	version: string;
-	layers: Layer[];
+	layers: TypeLayer[];
 	atlas: any;
 
-	constructor(engine, res: Res, atlas, texture) {
+	constructor(engine: Engine, res: TypeRes, atlas: any, texture: Texture2D) {
 		super(engine);
 
 		this.timePerFrame = 1000 / res.fr;

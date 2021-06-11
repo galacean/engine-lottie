@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Tools from './tools';
 
 const EX_REG = /(loopIn|loopOut)\(([^)]+)/;

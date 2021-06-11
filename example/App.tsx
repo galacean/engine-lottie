@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { LottieRenderer } from "../src";
-import {  Camera,  Vector3, Vector4, WebGLEngine } from "oasis-engine";
+import {  Camera, Vector3, Vector4, WebGLEngine } from "oasis-engine";
 import { OrbitControl } from "@oasis-engine/controls";
 import "./App.css";
 

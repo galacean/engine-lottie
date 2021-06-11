@@ -14,8 +14,6 @@ const SUBDIVISION_MAX_ITERATIONS = 10;
 let kSplineTableSize = 11;
 let kSampleStepSize = 1.0 / (kSplineTableSize - 1.0);
 
-let float32ArraySupported = typeof Float32Array === 'function';
-
 /* eslint new-cap: 0 */
 
 /**
@@ -130,88 +128,73 @@ function newtonRaphsonIterate(aX, aGuessT, mX1, mX2) {
   return aGuessT;
 }
 
-/**
- * cubic-bezier曲线的两个控制点，默认起始点为 0，结束点为 1
- *
- * @class
- * @private
- * @param {number} mX1 控制点1的x分量
- * @param {number} mY1 控制点1的y分量
- * @param {number} mX2 控制点2的x分量
- * @param {number} mY2 控制点2的y分量
- */
-function BezierEasing(mX1, mY1, mX2, mY2) {
-  // 不需要检查是否在某一区间内
-  // if (!(0 <= mX1 && mX1 <= 1 && 0 <= mX2 && mX2 <= 1)) {
-  //   throw new Error('bezier x values must be in [0, 1] range');
-  // }
-  this.mX1 = mX1;
-  this.mY1 = mY1;
-  this.mX2 = mX2;
-  this.mY2 = mY2;
-  this.sampleValues = float32ArraySupported ?
-    new Float32Array(kSplineTableSize):
-    new Array(kSplineTableSize);
+class BezierEasing {
+  private mX1;
+  private mY1;
+  private mX2;
+  private mY2;
+  private sampleValues: Float32Array = new Float32Array(kSplineTableSize);
 
-  this._preCompute();
+  constructor (mX1, mY1, mX2, mY2) {
+    this.mX1 = mX1;
+    this.mY1 = mY1;
+    this.mX2 = mX2;
+    this.mY2 = mY2;
 
-  this.get = this.get.bind(this);
-}
+    this._preCompute();
 
-BezierEasing.prototype._preCompute = function() {
-  // Precompute samples table
-  if (this.mX1 !== this.mY1 || this.mX2 !== this.mY2) {
-    for (let i = 0; i < kSplineTableSize; ++i) {
-      this.sampleValues[i] = calcBezier(i * kSampleStepSize, this.mX1, this.mX2);
+    this.get = this.get.bind(this);
+  }
+
+  private _preCompute () {
+    // Precompute samples table
+    if (this.mX1 !== this.mY1 || this.mX2 !== this.mY2) {
+      for (let i = 0; i < kSplineTableSize; ++i) {
+        this.sampleValues[i] = calcBezier(i * kSampleStepSize, this.mX1, this.mX2);
+      }
     }
   }
-};
 
-BezierEasing.prototype._getTForX = function(aX) {
-  let intervalStart = 0.0;
-  let currentSample = 1;
-  let lastSample = kSplineTableSize - 1;
+  private _getTForX (aX) {
+    let intervalStart = 0.0;
+    let currentSample = 1;
+    let lastSample = kSplineTableSize - 1;
 
-  for (
-    ;
-    currentSample !== lastSample && this.sampleValues[currentSample] <= aX;
-    ++currentSample
-  ) {
-    intervalStart += kSampleStepSize;
+    for (
+      ;
+      currentSample !== lastSample && this.sampleValues[currentSample] <= aX;
+      ++currentSample
+    ) {
+      intervalStart += kSampleStepSize;
+    }
+    --currentSample;
+
+    // Interpolate to provide an initial guess for t
+    let dist = (aX - this.sampleValues[currentSample]) /
+    (this.sampleValues[currentSample + 1] - this.sampleValues[currentSample]);
+    let guessForT = intervalStart + dist * kSampleStepSize;
+
+    let initialSlope = getSlope(guessForT, this.mX1, this.mX2);
+    if (initialSlope >= NEWTON_MIN_SLOPE) {
+      return newtonRaphsonIterate(aX, guessForT, this.mX1, this.mX2);
+    } else if (initialSlope === 0.0) {
+      return guessForT;
+    } else {
+      return binarySubdivide(aX, intervalStart, intervalStart + kSampleStepSize, this.mX1, this.mX2);
+    }
   }
-  --currentSample;
 
-  // Interpolate to provide an initial guess for t
-  let dist = (aX - this.sampleValues[currentSample]) /
-  (this.sampleValues[currentSample + 1] - this.sampleValues[currentSample]);
-  let guessForT = intervalStart + dist * kSampleStepSize;
+  get (x) {
+    if (this.mX1 === this.mY1 && this.mX2 === this.mY2) return x;
+    if (x === 0) {
+      return 0;
+    }
+    if (x === 1) {
+      return 1;
+    }
+    return calcBezier(this._getTForX(x), this.mY1, this.mY2);
+  }
+}
 
-  let initialSlope = getSlope(guessForT, this.mX1, this.mX2);
-  if (initialSlope >= NEWTON_MIN_SLOPE) {
-    return newtonRaphsonIterate(aX, guessForT, this.mX1, this.mX2);
-  } else if (initialSlope === 0.0) {
-    return guessForT;
-  } else {
-    return binarySubdivide(aX, intervalStart, intervalStart + kSampleStepSize, this.mX1, this.mX2);
-  }
-};
-
-/**
- * 通过x轴近似获取y的值
- *
- * @param {number} x x轴的偏移量
- * @return {number} y 与输入值x对应的y值
- */
-BezierEasing.prototype.get = function(x) {
-  if (this.mX1 === this.mY1 && this.mX2 === this.mY2) return x;
-  if (x === 0) {
-    return 0;
-  }
-  if (x === 1) {
-    return 1;
-  }
-  return calcBezier(this._getTForX(x), this.mY1, this.mY2);
-};
 
 export default BezierEasing;
-

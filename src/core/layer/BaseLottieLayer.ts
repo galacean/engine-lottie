@@ -1,4 +1,4 @@
-import { Layer } from '../../LottieResource';
+import { TypeLayer } from '../../LottieResource';
 import TransformFrames from '../TransformFrames';
 
 export default class BaseLottieLayer {
@@ -20,7 +20,7 @@ export default class BaseLottieLayer {
   height: number;
   visible: boolean;
   
-  constructor(layer: Layer) {
+  constructor(layer: TypeLayer) {
     this.is3D = !!layer.ddd;
     this.stretch = layer.sr || 1;
     this.inPoint = layer.ip;
@@ -33,14 +33,9 @@ export default class BaseLottieLayer {
     this.height = layer.h;
 
     this.isOverlapLayer = layer.op >= (this.outPoint - this.stretch);
-    this.isOverlapMode = layer.overlapMode;
 
     if (layer.ks) {
       this.transform = new TransformFrames(layer.ks);
-
-      if (layer.ao) {
-        this.transform.autoOriented = true;
-      }
     }
   }
 
