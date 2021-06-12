@@ -47,17 +47,17 @@ export class LottieRenderer extends Script {
 		this.height = height;
 
 		this.root = new CompLottieLayer(value);
-		const layers = this._buildLottieTree(this.root);
+		const layers = this.buildLottieTree(this.root);
 
 		this.layers = Object.values(layers);
 		this.layers.sort((a, b) => {
 			return b.index - a.index;
 		})
 
-		this.batch = this._createBatch(this.layers);
+		this.batch = this.createBatch(this.layers);
 	}
 
-	private _buildLottieTree(comp) {
+	private buildLottieTree(comp) {
 		const { layers } = comp;
 		const layersMap = {}
 		let children = [];
@@ -117,7 +117,7 @@ export class LottieRenderer extends Script {
 		this.batch.vertexBuffer.setData(this.batch.vertices);
 	}
 
-	private _createBatch(layers) {
+	private createBatch(layers) {
 		const batchEntity = this.entity.createChild('batch');
 		const batch = batchEntity.addComponent(MeshBatcher);
 		const l = layers.length;
@@ -238,7 +238,7 @@ export class LottieRenderer extends Script {
 		indices[ioffset + 5] = 4 * i + 3;
 	}
 
-	matrix(out, transform, parentPivot?) {
+	private matrix(out, transform, parentPivot?) {
 		const p = transform.p.v;
 		const r = transform.r.v;
 		const s = transform.s.v;;
@@ -262,7 +262,7 @@ export class LottieRenderer extends Script {
 		Matrix.affineTransformation(scale, rotation, translation, out);
 	}
 
-	transform(transform, parent?) {
+	private transform(transform, parent?) {
 		if (parent && parent.transform) {
 			this.matrix(this.tempParentWorldMatrix, parent.transform);
 			this.matrix(this.tempLocalMatrix, transform, parent.transform.a.v);
