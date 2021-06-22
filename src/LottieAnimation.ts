@@ -28,7 +28,7 @@ export class LottieAnimation extends Script {
 	private _root: CompLottieLayer = null;
 	private _isPlaying: boolean = false;
 	private _frame: number = 0;
-	private layer: (SpriteLottieLayer | CompLottieLayer)[];
+	private _layers: (SpriteLottieLayer | CompLottieLayer)[];
 	private _width: number;
 	private _height: number;
 	private _batch: MeshBatcher;
@@ -50,8 +50,8 @@ export class LottieAnimation extends Script {
 		this._height = value.height;
 
 		this._root = new CompLottieLayer(value);
-		this.layer = this._buildLottieTree(this._root);
-		this._batch = this.createBatch(this.layer);
+		this._layers = this._buildLottieTree(this._root);
+		this._batch = this.createBatch(this._layers);
 	}
 
 	get res(): LottieResource {
@@ -328,7 +328,7 @@ export class LottieAnimation extends Script {
 		const correctedFrame = this._resource.inPoint + this._frame;
 		this._root.update(correctedFrame);
 
-		this._updateLayers(this.layer);
+		this._updateLayers(this._layers);
 	}
 
 	/**
