@@ -4,3 +4,4 @@ dist
 coverage
 types
 tsconfig.tsbuildinfo
+.aci.yml

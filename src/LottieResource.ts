@@ -32,6 +32,10 @@ export type TypeRes = {
 	op: number;
 	layers: TypeLayer[];
 }
+
+/**
+ * @internal
+ */
 export class LottieResource extends EngineObject {
 	duration: number;
 	timePerFrame: number;
@@ -40,7 +44,6 @@ export class LottieResource extends EngineObject {
 	outPoint: number;
 	height: number;
 	width: number; 
-	version: string;
 	layers: TypeLayer[];
 	atlas: any;
 

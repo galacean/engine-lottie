@@ -25,6 +25,9 @@ const fragmentSource = `
 
 Shader.create('lottie',vertexSource,fragmentSource)
 
+/**
+ * @internal
+ */
 export class SkeletonMaterial extends Material {
   constructor(engine: Engine) {
     super(engine, Shader.find('lottie'));

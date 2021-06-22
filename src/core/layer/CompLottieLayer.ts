@@ -1,14 +1,17 @@
 import { initialDefaultFrame } from '../contant';
 import BaseLottieLayer from './BaseLottieLayer';
 
+/**
+ * @internal
+ */
 export default class CompLottieLayer extends BaseLottieLayer {
   private childLayers = [];
-  private layers: any;
+  layer: any;
+
   constructor(layer) {
     super(layer);
 
-    this.layers = layer.layers;
-
+    this.layer = layer.layers;
     this.update(initialDefaultFrame);
   }
 

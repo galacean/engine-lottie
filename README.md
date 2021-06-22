@@ -18,7 +18,7 @@ This is a [lottie](https://airbnb.design/lottie/) runtime created by [oasis engi
 Before using the code below, you should merge the **assets** (base64 encoding strings) in lottie json to one sprite sheet. It's convenient to complete the task with tools like [TexturePacker](https://www.codeandweb.com/texturepacker) which will generate a atlas file and a sprite image.
 
 ```typescript
-import { LottieRenderer } from "@oasis-engine/lottie";
+import { LottieAnimation } from "@oasis-engine/lottie";
 
 // Load lottie json、atlas and image file with engine's `resourceManager`
 engine.resourceManager.load({
@@ -32,10 +32,10 @@ engine.resourceManager.load({
   // Add lottie entity created to scene 
   root.addChild(lottieEntity);
 
-  // Get `LottieRenderer` component and play the animation
-  const lottie = lottieEntity.getComponent(LottieRenderer);
+  // Get `LottieAnimation` component and play the animation
+  const lottie = lottieEntity.getComponent(LottieAnimation);
   lottie.infinite = true;
-  lottie.timeScale = 1;
+  lottie.speed = 1;
   lottie.play();
 });
 ```

@@ -1,2 +1,2 @@
 import './LottieLoader';
-export { LottieRenderer } from './LottieRenderer';
+export { LottieAnimation } from './LottieAnimation';

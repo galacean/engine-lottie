@@ -1,11 +1,11 @@
 import { TypeLayer } from '../../LottieResource';
 import TransformFrames from '../TransformFrames';
 
+/**
+ * @internal
+ */
 export default class BaseLottieLayer {
-  private isOverlapLayer: boolean; 
-  private isOverlapMode: boolean; 
-  private transform: TransformFrames;
-
+  transform: TransformFrames;
   is3D: boolean;
   offsetTime: number;
   name: string;
@@ -19,6 +19,9 @@ export default class BaseLottieLayer {
   width: number;
   height: number;
   visible: boolean;
+
+  private isOverlapLayer: boolean; 
+  private isOverlapMode: boolean; 
   
   constructor(layer: TypeLayer) {
     this.is3D = !!layer.ddd;
