@@ -1,0 +1,49 @@
+{
+  "main": "dist/main.js",
+  "browser": "dist/browser.js",
+  "module": "dist/module.js",
+  "dependencies": {
+    "@oasis-engine/controls": "^0.3.11",
+    "oasis-engine": "^0.3.11"
+  },
+  "devDependencies": {
+    "@ali/ci": "latest",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/plugin-proposal-decorators": "^7.12.1",
+    "@babel/plugin-proposal-optional-chaining": "^7.12.1",
+    "@babel/plugin-transform-object-assign": "^7.12.1",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/preset-typescript": "^7.12.1",
+    "@pika/react": "^16.13.1",
+    "@pika/react-dom": "^16.13.1",
+    "@rollup/plugin-babel": "^5.2.1",
+    "@rollup/plugin-commonjs": "^16.0.0",
+    "@rollup/plugin-node-resolve": "^10.0.0",
+    "rollup": "^2.32.0",
+    "typescript": "^4.3.2",
+    "vite": "1.0.0-rc.5",
+    "vite-plugin-react": "^3.0.0"
+  },
+  "version": "0.0.3",
+  "description": "Lotte runtime of oasis engine",
+  "name": "@oasis-engine/lottie",
+  "ci": {
+    "type": "aci",
+    "versions": "12"
+  },
+  "files": [
+    "types",
+    "dist"
+  ],
+  "scripts": {
+    "example": "vite",
+    "test": "jest",
+    "test-cov": "jest --coverage",
+    "dev": "rollup -cw",
+    "build": "rollup -c && npm run b:types",
+    "ci": "npm run lint && npm run test-cov",
+    "lint": "eslint src --fix --ext .ts,.tsx",
+    "b:types": "tsc --emitDeclarationOnly"
+  },
+  "types": "types/index.d.ts"
+}
