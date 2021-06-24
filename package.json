@@ -3,8 +3,8 @@
   "browser": "dist/browser.js",
   "module": "dist/module.js",
   "dependencies": {
-    "@oasis-engine/controls": "^0.3.11",
-    "oasis-engine": "^0.3.11"
+    "@oasis-engine/controls": "^0.4.3",
+    "oasis-engine": "^0.4.3"
   },
   "devDependencies": {
     "@ali/ci": "latest",
@@ -24,7 +24,7 @@
     "vite": "1.0.0-rc.5",
     "vite-plugin-react": "^3.0.0"
   },
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Lotte runtime of oasis engine",
   "name": "@oasis-engine/lottie",
   "ci": {
