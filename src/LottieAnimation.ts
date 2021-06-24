@@ -179,30 +179,38 @@ export class LottieAnimation extends Script {
 
 		tempPosition.x = -a[0];
 		tempPosition.y = -height + a[1];
+		tempPosition.z = 0;
 		const lb = tempPosition.transformToVec3(worldMatrix).scale(unitsPerPixel);
 		vertices[offset] = lb.x;
 		vertices[offset + 1] = lb.y;
+		vertices[offset + 2] = lb.z;
 		vertices[offset + 6] = o;
 
 		tempPosition.x = width - a[0];
 		tempPosition.y = -height + a[1];
+		tempPosition.z = 0;
 		const rb = tempPosition.transformToVec3(worldMatrix).scale(unitsPerPixel);
 		vertices[offset + 9] = rb.x;
 		vertices[offset + 10] = rb.y;
+		vertices[offset + 11] = rb.z;
 		vertices[offset + 15] = o;
 
 		tempPosition.x = width - a[0];
 		tempPosition.y = a[1];
+		tempPosition.z = 0;
 		const rt = tempPosition.transformToVec3(worldMatrix).scale(unitsPerPixel);
 		vertices[offset + 18] = rt.x;
 		vertices[offset + 19] = rt.y;
+		vertices[offset + 20] = rt.z;
 		vertices[offset + 24] = o;
 
 		tempPosition.x = -a[0];
 		tempPosition.y = a[1];
+		tempPosition.z = 0;
 		const lt = tempPosition.transformToVec3(worldMatrix).scale(unitsPerPixel);
 		vertices[offset + 27] = lt.x;
 		vertices[offset + 28] = lt.y;
+		vertices[offset + 29] = lt.z;
 		vertices[offset + 33] = o;
 
 	}
