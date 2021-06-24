@@ -21,6 +21,10 @@ type KeyFrames = {
   p: TypeMultiDimensionalProperty;
   r: TypeValueProperty;
   s: TypeMultiDimensionalProperty;
+  rx?: TypeValueProperty;
+  ry?: TypeValueProperty;
+  rz?: TypeValueProperty;
+  or?: TypeMultiDimensionalProperty
 }
 
 /**
@@ -32,6 +36,10 @@ export default class TransformFrames {
   a: KeyframedMultidimensionalProperty;
   s: KeyframedMultidimensionalProperty;
   o: KeyframedValueProperty;
+  or: KeyframedMultidimensionalProperty;
+  rx: KeyframedValueProperty;
+  ry: KeyframedValueProperty;
+  rz: KeyframedValueProperty;
   private properties = [];
   private autoOrient: boolean = false;
 
@@ -58,9 +66,6 @@ export default class TransformFrames {
     this.p = create(data.p || { k: [0, 0, 0] }, 1);
     this.properties.push(this.p);
 
-    this.r = create(data.r || { k: 0 }, 0, degToRads);
-    this.properties.push(this.r);
-
     this.a = create(data.a || { k: [0, 0, 0] }, 1);
     this.properties.push(this.a);
 
@@ -69,6 +74,30 @@ export default class TransformFrames {
 
     this.o = create(data.o, 0, 0.01);
     this.properties.push(this.o);
+
+    // 2d rotation
+    if (data.r) {
+      this.r = create(data.r || { k: 0 }, 1, degToRads);
+      this.properties.push(this.r);
+    }
+    // 3d rotation
+    else if(data.rx || data.ry || data.rz) {
+      if (data.rx) {
+        this.rx = create(data.rx, 0, degToRads);
+        this.properties.push(this.rx);
+      }
+      if (data.ry) {
+        this.ry = create(data.ry, 0, degToRads);
+        this.properties.push(this.ry);
+      }
+      if (data.rz) {
+        this.rz = create(data.rz, 0, degToRads);
+        this.properties.push(this.rz);
+      }
+    } else if (data.or){
+      this.or = create(data.or, 1, degToRads);
+      this.properties.push(this.or);
+    }
 
     if (!this.properties.length) {
       this.update(initialDefaultFrame);

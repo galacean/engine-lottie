@@ -8,6 +8,7 @@ This is a [lottie](https://airbnb.design/lottie/) runtime created by [oasis engi
 
 ## Features
 - [x] Sprite element: transform and opacity animation.
+- [x] 3D rotation: rotate element in 3D space.
 
 #### TODO
 - [ ] Sprite mask
@@ -34,7 +35,7 @@ engine.resourceManager.load({
 
   // Get `LottieAnimation` component and play the animation
   const lottie = lottieEntity.getComponent(LottieAnimation);
-  lottie.infinite = true;
+  lottie.isLooping = true;
   lottie.speed = 1;
   lottie.play();
 });

@@ -51,7 +51,7 @@ export class LottieAnimation extends Script {
 
 		this._root = new CompLottieLayer(value);
 		this._layers = this._buildLottieTree(this._root);
-		this._batch = this.createBatch(this._layers);
+		this._batch = this._createBatch(this._layers);
 	}
 
 	get res(): LottieResource {
@@ -137,7 +137,7 @@ export class LottieAnimation extends Script {
 		this._batch.vertexBuffer.setData(vertices);
 	}
 
-	private createBatch<T extends BaseLottieLayer>(layers: T[]): MeshBatcher {
+	private _createBatch<T extends BaseLottieLayer>(layers: T[]): MeshBatcher {
 		const batchEntity = this.entity.createChild('batch');
 		const batch = batchEntity.addComponent(MeshBatcher);
 		const l = layers.length;
@@ -175,7 +175,7 @@ export class LottieAnimation extends Script {
 
 		const o = layer.visible ? transform.o.v : 0;
 
-		const worldMatrix = this.transform(layer.transform, layer.parent);
+		const worldMatrix = this._transform(layer.transform, layer.parent);
 
 		tempPosition.x = -a[0];
 		tempPosition.y = -height + a[1];
@@ -262,7 +262,6 @@ export class LottieAnimation extends Script {
 
 	private _matrix(out: Matrix, transform: TransformFrames, parentPivot?: Float32Array) {
 		const p = transform.p.v;
-		const r = transform.r.v;
 		const s = transform.s.v;;
 
 		const translation = this._tempTranslation;
@@ -276,7 +275,29 @@ export class LottieAnimation extends Script {
 		}
 
 		const rotation = this._tempRotation;
-		Quaternion.rotationEuler(0, 0, -r, rotation);
+
+		let rx = 0;
+		let ry = 0;
+		let rz = 0;
+
+		// 2d rotation
+		if (transform.r) {
+			rz = -transform.r.v;
+		}
+		// 3d rotation
+		else if (transform.rx || transform.ry){
+			rx = transform.rx ? transform.rx.v : 0;
+			ry = transform.ry ? transform.ry.v : 0;
+			rz = transform.rz ? transform.rz.v : 0;
+		}
+		else if (transform.or){
+			const { v } = transform.or;
+			rx = v[0];
+			ry = v[1];
+			rz = v[2];
+		}
+
+		Quaternion.rotationEuler(rx, ry, rz, rotation);
 
 		const scale = this._tempScale;
 		scale.setValue(s[0], s[1], 1);
@@ -284,7 +305,7 @@ export class LottieAnimation extends Script {
 		Matrix.affineTransformation(scale, rotation, translation, out);
 	}
 
-	private transform(transform: TransformFrames, parent?: CompLottieLayer) {
+	private _transform(transform: TransformFrames, parent?: CompLottieLayer) {
 		if (parent && parent.transform) {
 			this._matrix(this._tempParentWorldMatrix, parent.transform);
 			this._matrix(this._tempLocalMatrix, transform, parent.transform.a.v);
