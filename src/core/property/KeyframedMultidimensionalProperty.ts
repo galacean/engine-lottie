@@ -1,5 +1,5 @@
 
-import bez from '../bez';
+import bez from '../bezier';
 import { initialDefaultFrame as initFrame } from '../contant';
 import BaseProperty from './BaseProperty';
 

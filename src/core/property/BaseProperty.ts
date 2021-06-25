@@ -1,4 +1,4 @@
-import bez from '../bez';
+import bez from '../bezier';
 import { Quaternion, Vector3 } from 'oasis-engine';
 import Expression from '../Expression';
 
