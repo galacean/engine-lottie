@@ -4,6 +4,7 @@
   "module": "dist/module.js",
   "dependencies": {
     "@oasis-engine/controls": "^0.4.3",
+    "bezier-easing": "^2.1.0",
     "oasis-engine": "^0.4.3"
   },
   "devDependencies": {

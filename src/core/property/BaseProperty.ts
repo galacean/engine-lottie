@@ -110,7 +110,7 @@ export default class BaseProperty {
         if (keyData.__fnct) {
           fnc = keyData.__fnct;
         } else {
-          fnc = bez.getBezierEasing(keyData.o.x, keyData.o.y, keyData.i.x, keyData.i.y, keyData.n).get;
+          fnc = bez.getBezierEasing(keyData.o.x, keyData.o.y, keyData.i.x, keyData.i.y, keyData.n);
           keyData.__fnct = fnc;
         }
         perc = fnc((frameNum - keyTime) / (nextKeyTime - keyTime));
@@ -193,7 +193,7 @@ export default class BaseProperty {
                   outY = (typeof keyData.o.y[i] === 'undefined') ? keyData.o.y[0] : keyData.o.y[i];
                   inX = (typeof keyData.i.x[i] === 'undefined') ? keyData.i.x[0] : keyData.i.x[i];
                   inY = (typeof keyData.i.y[i] === 'undefined') ? keyData.i.y[0] : keyData.i.y[i];
-                  fnc = bez.getBezierEasing(outX, outY, inX, inY).get;
+                  fnc = bez.getBezierEasing(outX, outY, inX, inY);
                   keyData.__fnct[i] = fnc;
                 } else {
                   fnc = keyData.__fnct[i];
@@ -204,7 +204,7 @@ export default class BaseProperty {
                   outY = keyData.o.y;
                   inX = keyData.i.x;
                   inY = keyData.i.y;
-                  fnc = bez.getBezierEasing(outX, outY, inX, inY).get;
+                  fnc = bez.getBezierEasing(outX, outY, inX, inY);
                   keyData.__fnct = fnc;
                 } else {
                   fnc = keyData.__fnct;
