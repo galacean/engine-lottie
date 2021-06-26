@@ -47,7 +47,7 @@ function App() {
 			const lottie:LottieAnimation = lottieEntity.getComponent(LottieAnimation);
 			lottie.isLooping = true;
 			lottie.speed = 1;
-			lottieEntity.transform.setScale(0.5, 0.5, 1);
+			lottieEntity.transform.setScale(0.5, 0.5, 0.5);
 			lottie.play();
 		});
 

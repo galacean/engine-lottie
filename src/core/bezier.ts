@@ -6,8 +6,8 @@ const beziers = {};
 /**
  * get a bezierEasing from real time or cache
  */
-function getBezierEasing(a: number, b: number, c: number, d: number, nm?:string): BezierEasing {
-  const str = nm || ('bez_' + a+'_'+b+'_'+c+'_'+d).replace(/\./g, 'p');
+function getBezierEasing(a: number, b: number, c: number, d: number, nm?: string): BezierEasing.EasingFunction {
+  const str = nm || ('bez_' + a + '_' + b + '_' + c + '_' + d).replace(/\./g, 'p');
   if (beziers[str]) {
     return beziers[str];
   }
@@ -95,5 +95,5 @@ export default {
   buildBezierData,
   pointOnLine2D,
   pointOnLine3D,
-  getBezierEasing 
+  getBezierEasing
 };

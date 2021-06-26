@@ -230,7 +230,6 @@ export class LottieAnimation extends Script {
 		// These buffers will not change
 
 		// color
-		vertices[voffset + 2] = 0;
 		vertices[voffset + 3] = 1;
 		vertices[voffset + 4] = 1;
 		vertices[voffset + 5] = 1;
@@ -239,21 +238,18 @@ export class LottieAnimation extends Script {
 		vertices[voffset + 7] = u;
 		vertices[voffset + 8] = q;
 
-		vertices[voffset + 11] = 0;
 		vertices[voffset + 12] = 1;
 		vertices[voffset + 13] = 1;
 		vertices[voffset + 14] = 1;
 		vertices[voffset + 16] = p;
 		vertices[voffset + 17] = q;
 
-		vertices[voffset + 20] = 0;
 		vertices[voffset + 21] = 1;
 		vertices[voffset + 22] = 1;
 		vertices[voffset + 23] = 1;
 		vertices[voffset + 25] = p;
 		vertices[voffset + 26] = v;
 
-		vertices[voffset + 29] = 0;
 		vertices[voffset + 30] = 1;
 		vertices[voffset + 31] = 1;
 		vertices[voffset + 32] = 1;

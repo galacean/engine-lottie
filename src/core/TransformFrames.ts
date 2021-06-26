@@ -1,5 +1,4 @@
 import { degToRads, initialDefaultFrame } from './contant';
-import BaseLottieLayer from './layer/BaseLottieLayer';
 import ValueProperty from './property/ValueProperty';
 import MultiDimensionalProperty from './property/MultiDimensionalProperty';
 import KeyframedValueProperty from './property/KeyframedValueProperty';
@@ -61,15 +60,16 @@ export default class TransformFrames {
   }
 
   constructor(data: KeyFrames) {
+    console.log(data)
     const { create } = TransformFrames;
 
-    this.p = create(data.p || { k: [0, 0, 0] }, 1);
+    this.p = create(data.p, 1);
     this.properties.push(this.p);
 
-    this.a = create(data.a || { k: [0, 0, 0] }, 1);
+    this.a = create(data.a, 1);
     this.properties.push(this.a);
 
-    this.s = create(data.s || { k: [100, 100, 100] }, 1, 0.01);
+    this.s = create(data.s, 1, 0.01);
     this.properties.push(this.s);
 
     this.o = create(data.o, 0, 0.01);
@@ -77,7 +77,7 @@ export default class TransformFrames {
 
     // 2d rotation
     if (data.r) {
-      this.r = create(data.r || { k: 0 }, 1, degToRads);
+      this.r = create(data.r, 1, degToRads);
       this.properties.push(this.r);
     }
     // 3d rotation
