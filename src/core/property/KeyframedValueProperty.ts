@@ -1,16 +1,23 @@
-import { initialDefaultFrame as initFrame } from '../contant';
 import Expression from '../Expression';
 import BaseProperty, { TypeKeyframe, TypeValueKeyframedProperty } from './BaseProperty';
+
+type TypeCaching = {
+  lastIndex: number;
+  lastFrame: number;
+  value: number;
+  lastKeyframeIndex: number;
+}
 
 /**
  * keyframed unidimensional value property
  */
 export default class KeyframedValueProperty extends BaseProperty {
-  constructor(data: TypeValueKeyframedProperty, mult) {
+  private _caching: TypeCaching;
+
+  constructor(data: TypeValueKeyframedProperty, mult: number = 1) {
     super(data, mult);
-    this._caching = { lastFrame: initFrame, lastIndex: 0, value: 0, lastKeyframeIndex: -1 };
-    this.keyframed = true;
-    this.v = initFrame * this.mult;
+    this._caching = { lastFrame: 0, lastIndex: 0, value: 0, lastKeyframeIndex: -1 };
+    this.v = 0;
 
     if (Expression.hasSupportExpression(data)) {
       this.expression = Expression.getExpression(data);
@@ -19,9 +26,8 @@ export default class KeyframedValueProperty extends BaseProperty {
 
   /**
    * interpolate value
-   * @interal
    */
-  _interpolateValue(frameNum: number): number {
+  private _interpolateValue(frameNum: number): number {
     const caching = this._caching;
     let { lastIndex } = caching;
     const { value } = this;
@@ -56,17 +62,14 @@ export default class KeyframedValueProperty extends BaseProperty {
   }
 
   update(frameNum: number) {
-    let finalValue: number;
-
     if (this.expression) {
       frameNum = this.expression.update(frameNum);
     }
 
     this._caching.lastKeyframeIndex = -1;
     this._caching.lastIndex = 0;
-    finalValue = this._interpolateValue(frameNum) as number;
     this._caching.lastFrame = frameNum;
 
-    this.v = finalValue * this.mult;
+    this.v = this._interpolateValue(frameNum) * this.mult;
   }
 }

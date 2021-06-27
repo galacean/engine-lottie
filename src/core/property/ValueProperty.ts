@@ -6,13 +6,12 @@ import { TypeValueProperty } from './BaseProperty';
  * @internal
  */
 export default class ValueProperty extends BaseProperty {
-  constructor(data: TypeValueProperty, mult: number) {
+  constructor(data: TypeValueProperty, mult: number = 1) {
     super(data, mult);
-    this.isMultidimensional = false;
     this.v = mult ? data.k * mult : data.k;
   }
 
-  update () {
+  update() {
     this.v = this.value * this.mult;
   }
 }

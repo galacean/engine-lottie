@@ -8,39 +8,16 @@ const beziers = {};
  */
 function getBezierEasing(a: number, b: number, c: number, d: number, nm?: string): BezierEasing.EasingFunction {
   const str = nm || ('bez_' + a + '_' + b + '_' + c + '_' + d).replace(/\./g, 'p');
-  if (beziers[str]) {
-    return beziers[str];
-  }
-  const bezEasing = BezierEasing(a, b, c, d);
-  beziers[str] = bezEasing;
-  return bezEasing;
-}
+  let bezier = beziers[str];
 
-function pointOnLine2D(x1, y1, x2, y2, x3, y3) {
-  const det1 = (x1 * y2) + (y1 * x3) + (x2 * y3) - (x3 * y2) - (y3 * x1) - (x2 * y1);
-  return det1 > -0.001 && det1 < 0.001;
-}
+  if (bezier) {
+    return bezier;
+  }
 
-function pointOnLine3D(x1, y1, z1, x2, y2, z2, x3, y3, z3) {
-  if (z1 === 0 && z2 === 0 && z3 === 0) {
-    return pointOnLine2D(x1, y1, x2, y2, x3, y3);
-  }
-  const dist1 = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2) + Math.pow(z2 - z1, 2));
-  const dist2 = Math.sqrt(Math.pow(x3 - x1, 2) + Math.pow(y3 - y1, 2) + Math.pow(z3 - z1, 2));
-  const dist3 = Math.sqrt(Math.pow(x3 - x2, 2) + Math.pow(y3 - y2, 2) + Math.pow(z3 - z2, 2));
-  let diffDist;
-  if (dist1 > dist2) {
-    if (dist1 > dist3) {
-      diffDist = dist1 - dist2 - dist3;
-    } else {
-      diffDist = dist3 - dist2 - dist1;
-    }
-  } else if (dist3 > dist2) {
-    diffDist = dist3 - dist2 - dist1;
-  } else {
-    diffDist = dist2 - dist1 - dist3;
-  }
-  return diffDist > -0.0001 && diffDist < 0.0001;
+  bezier = BezierEasing(a, b, c, d);
+  beziers[str] = bezier;
+
+  return bezier;
 }
 
 function BezierData(length) {
@@ -93,7 +70,5 @@ function buildBezierData(pt1, pt2, pt3, pt4) {
 
 export default {
   buildBezierData,
-  pointOnLine2D,
-  pointOnLine3D,
   getBezierEasing
 };

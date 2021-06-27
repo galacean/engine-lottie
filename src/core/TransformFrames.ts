@@ -1,48 +1,38 @@
-import { degToRads, initialDefaultFrame } from './contant';
 import ValueProperty from './property/ValueProperty';
 import MultiDimensionalProperty from './property/MultiDimensionalProperty';
 import KeyframedValueProperty from './property/KeyframedValueProperty';
 import KeyframedMultidimensionalProperty from './property/KeyframedMultidimensionalProperty';
-
-type TypeMultiDimensionalProperty = {
-  a: number;
-  k: number[];
-}
-
-type TypeValueProperty = {
-  a: number;
-  k: number;
-}
+import { TypeMultiDimensionalKeyframedProperty, TypeValueKeyframedProperty } from './property/BaseProperty';
 
 type KeyFrames = {
-  a: TypeMultiDimensionalProperty;
-  o: TypeValueProperty;
-  p: TypeMultiDimensionalProperty;
-  r: TypeValueProperty;
-  s: TypeMultiDimensionalProperty;
-  rx?: TypeValueProperty;
-  ry?: TypeValueProperty;
-  rz?: TypeValueProperty;
-  or?: TypeMultiDimensionalProperty
+  a: TypeMultiDimensionalKeyframedProperty;
+  p: TypeMultiDimensionalKeyframedProperty;
+  s: TypeMultiDimensionalKeyframedProperty;
+  or?: TypeMultiDimensionalKeyframedProperty;
+  o: TypeValueKeyframedProperty;
+  r: TypeValueKeyframedProperty;
+  rx?: TypeValueKeyframedProperty;
+  ry?: TypeValueKeyframedProperty;
+  rz?: TypeValueKeyframedProperty;
 }
 
 /**
  * transform property origin from tr or ks
  */
 export default class TransformFrames {
-  p: KeyframedMultidimensionalProperty;
-  r: KeyframedValueProperty;
-  a: KeyframedMultidimensionalProperty;
-  s: KeyframedMultidimensionalProperty;
-  o: KeyframedValueProperty;
-  or: KeyframedMultidimensionalProperty;
-  rx: KeyframedValueProperty;
-  ry: KeyframedValueProperty;
-  rz: KeyframedValueProperty;
+  p: ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty;
+  a: ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty;
+  s: ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty;
+  or: ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty;
+  r: ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty;
+  o: ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty;
+  rx: ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty;
+  ry: ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty;
+  rz: ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty;
   private properties = [];
   private autoOrient: boolean = false;
 
-  static create(data, type, mult?): ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty {
+  static create(data, type = 0, mult = 1): ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty {
     if (!data.k.length) {
       return new ValueProperty(data, mult);
     }
@@ -75,13 +65,15 @@ export default class TransformFrames {
     this.o = create(data.o, 0, 0.01);
     this.properties.push(this.o);
 
+    const degToRads = Math.PI / 180;
+
     // 2d rotation
     if (data.r) {
-      this.r = create(data.r, 1, degToRads);
+      this.r = create(data.r, 0, degToRads);
       this.properties.push(this.r);
     }
     // 3d rotation
-    else if(data.rx || data.ry || data.rz) {
+    else if (data.rx || data.ry || data.rz) {
       if (data.rx) {
         this.rx = create(data.rx, 0, degToRads);
         this.properties.push(this.rx);
@@ -94,17 +86,17 @@ export default class TransformFrames {
         this.rz = create(data.rz, 0, degToRads);
         this.properties.push(this.rz);
       }
-    } else if (data.or){
+    } else if (data.or) {
       this.or = create(data.or, 1, degToRads);
       this.properties.push(this.or);
     }
 
     if (!this.properties.length) {
-      this.update(initialDefaultFrame);
+      this.update();
     }
   }
 
-  update(frameNum: number) {
+  update(frameNum = 0) {
     const len = this.properties.length;
 
     for (let i = 0; i < len; i += 1) {

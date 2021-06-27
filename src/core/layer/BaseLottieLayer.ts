@@ -42,7 +42,7 @@ export default class BaseLottieLayer {
     }
   }
 
-  update(frameNum: number, forceUpdate=false) {
+  update(frameNum: number = 0, forceUpdate=false) {
     if (this.isOverlapMode && this.isOverlapLayer) {
       this.visible = frameNum >= this.inPoint;
     } else {

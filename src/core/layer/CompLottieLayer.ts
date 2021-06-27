@@ -1,4 +1,3 @@
-import { initialDefaultFrame } from '../contant';
 import BaseLottieLayer from './BaseLottieLayer';
 
 /**
@@ -12,13 +11,13 @@ export default class CompLottieLayer extends BaseLottieLayer {
     super(layer);
 
     this.layer = layer.layers;
-    this.update(initialDefaultFrame);
+    this.update();
   }
 
   /**
    * update frame
    */
-  update(frameNum: number) {
+  update(frameNum: number = 0) {
     frameNum -= this.startTime;
     frameNum = frameNum / this.stretch;
 

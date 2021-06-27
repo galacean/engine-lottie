@@ -1,15 +1,6 @@
 import bez from '../bezier';
 import Expression from '../Expression';
 
-type TypeCaching = {
-  lastIndex: number;
-  lastFrame: number;
-  value: Float32Array | number;
-  lastKeyframeIndex?: number;
-  lastPoint?: number;
-  lastAddedLength?: number;
-}
-
 export type TypeValueProperty = {
   k: number;
   x?: Function;
@@ -54,11 +45,6 @@ export type TypeMultiDimensionalKeyframedProperty = {
  * @internal
  */
 export default class BaseProperty {
-  isMultidimensional: boolean = false;
-  keyframed: boolean = false;
-
-  _caching: TypeCaching;
-
   mult: number;
   v: any;
 
