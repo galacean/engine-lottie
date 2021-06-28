@@ -20,51 +20,56 @@ function getBezierEasing(a: number, b: number, c: number, d: number, nm?: string
   return bezier;
 }
 
-function BezierData(length) {
-  this.segmentLength = 0;
-  this.points = new Array(length);
-}
-
-function PointData(partial, point) {
-  this.partialLength = partial;
-  this.point = point;
-}
-
 const storedData = {};
 
-function buildBezierData(pt1, pt2, pt3, pt4) {
-  const bezierName = (pt1[0] + '_' + pt1[1] + '_' + pt2[0] + '_' + pt2[1] + '_' + pt3[0] + '_' + pt3[1] + '_' + pt4[0] + '_' + pt4[1]).replace(/\./g, 'p');
+function buildBezierData(s: number[], e: number[], to: number[], ti: number[]) {
+  const bezierName = (s[0] + '_' + s[1] + '_' + e[0] + '_' + e[1] + '_' + to[0] + '_' + to[1] + '_' + ti[0] + '_' + ti[1]).replace(/\./g, 'p');
+
   if (!storedData[bezierName]) {
-    let curveSegments = defaultCurveSegments;
-    // var k, i, len;
-    let addedLength = 0;
-    let ptDistance;
-    let point;
-    let lastPoint = null;
-    if (pt1.length === 2 && (pt1[0] != pt2[0] || pt1[1] != pt2[1]) && pointOnLine2D(pt1[0], pt1[1], pt2[0], pt2[1], pt1[0] + pt3[0], pt1[1] + pt3[1]) && pointOnLine2D(pt1[0], pt1[1], pt2[0], pt2[1], pt2[0] + pt4[0], pt2[1] + pt4[1])) {
-      curveSegments = 2;
-    }
-    const bezierData = new BezierData(curveSegments);
-    const len = pt3.length;
-    for (let k = 0; k < curveSegments; k += 1) {
-      point = new Array(len);
-      const perc = k / (curveSegments - 1);
-      ptDistance = 0;
+    let curveSegments: number = defaultCurveSegments;
+    let segmentLength: number = 0;
+    let lastPoint: number[];
+    let points = [];
+
+    // console.log('s:', s, 'e:', e, 'to:', to, 'ti:', ti)
+
+    for (let k = 0; k < curveSegments; k++) {
+      const len = to.length;
+      const point: number[] = new Array(len);
+      const perc: number = k / (curveSegments - 1);
+      let ptDistance: number = 0;
+
       for (let i = 0; i < len; i += 1) {
-        const ptCoord = Math.pow(1 - perc, 3) * pt1[i] + 3 * Math.pow(1 - perc, 2) * perc * (pt1[i] + pt3[i]) + 3 * (1 - perc) * Math.pow(perc, 2) * (pt2[i] + pt4[i]) + Math.pow(perc, 3) * pt2[i];
+        const ptCoord = Math.pow(1 - perc, 3) * s[i] +
+          3 * Math.pow(1 - perc, 2) * perc * (s[i] + to[i]) +
+          3 * (1 - perc) * Math.pow(perc, 2) * (e[i] + ti[i]) +
+          Math.pow(perc, 3) * e[i];
+
         point[i] = ptCoord;
-        if (lastPoint !== null) {
+
+        if (lastPoint) {
           ptDistance += Math.pow(point[i] - lastPoint[i], 2);
         }
       }
+
       ptDistance = Math.sqrt(ptDistance);
-      addedLength += ptDistance;
-      bezierData.points[k] = new PointData(ptDistance, point);
+      segmentLength += ptDistance;
+
+      points[k] = {
+        partialLength: ptDistance,
+        point
+      }
+
       lastPoint = point;
     }
-    bezierData.segmentLength = addedLength;
-    storedData[bezierName] = bezierData;
+
+    // console.log('points:', points)
+    storedData[bezierName] = {
+      segmentLength,
+      points
+    };
   }
+
   return storedData[bezierName];
 }
 
