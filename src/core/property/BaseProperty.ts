@@ -8,16 +8,23 @@ export type TypeValueProperty = {
   a: boolean
 }
 
+type TypePoint = {
+  partialLength: number;
+  point: number[];
+};
+
 export type TypeKeyframe = {
   e: number[];
   s: number[];
   t: number;
-  i?: { x: number | number[], y: number | number[] };
-  o?: { x: number | number[], y: number | number[] };
+  i?: { x: number, y: number };
+  o?: { x: number, y: number };
   h?: number;
   ti?: number[];
   to?: number[];
-  beziers?: BezierEasing.EasingFunction[]
+  beziers?: BezierEasing.EasingFunction[];
+  bezierData?: { segmentLength: number, points: TypePoint[] },
+  n?: string,
 }
 
 export type TypeValueKeyframedProperty = {

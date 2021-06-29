@@ -55,10 +55,10 @@ function buildBezierData(s: number[], e: number[], to: number[], ti: number[]) {
       ptDistance = Math.sqrt(ptDistance);
       segmentLength += ptDistance;
 
-      points[k] = {
+      points.push({
         partialLength: ptDistance,
         point
-      }
+      });
 
       lastPoint = point;
     }

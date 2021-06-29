@@ -50,7 +50,6 @@ export default class TransformFrames {
   }
 
   constructor(data: KeyFrames) {
-    console.log(data)
     const { create } = TransformFrames;
 
     this.p = create(data.p, 1);

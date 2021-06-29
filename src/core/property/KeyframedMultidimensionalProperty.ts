@@ -4,9 +4,7 @@ import BaseProperty, { TypeKeyframe, TypeMultiDimensionalKeyframedProperty } fro
 
 type TypeCaching = {
   lastIndex: number;
-  lastFrame: number;
   value: Float32Array;
-  lastKeyframeIndex?: number;
   lastPoint?: number;
   lastAddedLength?: number;
 }
@@ -19,17 +17,16 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
 
   constructor(data: TypeMultiDimensionalKeyframedProperty, mult: number = 1) {
     super(data, mult);
-    const len = data.k.length;
 
-    this.newValue = new Float32Array(len);
-    let arrLen = data.k[0].s.length;
+    let arrLen = this.value[0].s.length;
+    this.newValue = new Float32Array(arrLen);
     this.v = new Float32Array(arrLen);
 
     for (let i = 0; i < arrLen; i += 1) {
       this.v[i] = 0;
     }
 
-    this._caching = { lastFrame: 0, lastIndex: 0, value: new Float32Array(arrLen) };
+    this._caching = { value: new Float32Array(arrLen), lastPoint: 0, lastAddedLength: 0, lastIndex: 0 };
   }
 
   /**
@@ -75,54 +72,32 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
         keyData.bezierData = bez.buildBezierData(keyData.s, nextKeyData.s || keyData.e, keyData.to, keyData.ti);
       }
 
-      let bezierData = keyData.bezierData;
+      const { points, segmentLength } = keyData.bezierData;
 
-      if (frameNum >= nextKeyTime || frameNum < keyTime) {
-        let ind = frameNum >= nextKeyTime ? bezierData.points.length - 1 : 0;
-        const kLen = bezierData.points[ind].point.length;
-        for (let k = 0; k < kLen; k += 1) {
-          newValue[k] = bezierData.points[ind].point[k];
-        }
-        // caching.lastKeyframeIndex = -1;
-      } else {
-        const bezier = bez.getBezierEasing(keyData.o.x as number, keyData.o.y as number, keyData.i.x as number, keyData.i.y as number, keyData.n);
-        const perc = bezier((frameNum - keyTime) / (nextKeyTime - keyTime));
-        let distanceInLine = bezierData.segmentLength * perc;
+      const bezier = bez.getBezierEasing(keyData.o.x, keyData.o.y, keyData.i.x, keyData.i.y, keyData.n);
+      const perc: number = bezier((frameNum - keyTime) / (nextKeyTime - keyTime));
+      let distanceInLine: number = segmentLength * perc;
 
-        let segmentPerc: number;
-        let addedLength = (caching.lastFrame < frameNum && caching.lastKeyframeIndex === i) ? caching.lastAddedLength : 0;
-        let j = (caching.lastFrame < frameNum && caching.lastKeyframeIndex === i) ? caching.lastPoint : 0;
-        const jLen = bezierData.points.length;
+      let addedLength: number = caching.lastAddedLength;
+      let j: number = caching.lastPoint;
 
-        let flag: boolean = true;
-
-        while (flag) {
-          addedLength += bezierData.points[j].partialLength;
-          if (distanceInLine === 0 || perc === 0 || j === bezierData.points.length - 1) {
-            const kLen = bezierData.points[j].point.length;
-            for (let k = 0; k < kLen; k += 1) {
-              newValue[k] = bezierData.points[j].point[k];
-            }
-            break;
-          } else if (distanceInLine >= addedLength && distanceInLine < addedLength + bezierData.points[j + 1].partialLength) {
-            segmentPerc = (distanceInLine - addedLength) / bezierData.points[j + 1].partialLength;
-            const kLen = bezierData.points[j].point.length;
-            for (let k = 0; k < kLen; k += 1) {
-              newValue[k] = bezierData.points[j].point[k] + (bezierData.points[j + 1].point[k] - bezierData.points[j].point[k]) * segmentPerc;
-            }
-            break;
-          }
-          if (j < jLen - 1) {
-            j += 1;
-          } else {
-            flag = false;
-          }
-        }
-
-        caching.lastPoint = j;
-        caching.lastAddedLength = addedLength - bezierData.points[j].partialLength;
-        caching.lastKeyframeIndex = i;
+      if (distanceInLine === 0 || perc === 0 || j === points.length - 1) {
+        newValue = points[j].point;
       }
+      else {
+        const point = points[j];
+        const nextPoint = points[j + 1];
+
+        const segmentPerc: number = (distanceInLine - addedLength) / nextPoint.partialLength;
+
+        for (let k = 0, l = point.point.length; k < l; k += 1) {
+          newValue[k] = point.point[k] + (nextPoint.point[k] - point.point[k]) * segmentPerc;
+        }
+
+      }
+
+      caching.lastPoint = j;
+      caching.lastAddedLength = addedLength - points[j].partialLength;
     } else {
       keyData.beziers = [];
 
@@ -138,10 +113,6 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
     if (this.expression) {
       frameNum = this.expression.update(frameNum);
     }
-
-    this._caching.lastKeyframeIndex = -1;
-    this._caching.lastIndex = 0;
-    this._caching.lastFrame = frameNum;
 
     const finalValue = this._interpolateValue(frameNum);
 

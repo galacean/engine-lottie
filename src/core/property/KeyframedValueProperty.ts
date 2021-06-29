@@ -3,9 +3,7 @@ import BaseProperty, { TypeKeyframe, TypeValueKeyframedProperty } from './BasePr
 
 type TypeCaching = {
   lastIndex: number;
-  lastFrame: number;
   value: number;
-  lastKeyframeIndex: number;
 }
 
 /**
@@ -16,7 +14,7 @@ export default class KeyframedValueProperty extends BaseProperty {
 
   constructor(data: TypeValueKeyframedProperty, mult: number = 1) {
     super(data, mult);
-    this._caching = { lastFrame: 0, lastIndex: 0, value: 0, lastKeyframeIndex: -1 };
+    this._caching = { lastIndex: 0, value: 0 };
     this.v = 0;
 
     if (Expression.hasSupportExpression(data)) {
@@ -65,10 +63,6 @@ export default class KeyframedValueProperty extends BaseProperty {
     if (this.expression) {
       frameNum = this.expression.update(frameNum);
     }
-
-    this._caching.lastKeyframeIndex = -1;
-    this._caching.lastIndex = 0;
-    this._caching.lastFrame = frameNum;
 
     this.v = this._interpolateValue(frameNum) * this.mult;
   }

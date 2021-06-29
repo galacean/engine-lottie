@@ -8,7 +8,7 @@ import { TypeValueProperty } from './BaseProperty';
 export default class ValueProperty extends BaseProperty {
   constructor(data: TypeValueProperty, mult: number = 1) {
     super(data, mult);
-    this.v = mult ? data.k * mult : data.k;
+    this.v = mult ? this.value * mult : this.value;
   }
 
   update() {
