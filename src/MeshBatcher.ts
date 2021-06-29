@@ -9,7 +9,6 @@ import {
   MeshRenderer,
   BufferMesh,
 } from 'oasis-engine';
-import { SkeletonMaterial } from './LottieMaterial';
 
 /**
  * @internal
@@ -25,6 +24,7 @@ export class MeshBatcher extends MeshRenderer {
 
   constructor(entity: Entity) {
     super(entity);
+    this.shaderData.enableMacro('USE_MODEL_MATRIX');
   }
 
   init(l: number): void {
@@ -66,7 +66,7 @@ export class MeshBatcher extends MeshRenderer {
 
     this.mesh = mesh;
 
-    this.setMaterial(new SkeletonMaterial(this.engine));
+    this.setMaterial(this.engine._spriteDefaultMaterial);
   }
 
   setBufferData(): void {

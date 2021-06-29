@@ -155,7 +155,7 @@ export class LottieAnimation extends Script {
 
 		batch.setBufferData();
 
-		batch.getMaterial().shaderData.setTexture('map', this._resource.texture);
+		batch.shaderData.setTexture('u_spriteTexture', this._resource.texture);
 
 		return batch;
 	}
