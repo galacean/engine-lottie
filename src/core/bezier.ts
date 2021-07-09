@@ -31,8 +31,6 @@ function buildBezierData(s: number[], e: number[], to: number[], ti: number[]) {
     let lastPoint: number[];
     let points = [];
 
-    // console.log('s:', s, 'e:', e, 'to:', to, 'ti:', ti)
-
     for (let k = 0; k < curveSegments; k++) {
       const len = to.length;
       const point: number[] = new Array(len);

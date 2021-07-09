@@ -22,10 +22,11 @@ export default class KeyframedValueProperty extends BaseProperty {
     }
   }
 
-  /**
-   * interpolate value
-   */
-  private _interpolateValue(frameNum: number): number {
+  update(frameNum: number) {
+    if (this.expression) {
+      frameNum = this.expression.update(frameNum);
+    }
+
     const caching = this._caching;
     let { lastIndex } = caching;
     const { value } = this;
@@ -56,14 +57,6 @@ export default class KeyframedValueProperty extends BaseProperty {
     caching.lastIndex = lastIndex;
     keyData.beziers = [];
 
-    return this.getValue(frameNum, 0, keyData, nextKeyData);
-  }
-
-  update(frameNum: number) {
-    if (this.expression) {
-      frameNum = this.expression.update(frameNum);
-    }
-
-    this.v = this._interpolateValue(frameNum) * this.mult;
+    this.v = this.getValue(frameNum, 0, keyData, nextKeyData) * this.mult;
   }
 }
