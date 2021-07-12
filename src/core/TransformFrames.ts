@@ -95,7 +95,7 @@ export default class TransformFrames {
     }
   }
 
-  update(frameNum = 0) {
+  update(frameNum: number = 0) {
     const len = this.properties.length;
 
     for (let i = 0; i < len; i += 1) {
