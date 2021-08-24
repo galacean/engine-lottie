@@ -132,7 +132,7 @@ export class LottieAnimation extends Script {
 			// @ts-ignore
 			spriteRenderer._renderSortId = layer.index;
 			// @ts-ignore
-			spriteRenderer._curtomRootEntity = this.entity;
+			spriteRenderer._customRootEntity = this.entity;
 			layer.entity = spriteEntity;
 			layer.spriteRenderer = spriteRenderer;
 			const curBounds = sprite.bounds;
