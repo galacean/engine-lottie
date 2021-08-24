@@ -61,7 +61,6 @@ function buildBezierData(s: number[], e: number[], to: number[], ti: number[]) {
       lastPoint = point;
     }
 
-    // console.log('points:', points)
     storedData[bezierName] = {
       segmentLength,
       points

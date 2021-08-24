@@ -104,7 +104,7 @@ export class LottieAnimation extends Script {
 		const layer: T[] = Object.values(layersMap);
 
 		return layer.sort((a: T, b: T) => {
-			return a.index - b.index;
+			return b.index - a.index;
 		})
 	}
 
@@ -126,7 +126,6 @@ export class LottieAnimation extends Script {
 			spriteRenderer.sprite = sprite;
 			layer.entity = spriteEntity;
 			layer.spriteRenderer = spriteRenderer;
-			console.log(layer.spriteRenderer.getMaterial())
 		}
 
 		for (let i = 0; i < layers.length; i++) {
@@ -183,11 +182,11 @@ export class LottieAnimation extends Script {
 		entityTransform.setRotation(rx * radianToDeg, ry * radianToDeg, rz * radianToDeg);
 
 		if (parent?.transform?.a) {
-			entityTransform.setPosition((p[0] - parent.transform.a.v[0]) / pixelsPerUnit, (-p[1] + parent.transform.a.v[1]) / pixelsPerUnit, p[2] / pixelsPerUnit);
-		}
-		else {
-			entityTransform.setPosition((p[0] - this._width / 2) / pixelsPerUnit, (-p[1] + this._height / 2) / pixelsPerUnit, p[2] / pixelsPerUnit);
-		}
+      entityTransform.setPosition((p[0] - parent.transform.a.v[0]) / pixelsPerUnit, (-p[1] + parent.transform.a.v[1]) / pixelsPerUnit, p[2] / pixelsPerUnit);
+    }
+    else {
+      entityTransform.setPosition((p[0] - this._width / 2) / pixelsPerUnit, (-p[1] + this._height / 2) / pixelsPerUnit, p[2] / pixelsPerUnit);
+    }
 	}
 
 	/**
