@@ -1,9 +1,9 @@
-import { CompLottieLayer, SpriteLottieLayer, Tools } from './core';
-import { Script, Vector2, SpriteRenderer, Color } from "oasis-engine";
-import { LottieResource } from './LottieResource';
-import BaseLottieLayer from './core/layer/BaseLottieLayer';
+import { CompLottieLayer, SpriteLottieLayer, Tools } from "./core";
+import { Script, Vector2, SpriteRenderer, BoundingBox } from "oasis-engine";
+import { LottieResource } from "./LottieResource";
+import BaseLottieLayer from "./core/layer/BaseLottieLayer";
 
-export { LottieLoader } from './LottieLoader';
+export { LottieLoader } from "./LottieLoader";
 
 export class LottieAnimation extends Script {
 	/** The number of units in world space that correspond to one pixel in the sprite. */
@@ -57,7 +57,7 @@ export class LottieAnimation extends Script {
 
 	private _buildLottieTree<T extends BaseLottieLayer>(comp: CompLottieLayer): T[] {
 		const layers = comp.layer;
-		const layersMap = {}
+		const layersMap = {};
 		let children = [];
 
 		for (let i = layers.length - 1; i >= 0; i--) {
@@ -92,7 +92,7 @@ export class LottieAnimation extends Script {
 			}
 		}
 
-		for (let i = 0; i < children.length; i++) {
+		for (let i = 0, l = children.length; i < l; i++) {
 			const layer = children[i];
 			const { parent } = layer;
 
@@ -103,13 +103,11 @@ export class LottieAnimation extends Script {
 
 		const layer: T[] = Object.values(layersMap);
 
-		return layer.sort((a: T, b: T) => {
-			return b.index - a.index;
-		})
+		return layer;
 	}
 
 	private _updateLayers<T extends BaseLottieLayer>(layers: T[]): void {
-		for (let i = 0; i < layers.length; i++) {
+		for (let i = 0, l = layers.length; i < l; i++) {
 			const layer = layers[i];
 
 			this._updateLayer(layer);
@@ -117,23 +115,38 @@ export class LottieAnimation extends Script {
 	}
 
 	private _createLayers(layers) {
-		for (let i = 0; i < layers.length; i++) {
+		const mergeBounds = new BoundingBox();
+		const minValue = Number.MIN_SAFE_INTEGER;
+		const maxValue = Number.MAX_SAFE_INTEGER;
+		mergeBounds.min.setValue(maxValue, maxValue, maxValue);
+		mergeBounds.max.setValue(minValue, minValue, minValue);
+
+		const len = layers.length;
+		for (let i = 0; i < len; i++) {
 			const layer = layers[i];
 
 			const { sprite } = layer;
 			const spriteEntity = this.entity.createChild(sprite.name);
 			const spriteRenderer = spriteEntity.addComponent(SpriteRenderer);
 			spriteRenderer.sprite = sprite;
+			// @ts-ignore
+			spriteRenderer._renderSortId = layer.index;
+			// @ts-ignore
+			spriteRenderer._customRootEntity = this.entity;
 			layer.entity = spriteEntity;
 			layer.spriteRenderer = spriteRenderer;
+			const curBounds = sprite.bounds;
+			BoundingBox.merge(curBounds, mergeBounds, mergeBounds);
 		}
 
-		for (let i = 0; i < layers.length; i++) {
+		for (let i = 0; i < len; i++) {
 			const layer = layers[i];
 
 			if (layer.parent?.entity) {
 				layer.entity.parent = layer.parent?.entity;
 			}
+
+			layer.entity.getComponent(SpriteRenderer)._customLocalBounds = mergeBounds;
 		}
 	}
 
@@ -166,31 +179,38 @@ export class LottieAnimation extends Script {
 			rx = transform.rx ? transform.rx.v : 0;
 			ry = transform.ry ? transform.ry.v : 0;
 			rz = transform.rz ? transform.rz.v : 0;
-		}
-		else if (transform.or) {
+		} else if (transform.or) {
 			const { v } = transform.or;
 			rx = v[0];
 			ry = v[1];
 			rz = v[2];
 		}
 
-		spriteRenderer.color = new Color(1, 1, 1, o);
+		spriteRenderer.color.setValue(1, 1, 1, o);
 
 		sprite.pivot = new Vector2(a[0] / width, (height - a[1]) / height);
 
 		entityTransform.setScale(s[0], s[1], 1);
+
 		entityTransform.setRotation(rx * radianToDeg, ry * radianToDeg, rz * radianToDeg);
 
 		if (parent?.transform?.a) {
-      entityTransform.setPosition((p[0] - parent.transform.a.v[0]) / pixelsPerUnit, (-p[1] + parent.transform.a.v[1]) / pixelsPerUnit, p[2] / pixelsPerUnit);
-    }
-    else {
-      entityTransform.setPosition((p[0] - this._width / 2) / pixelsPerUnit, (-p[1] + this._height / 2) / pixelsPerUnit, p[2] / pixelsPerUnit);
-    }
+			entityTransform.setPosition(
+				(p[0] - parent.transform.a.v[0]) / pixelsPerUnit,
+				(-p[1] + parent.transform.a.v[1]) / pixelsPerUnit,
+				p[2] / pixelsPerUnit,
+			);
+		} else {
+			entityTransform.setPosition(
+				(p[0] - this._width / 2) / pixelsPerUnit,
+				(-p[1] + this._height / 2) / pixelsPerUnit,
+				p[2] / pixelsPerUnit,
+			);
+		}
 	}
 
 	/**
-	 * @override 
+	 * @override
 	 */
 	onUpdate(deltaTime: number): void {
 		const time = this.direction * this.speed * deltaTime;
