@@ -151,6 +151,7 @@ export class LottieAnimation extends Script {
 	}
 
 	private _updateLayer<T extends BaseLottieLayer>(layer: T) {
+		// @ts-ignore
 		const { transform, entity, sprite, spriteRenderer, parent, width, height } = layer;
 		const entityTransform = entity.transform;
 		const a = transform.a.v;
