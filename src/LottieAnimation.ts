@@ -1,5 +1,5 @@
 import { CompLottieLayer, SpriteLottieLayer, Tools } from "./core";
-import { Script, Vector2, SpriteRenderer, BoundingBox } from "oasis-engine";
+import { Script, Vector2, SpriteRenderer, BoundingBox, ignoreClone, deepClone, Entity } from "oasis-engine";
 import { LottieResource } from "./LottieResource";
 import BaseLottieLayer from "./core/layer/BaseLottieLayer";
 
@@ -19,12 +19,15 @@ export class LottieAnimation extends Script {
 
 	private _width: number;
 	private _height: number;
-	private _root: CompLottieLayer = null;
 	private _isPlaying: boolean = false;
 	private _frame: number = 0;
-	private _layers: (SpriteLottieLayer | CompLottieLayer)[];
-	// private _batch: MeshBatcher;
+
 	private _resource: LottieResource;
+
+	@ignoreClone
+	private _root: CompLottieLayer = null;
+	@ignoreClone
+	private _layers: (SpriteLottieLayer | CompLottieLayer)[];
 
 	set res(value: LottieResource) {
 		this._resource = value;
@@ -56,12 +59,12 @@ export class LottieAnimation extends Script {
 	}
 
 	private _buildLottieTree<T extends BaseLottieLayer>(comp: CompLottieLayer): T[] {
-		const layers = comp.layer;
+		const lottieLayers = comp.layer;
 		const layersMap = {};
 		let children = [];
 
-		for (let i = layers.length - 1; i >= 0; i--) {
-			const layer = layers[i];
+		for (let i = lottieLayers.length - 1; i >= 0; i--) {
+			const layer = lottieLayers[i];
 			let element = null;
 
 			if (layer.td !== undefined) continue;
@@ -72,7 +75,7 @@ export class LottieAnimation extends Script {
 					children.push(element);
 					break;
 				case 2:
-					element = new SpriteLottieLayer(layer, this._resource.atlas);
+					element = new SpriteLottieLayer(layer, this._resource.atlas, this.entity, i);
 					break;
 			}
 
@@ -101,9 +104,9 @@ export class LottieAnimation extends Script {
 			}
 		}
 
-		const layer: T[] = Object.values(layersMap);
+		const layers: T[] = Object.values(layersMap);
 
-		return layer;
+		return layers;
 	}
 
 	private _updateLayers<T extends BaseLottieLayer>(layers: T[]): void {
@@ -122,19 +125,12 @@ export class LottieAnimation extends Script {
 		mergeBounds.max.setValue(minValue, minValue, minValue);
 
 		const len = layers.length;
+
 		for (let i = 0; i < len; i++) {
 			const layer = layers[i];
 
 			const { sprite } = layer;
-			const spriteEntity = this.entity.createChild(sprite.name);
-			const spriteRenderer = spriteEntity.addComponent(SpriteRenderer);
-			spriteRenderer.sprite = sprite;
-			// @ts-ignore
-			spriteRenderer._renderSortId = layer.index;
-			// @ts-ignore
-			spriteRenderer._customRootEntity = this.entity;
-			layer.entity = spriteEntity;
-			layer.spriteRenderer = spriteRenderer;
+			this.entity.addChild(layer.entity);
 			const curBounds = sprite.bounds;
 			BoundingBox.merge(curBounds, mergeBounds, mergeBounds);
 		}
@@ -251,5 +247,15 @@ export class LottieAnimation extends Script {
 		const bottomSpill = this._frame <= 0 && this.direction === -1;
 		const topSpill = this._frame >= this._resource.duration && this.direction === 1;
 		return bottomSpill || topSpill;
+	}
+
+	/**
+	 * @override
+	 * @param target 
+	 */
+	_cloneTo(target) {
+		target._root = new CompLottieLayer(this.res);
+		target._layers = target._buildLottieTree(target._root);
+		target._createLayers(target._layers);
 	}
 }
