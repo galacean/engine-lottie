@@ -16,7 +16,7 @@ This is a [lottie](https://airbnb.design/lottie/) runtime created by [oasis engi
 
 ## Usage
 
-Before using the code below, you should merge the **assets** (base64 encoding strings) in lottie json to one sprite sheet. It's convenient to complete the task with tools like [TexturePacker](https://www.codeandweb.com/texturepacker) which will generate a atlas file and a sprite image.
+Before using the code below, you should merge the **assets** (base64 encoding strings) in lottie json to one sprite atlas. It's convenient to complete the task with tools like [tool-atlas-lottie](https://www.npmjs.com/package/@oasis-engine/tool-atlas-lottie) which will generate a folder which contains three files: a processed lottie JSON file, an atlas file and an image.
 
 ```typescript
 import { LottieAnimation } from "@oasis-engine/lottie";
@@ -24,9 +24,8 @@ import { LottieAnimation } from "@oasis-engine/lottie";
 // Load lottie json、atlas and image file with engine's `resourceManager`
 engine.resourceManager.load({
   urls: [
-    'https://gw.alipayobjects.com/os/bmw-prod/bf9346a5-8c25-48e2-b2c6-8a504707c8c7.json',
-    'https://gw.alipayobjects.com/os/bmw-prod/083ff1ac-15d9-42cb-8d7a-5b7c39b81f5f.json',
-    'https://gw.alipayobjects.com/mdn/rms_e54b79/afts/img/A*Ax4DSrekVhEAAAAAAAAAAAAAARQnAQ'
+    'https://gw.alipayobjects.com/os/bmw-prod/9ad65a42-9171-47ab-9218-54cf175f6201.json',
+    'https://gw.alipayobjects.com/os/bmw-prod/58cde292-8675-4299-b400-d98029b48ac7.atlas',
   ],
   type: 'lottie'
 }).then((lottieEntity) => {
