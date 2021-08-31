@@ -2,7 +2,7 @@ import { Script, Entity, Parser } from "oasis-engine";
 import { LottieAnimation } from "../LottieAnimation";
 
 export class LottieComponent extends Script {
-  private _resource: any;
+  private _resource: Entity;
   private _isLooping = true;
   private _speed = 1;
 
@@ -11,6 +11,7 @@ export class LottieComponent extends Script {
     if (!lottieEntity) return;
     const lottieAnimation = lottieEntity.getComponent(LottieAnimation);
     this.entity.addChild(lottieEntity);
+    this.isLooping = this.isLooping;
     lottieAnimation.play();
   }
 
