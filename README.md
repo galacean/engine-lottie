@@ -21,7 +21,7 @@ Before using the code below, you should merge the **assets** (base64 encoding st
 ```typescript
 import { LottieAnimation } from "@oasis-engine/lottie";
 
-// Load lottie json、atlas and image file with engine's `resourceManager`
+// Load lottie json、atlas file with engine's `resourceManager`
 engine.resourceManager.load({
   urls: [
     'https://gw.alipayobjects.com/os/bmw-prod/9ad65a42-9171-47ab-9218-54cf175f6201.json',
