@@ -89,9 +89,9 @@ export class LottieAnimation extends Script {
 
 				if (layer.parent) {
 					children.push(layer);
-				} else {
-					comp.addChild(element);
 				}
+
+				comp.addChild(element);
 			}
 		}
 
