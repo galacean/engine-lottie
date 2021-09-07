@@ -64,29 +64,27 @@ export default class TransformFrames {
     this.o = create(data.o, 0, 0.01);
     this.properties.push(this.o);
 
-    const degToRads = Math.PI / 180;
-
     // 2d rotation
     if (data.r) {
-      this.r = create(data.r, 0, degToRads);
+      this.r = create(data.r, 0);
       this.properties.push(this.r);
     }
     // 3d rotation
     else if (data.rx || data.ry || data.rz) {
       if (data.rx) {
-        this.rx = create(data.rx, 0, degToRads);
+        this.rx = create(data.rx, 0);
         this.properties.push(this.rx);
       }
       if (data.ry) {
-        this.ry = create(data.ry, 0, degToRads);
+        this.ry = create(data.ry, 0);
         this.properties.push(this.ry);
       }
       if (data.rz) {
-        this.rz = create(data.rz, 0, degToRads);
+        this.rz = create(data.rz, 0);
         this.properties.push(this.rz);
       }
     } else if (data.or) {
-      this.or = create(data.or, 1, degToRads);
+      this.or = create(data.or, 1);
       this.properties.push(this.or);
     }
 

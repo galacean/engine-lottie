@@ -77,35 +77,41 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
 
       // Time bezier easing
       const bezier = bez.getBezierEasing(keyData.o.x, keyData.o.y, keyData.i.x, keyData.i.y, keyData.n);
-      const percent: number = bezier((frameNum - keyTime) / (nextKeyTime - keyTime));
+      let t = (frameNum - keyTime) / (nextKeyTime - keyTime);
+      t = Math.min(Math.max(0, t), 1);
+
+      const percent: number = bezier(t);
 
       let distanceInLine: number = segmentLength * percent;
 
       let { addedLength, lastPoint } = caching;
 
-      if (percent === 0 || lastPoint === points.length - 1) {
-        newValue = points[lastPoint].point;
-      }
-      else {
-        for (let i = lastPoint, l = points.length; i < l; i++) {
-          if (distanceInLine >= addedLength && distanceInLine < addedLength + points[i + 1].partialLength) {
-            const point = points[lastPoint];
-            const nextPoint = points[lastPoint+ 1];
+      for (let i = lastPoint, l = points.length; i < l; i++) {
+        if (i === l - 1) {
+          lastPoint = 0;
+          addedLength = 0;
 
-            const segmentPerc: number = (distanceInLine - addedLength) / nextPoint.partialLength;
+          break;
+        }
 
-            for (let k = 0, l = point.point.length; k < l; k += 1) {
-              newValue[k] = point.point[k] + (nextPoint.point[k] - point.point[k]) * segmentPerc;
-            }
+        lastPoint = i;
 
-            lastPoint = i;
+        const point = points[i];
+        const nextPoint = points[i + 1];
+        const { partialLength } = nextPoint;
 
-            break;
+        if (distanceInLine >= addedLength && distanceInLine < addedLength + partialLength) {
+          const segmentPercent: number = (distanceInLine - addedLength) / partialLength;
+
+          for (let k = 0, l = point.point.length; k < l; k += 1) {
+            newValue[k] = point.point[k] + (nextPoint.point[k] - point.point[k]) * segmentPercent;
           }
 
-          // Add partial length util the distanceInLine is between two points.
-          addedLength += points[i].partialLength;
+          break;
         }
+
+        // Add partial length util the distanceInLine is between two points.
+        addedLength += partialLength;
       }
 
       caching.lastPoint = lastPoint;

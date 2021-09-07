@@ -33,7 +33,7 @@ function App() {
 			const clone = lottieEntity.clone();
 			root.addChild(clone);
 			const lottie1:LottieAnimation = clone.getComponent(LottieAnimation);
-			clone.transform.setPosition(0, -2, 0);
+			clone.transform.setPosition(2, 0, 0);
 			lottie1.isLooping = true;
 			lottie1.speed = 0.5;
 			lottie1.play();
@@ -41,8 +41,8 @@ function App() {
 
 		engine.resourceManager.load<Entity>({
 			urls: [
-				"https://gw.alipayobjects.com/os/bmw-prod/fe5aa92d-b573-439d-a14e-9212d45d480d.json",
-				"https://gw.alipayobjects.com/os/bmw-prod/56bd6b71-bd34-485c-b727-6cad484d8896.atlas"
+				"https://gw.alipayobjects.com/os/bmw-prod/70bed2d5-7284-44bf-9df6-638f66945ffd.json",
+				"https://gw.alipayobjects.com/os/bmw-prod/66b4c260-bbf1-4e7a-90a5-554edd43168c.atlas"
 			],
 			type: 'lottie'
 		}).then((lottieEntity) => {
@@ -50,6 +50,21 @@ function App() {
 			const lottie:LottieAnimation = lottieEntity.getComponent(LottieAnimation);
 			lottie.isLooping = true;
 			lottieEntity.transform.setPosition(0, 2, 0);
+			lottieEntity.transform.setScale(0.5, 0.5, 0.5);
+			lottie.play();
+		});
+
+		engine.resourceManager.load<Entity>({
+			urls: [
+				"https://gw.alipayobjects.com/os/OasisHub/2c60c9b9-f82f-4c86-83f3-38a34bcf8b4a/870d1b337917bdb9bf024e191ba2a424-oasis-1630915668988-%25E5%258A%25A8%25E6%2595%2588%25E5%258C%25BA%25E5%259F%259F.json",
+				"https://gw.alipayobjects.com/os/OasisHub/385e89f5-3862-43f5-9208-4b752481216e/05997b6d18c03eea5acbd3ed26cd59c3-oasis-1630915668988-%25E5%258A%25A8%25E6%2595%2588%25E5%258C%25BA%25E5%259F%259F.atlas"
+			],
+			type: 'lottie'
+		}).then((lottieEntity) => {
+			root.addChild(lottieEntity);
+			const lottie:LottieAnimation = lottieEntity.getComponent(LottieAnimation);
+			lottie.isLooping = true;
+			lottieEntity.transform.setPosition(3, 2, 0);
 			lottieEntity.transform.setScale(0.5, 0.5, 0.5);
 			lottie.play();
 		});

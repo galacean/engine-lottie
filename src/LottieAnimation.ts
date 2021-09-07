@@ -89,9 +89,9 @@ export class LottieAnimation extends Script {
 
 				if (layer.parent) {
 					children.push(layer);
-				} else {
-					comp.addChild(element);
 				}
+
+				comp.addChild(element);
 			}
 		}
 
@@ -161,7 +161,6 @@ export class LottieAnimation extends Script {
 
 		const o = layer.visible ? transform.o.v : 0;
 		const { pixelsPerUnit } = sprite;
-		const radianToDeg = 360 / Math.PI;
 
 		let rx = 0;
 		let ry = 0;
@@ -189,7 +188,7 @@ export class LottieAnimation extends Script {
 
 		entityTransform.setScale(s[0], s[1], 1);
 
-		entityTransform.setRotation(rx * radianToDeg, ry * radianToDeg, rz * radianToDeg);
+		entityTransform.setRotation(rx, ry, rz);
 
 		if (parent?.transform?.a) {
 			entityTransform.setPosition(
