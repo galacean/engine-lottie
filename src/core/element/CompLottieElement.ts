@@ -11,7 +11,6 @@ export default class CompLottieElement extends BaseLottieElement {
     super(layer);
 
     this.layers = layer.layers;
-    this.update();
 
     if (entity) {
       this.entity = entity;
