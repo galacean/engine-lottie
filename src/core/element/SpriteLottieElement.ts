@@ -1,12 +1,11 @@
 import { Engine, Entity, Sprite, SpriteAtlas, SpriteRenderer } from 'oasis-engine';
-import BaseLottieLayer from './BaseLottieLayer';
+import BaseLottieElement from './BaseLottieElement';
 
 /**
  * @internal
  */
-export default class SpriteLottieLayer extends BaseLottieLayer {
+export default class SpriteLottieLayer extends BaseLottieElement {
   sprite: Sprite;
-  entity: Entity;
   spriteRenderer: SpriteRenderer;
 
   constructor(layer, atlas: SpriteAtlas, entity: Entity, index: number) {
@@ -15,7 +14,7 @@ export default class SpriteLottieLayer extends BaseLottieLayer {
     if (layer.refId) {
       this.sprite = atlas.getSprite(layer.refId);
       const { atlasRegion, texture } = this.sprite;
-      const name = `${this.sprite.name}_${index}`;
+      const name = `${layer.nm}_${index}`;
       const childEntity = entity.findByName(name);
 
       // If it has entity already(such as cloned entity), set the existed entity to the layer
@@ -43,7 +42,5 @@ export default class SpriteLottieLayer extends BaseLottieLayer {
       this.width = atlasRegion.width * texture.width;
       this.height = atlasRegion.height * texture.height;
     }
-
-    this.update(0, true);
   }
 }

@@ -44,6 +44,7 @@ export class LottieResource extends EngineObject {
 	width: number; 
 	layers: TypeLayer[];
 	atlas: any;
+	name: string;
 
 	constructor(engine: Engine, res: TypeRes, atlas: any) {
 		super(engine);
@@ -56,6 +57,7 @@ export class LottieResource extends EngineObject {
 		this.outPoint = res.op;
 		this.atlas = atlas;
 		this.layers = res.layers;
+		this.name = res.nm;
 	}
 
 }
