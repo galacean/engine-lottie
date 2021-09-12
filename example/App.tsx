@@ -40,6 +40,22 @@ function App() {
 			lottie1.play();
 		});
 
+		// layers in assets
+		engine.resourceManager.load<Entity>({
+			urls: [
+				"https://gw.alipayobjects.com/os/bmw-prod/4fc3999b-c55b-4cce-8020-b98b8ae6a09e.json",
+				"https://gw.alipayobjects.com/os/bmw-prod/54ccb246-a456-4b89-be51-5dc424d80938.atlas"
+			],
+			type: 'lottie'
+		}).then((lottieEntity) => {
+			root.addChild(lottieEntity);
+			const lottie:LottieAnimation = lottieEntity.getComponent(LottieAnimation);
+			lottie.isLooping = true;
+			lottieEntity.transform.setPosition(-3, 2, 0);
+			lottieEntity.transform.setScale(0.5, 0.5, 0.5);
+			lottie.play();
+		});
+
 		// 3d
 		engine.resourceManager.load<Entity>({
 			urls: [

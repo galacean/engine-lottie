@@ -1,9 +1,9 @@
-import CompLottieLayer from './layer/CompLottieLayer';
-import SpriteLottieLayer from './layer/SpriteLottieLayer';
+import CompLottieElement from './element/CompLottieElement';
+import SpriteLottieElement from './element/SpriteLottieElement';
 import Tools from './tools';
 
 export {
-  CompLottieLayer,
-  SpriteLottieLayer,
+  CompLottieElement,
+  SpriteLottieElement,
   Tools
 };

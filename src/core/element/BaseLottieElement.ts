@@ -1,34 +1,35 @@
 import { TypeLayer } from '../../LottieResource';
 import TransformFrames from '../TransformFrames';
+import { Entity } from 'oasis-engine';
 
 /**
  * @internal
  */
-export default class BaseLottieLayer {
+export default class BaseLottieElement {
   transform: TransformFrames;
   is3D: boolean;
   offsetTime: number;
   name: string;
   index: number;
   stretch: number;
-  startTime: number;
   parent: any = null;
   inPoint: any;
   outPoint: any;
   timeRemapping: any;
   width: number;
   height: number;
-  visible: boolean;
+  visible: boolean = true;
+  entity: Entity;
 
-  private isOverlapLayer: boolean; 
-  private isOverlapMode: boolean; 
-  
+  private isOverlapLayer: boolean;
+  private isOverlapMode: boolean;
+  private childLayers = [];
+
   constructor(layer: TypeLayer) {
     this.is3D = !!layer.ddd;
     this.stretch = layer.sr || 1;
     this.inPoint = layer.ip;
     this.outPoint = layer.op;
-    this.startTime = layer.st || 0;
     this.name = layer.nm || '';
     this.index = layer.ind;
     this.timeRemapping = layer.tm;
@@ -42,15 +43,30 @@ export default class BaseLottieLayer {
     }
   }
 
-  update(frameNum: number = 0, forceUpdate=false) {
+  update(frameNum: number = 0) {
+    frameNum = frameNum / this.stretch;
+
     if (this.isOverlapMode && this.isOverlapLayer) {
       this.visible = frameNum >= this.inPoint;
     } else {
       this.visible = (this.inPoint <= frameNum && this.outPoint >= frameNum);
     }
 
-    if (this.transform && (forceUpdate || this.visible)) {
+    if (this.transform && this.visible) {
       this.transform.update(frameNum);
     }
+
+    for (let i = 0; i < this.childLayers.length; i++) {
+      this.childLayers[i].update(frameNum);
+    }
+  }
+
+  /**
+   * add child layer
+   */
+  addChild(node) {
+    node.parent = this;
+    node.entity.parent = this.entity;
+    this.childLayers.push(node);
   }
 }
