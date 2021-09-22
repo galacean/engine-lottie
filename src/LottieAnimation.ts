@@ -81,11 +81,14 @@ export class LottieAnimation extends Script {
 
 			switch (layer.ty) {
 				case 0:
-					layer.id = `layer_${layer.refId}` || `layer_${layer.nm}_${layer.ind}`;
+					layer.id = layer.refId ? `layer_${layer.refId}` : `layer_${layer.nm}_${layer.ind}`;
 					element = new CompLottieElement(layer, layer.id, this.engine);
 					break;
 				case 2:
-					layer.id = layer.ind;
+					if (!layer.id) {
+						layer.id = layer.ind;
+					}
+
 					element = new SpriteLottieElement(layer, this._resource.atlas, this.entity, i);
 
 					const curBounds = element.sprite.bounds;
