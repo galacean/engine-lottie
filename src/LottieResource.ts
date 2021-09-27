@@ -45,6 +45,7 @@ export class LottieResource extends EngineObject {
 	height: number;
 	width: number; 
 	layers: TypeLayer[];
+	animations: any[];
 	comps: any[];
 	atlas: any;
 	name: string;
@@ -83,11 +84,11 @@ export class LottieResource extends EngineObject {
 			}
 		}
 
-		// TODO
-		// this.layers = [this.layers[0], this.layers[1]]
-		// this.layers = [this.layers[0], this.layers[1]]
-		this.layers = [this.layers[1]]
 		this._buildTree(this.layers, compsMap);
+	}
+
+	private _parseAnimations () {
+
 	}
 
 	private _buildTree(layers, compsMap){

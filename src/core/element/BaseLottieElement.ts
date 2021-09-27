@@ -45,18 +45,23 @@ export default class BaseLottieElement {
     }
   }
 
-  update(frameNum: number = 0) {
+  update(frameNum: number = 0, isParentVisible?: boolean) {
     const { startTime } = this;
     const frame = frameNum / this.stretch;
 
-    this.visible = this.inPoint <= frame && this.outPoint >= frame;
+    if (isParentVisible === true) {
+      this.visible = this.inPoint <= frame && this.outPoint >= frame;
+    }
+    else if (isParentVisible === false) {
+      this.visible = false;
+    }
 
     if (this.transform && this.visible) {
       this.transform.update(frame);
     }
 
     for (let i = 0; i < this.childLayers.length; i++) {
-      this.childLayers[i].update(frame - startTime);
+      this.childLayers[i].update(frame - startTime, this.visible);
     }
   }
 

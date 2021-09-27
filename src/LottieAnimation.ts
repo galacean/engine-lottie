@@ -138,7 +138,7 @@ export class LottieAnimation extends Script {
 		const entityTransform = entity.transform;
 		const a = transform.a.v;
 		const s = transform.s.v;
-		let p = transform.p.v;
+		const p = transform.p.v;
 		const o = transform.o.v;
 		const pixelsPerUnit = sprite ? sprite.pixelsPerUnit : 128;
 
@@ -146,6 +146,10 @@ export class LottieAnimation extends Script {
 		let ry = 0;
 		let rz = 0;
 
+		if (!layer.visible) {
+			entity.isActive = layer.visible;
+			return;
+		}
 
 		// 2d rotation
 		if (transform.r) {
@@ -166,21 +170,6 @@ export class LottieAnimation extends Script {
 		if (sprite) {
 			spriteRenderer.color.setValue(1, 1, 1, o);
 			sprite.pivot = new Vector2(a[0] / width, (height - a[1]) / height);
-
-			// TODO
-			if (layer.name === 'a宝箱中间logo.png' && layer.parent.parent.name === '开启前') {
-				// console.log('前', sprite.pivot);
-			}
-
-			if (layer.name === 'a宝箱中间logo.png' && layer.parent.parent.parent.name === '开启中') {
-				debugger
-				// console.log(this.entity.findByName('开启前').isActive)
-				// console.log('中', a);
-			}
-
-			if (layer.name === 'a宝箱中间logo.png' && layer.parent.parent.parent.name === '开启后') {
-				// console.log('后', sprite.pivot);
-			}
 		}
 
 		entity.isActive = layer.visible;
