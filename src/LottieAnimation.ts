@@ -59,20 +59,7 @@ export class LottieAnimation extends Script {
 		this._isPlaying = false;
 	}
 
-	private _createElements<T extends BaseLottieLayer>(value) {
-		const root = new CompLottieElement(value, value.name, this.engine, this.entity);
-		this._root = root;
-
-		const { layers } = root;
-		const elementsMap = {};
-		const children = [];
-
-		const mergeBounds = new BoundingBox();
-		const minValue = Number.MIN_SAFE_INTEGER;
-		const maxValue = Number.MAX_SAFE_INTEGER;
-		mergeBounds.min.setValue(maxValue, maxValue, maxValue);
-		mergeBounds.max.setValue(minValue, minValue, minValue);
-
+	private _createLayerElements (layers, mergeBounds, elements, parent) {
 		for (let i = layers.length - 1; i >= 0; i--) {
 			const layer = layers[i];
 			let element = null;
@@ -80,48 +67,56 @@ export class LottieAnimation extends Script {
 			if (layer.td !== undefined) continue;
 
 			switch (layer.ty) {
+
 				case 0:
-					layer.id = layer.refId ? `layer_${layer.refId}` : `layer_${layer.nm}_${layer.ind}`;
 					element = new CompLottieElement(layer, layer.id, this.engine);
 					break;
-				case 2:
-					if (!layer.id) {
-						layer.id = layer.ind;
-					}
 
-					element = new SpriteLottieElement(layer, this._resource.atlas, this.entity, i);
+				case 2:
+					element = new SpriteLottieElement(layer, this._resource.atlas, this.entity);
 
 					const curBounds = element.sprite.bounds;
 					BoundingBox.merge(curBounds, mergeBounds, mergeBounds);
-					const spriteRenderer = element.entity.getComponent(SpriteRenderer);
-					spriteRenderer._customLocalBounds = mergeBounds;
+					element.spriteRenderer._customLocalBounds = mergeBounds;
 
 					break;
-			}
 
-			if (element) {
-				elementsMap[layer.id] = element;
+				case 3:
+					if (layer?.ks?.o?.k === 0) {
+						layer.ks.o.k = 100;
+					}
 
-				if (layer.parent) {
-					children.push(layer);
-				}
-				else {
-					root.addChild(element);
-				}
+					element = new CompLottieElement(layer, layer.id, this.engine);
+					
+					break;
 
 			}
-		}
 
-		for (let i = 0, l = children.length; i < l; i++) {
-			const layer = children[i];
-			const { parent } = layer;
+			elements.push(element);
+			parent.addChild(element);
 
-			if (elementsMap[parent]) {
-				elementsMap[parent].addChild(elementsMap[layer.id]);
+			if (layer.layers) {
+				this._createLayerElements(layer.layers, mergeBounds, elements, element);
 			}
 		}
+	}
 
-		const elements: T[] = Object.values(elementsMap);
+	private _createElements(value) {
+		const root = new CompLottieElement(value, value.name, this.engine, this.entity);
+		this._root = root;
+
+		const { layers } = root;
+
+		const elements = [];
+
+		const mergeBounds = new BoundingBox();
+		const minValue = Number.MIN_SAFE_INTEGER;
+		const maxValue = Number.MAX_SAFE_INTEGER;
+		mergeBounds.min.setValue(maxValue, maxValue, maxValue);
+		mergeBounds.max.setValue(minValue, minValue, minValue);
+
+		this._createLayerElements(layers, mergeBounds, elements, root);
+
 		this._elements = elements;
 	}
 
@@ -143,13 +138,14 @@ export class LottieAnimation extends Script {
 		const entityTransform = entity.transform;
 		const a = transform.a.v;
 		const s = transform.s.v;
-		const p = transform.p.v;
-		const o = layer.visible ? transform.o.v : 0;
+		let p = transform.p.v;
+		const o = transform.o.v;
 		const pixelsPerUnit = sprite ? sprite.pixelsPerUnit : 128;
 
 		let rx = 0;
 		let ry = 0;
 		let rz = 0;
+
 
 		// 2d rotation
 		if (transform.r) {
@@ -170,7 +166,24 @@ export class LottieAnimation extends Script {
 		if (sprite) {
 			spriteRenderer.color.setValue(1, 1, 1, o);
 			sprite.pivot = new Vector2(a[0] / width, (height - a[1]) / height);
+
+			// TODO
+			if (layer.name === 'a宝箱中间logo.png' && layer.parent.parent.name === '开启前') {
+				// console.log('前', sprite.pivot);
+			}
+
+			if (layer.name === 'a宝箱中间logo.png' && layer.parent.parent.parent.name === '开启中') {
+				debugger
+				// console.log(this.entity.findByName('开启前').isActive)
+				// console.log('中', a);
+			}
+
+			if (layer.name === 'a宝箱中间logo.png' && layer.parent.parent.parent.name === '开启后') {
+				// console.log('后', sprite.pivot);
+			}
 		}
+
+		entity.isActive = layer.visible;
 
 		entityTransform.setScale(s[0], s[1], 1);
 		entityTransform.setRotation(rx, ry, rz);

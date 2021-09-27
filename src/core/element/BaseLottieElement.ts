@@ -11,7 +11,7 @@ export default class BaseLottieElement {
   offsetTime: number;
   name: string;
   index: number;
-  stretch: number;
+  stretch: number = 1;
   parent: any = null;
   inPoint: any;
   outPoint: any;
@@ -20,23 +20,25 @@ export default class BaseLottieElement {
   height: number;
   visible: boolean = true;
   entity: Entity;
+  startTime: number = 0;
 
-  private isOverlapLayer: boolean;
-  private isOverlapMode: boolean;
   private childLayers = [];
 
   constructor(layer: TypeLayer) {
     this.is3D = !!layer.ddd;
     this.stretch = layer.sr || 1;
-    this.inPoint = layer.ip;
-    this.outPoint = layer.op;
     this.name = layer.nm || '';
     this.index = layer.ind;
     this.timeRemapping = layer.tm;
     this.width = layer.w;
     this.height = layer.h;
 
-    this.isOverlapLayer = layer.op >= (this.outPoint - this.stretch);
+    this.inPoint = layer.ip;
+    this.outPoint = layer.op;
+
+    if (layer.st) {
+      this.startTime = layer.st;
+    }
 
     if (layer.ks) {
       this.transform = new TransformFrames(layer.ks);
@@ -44,20 +46,17 @@ export default class BaseLottieElement {
   }
 
   update(frameNum: number = 0) {
-    frameNum = frameNum / this.stretch;
+    const { startTime } = this;
+    const frame = frameNum / this.stretch;
 
-    if (this.isOverlapMode && this.isOverlapLayer) {
-      this.visible = frameNum >= this.inPoint;
-    } else {
-      this.visible = (this.inPoint <= frameNum && this.outPoint >= frameNum);
-    }
+    this.visible = this.inPoint <= frame && this.outPoint >= frame;
 
     if (this.transform && this.visible) {
-      this.transform.update(frameNum);
+      this.transform.update(frame);
     }
 
     for (let i = 0; i < this.childLayers.length; i++) {
-      this.childLayers[i].update(frameNum);
+      this.childLayers[i].update(frame - startTime);
     }
   }
 

@@ -18,6 +18,7 @@ export type TypeLayer = {
   w: number;
   h: number;
 	fr: number;
+	layers: TypeLayer[]
 }
 
 export type TypeRes = {
@@ -30,6 +31,7 @@ export type TypeRes = {
 	ip: number;
 	op: number;
 	layers: TypeLayer[];
+	assets: any[];
 }
 
 /**
@@ -43,6 +45,7 @@ export class LottieResource extends EngineObject {
 	height: number;
 	width: number; 
 	layers: TypeLayer[];
+	comps: any[];
 	atlas: any;
 	name: string;
 
@@ -57,7 +60,70 @@ export class LottieResource extends EngineObject {
 		this.outPoint = res.op;
 		this.atlas = atlas;
 		this.layers = res.layers;
+		this.comps = res.assets;
 		this.name = res.nm;
+
+		const compsMap = {};
+		const { comps } = this;
+
+		if(comps) {
+			for (let i = 0, l = comps.length; i < l; i++) {
+				const comp = comps[i];
+				compsMap[comp.id] = comp;
+			}
+
+			for (let i = 0, l = this.layers.length; i < l; i++) {
+				const layer = this.layers[i];
+
+				const {refId} = layer;
+
+				if (refId && compsMap[refId]) {
+					layer.layers = compsMap[refId].layers;
+				}
+			}
+		}
+
+		// TODO
+		// this.layers = [this.layers[0], this.layers[1]]
+		// this.layers = [this.layers[0], this.layers[1]]
+		this.layers = [this.layers[1]]
+		this._buildTree(this.layers, compsMap);
 	}
 
+	private _buildTree(layers, compsMap){
+		const layersMap = {};
+
+		for (let i = 0, l = layers.length; i < l; i++) {
+			const layer = layers[i];
+			layersMap[layer.ind] = layer;
+		}
+
+		const children = [];
+		
+		for (let i = 0, l = layers.length; i < l; i++) {
+			const layer = layers[i];
+			const { refId, parent } = layer;
+
+			if (parent) {
+				if (!layersMap[parent].layers) {
+					layersMap[parent].layers = [];
+				}
+
+				layersMap[parent].layers.push(layer);
+				children.push(layer);
+			}
+
+			if (refId && compsMap[refId]) {
+				layer.layers = compsMap[refId].layers;
+
+				this._buildTree(layer.layers, compsMap);
+			}
+		}
+
+		// remove children belong to the parent in layersMap
+		for (let i = 0, l = children.length; i < l; i++) {
+			const index = layers.indexOf(children[i]);
+			layers.splice(index, 1);
+		}
+	}
 }
