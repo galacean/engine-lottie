@@ -22,6 +22,8 @@ export class LottieAnimation extends Script {
 	private _isPlaying: boolean = false;
 	private _frame: number = 0;
 	private _resource: LottieResource;
+	private _clips: {};
+	private _clip: { start: number, end: number };
 
 	@ignoreClone
 	private _root: CompLottieElement = null;
@@ -32,6 +34,7 @@ export class LottieAnimation extends Script {
 		this._resource = value;
 		this._width = value.width;
 		this._height = value.height;
+		this._clips = value.clips;
 
 		this._createElements(value);
 
@@ -48,8 +51,17 @@ export class LottieAnimation extends Script {
 	/**
 	 * Play the lottie animation
 	 */
-	play(): void {
+	play(name?: string): void {
+		if (name) {
+			const clip = this._clips[name];
+			this._clip = clip;
+		}
+		else {
+			this._clip = null;
+		}
+
 		this._isPlaying = true;
+		this._frame = 0;
 	}
 
 	/**
@@ -59,7 +71,7 @@ export class LottieAnimation extends Script {
 		this._isPlaying = false;
 	}
 
-	private _createLayerElements (layers, mergeBounds, elements, parent) {
+	private _createLayerElements(layers, mergeBounds, elements, parent) {
 		for (let i = layers.length - 1; i >= 0; i--) {
 			const layer = layers[i];
 			let element = null;
@@ -87,7 +99,7 @@ export class LottieAnimation extends Script {
 					}
 
 					element = new CompLottieElement(layer, layer.id, this.engine);
-					
+
 					break;
 
 			}
@@ -202,32 +214,67 @@ export class LottieAnimation extends Script {
 
 		const time = this.direction * this.speed * deltaTime;
 		this._frame += time / this._resource.timePerFrame;
+		const clip = this._clip;
 
 		if (this._spill()) {
 			const { duration } = this._resource;
+
 			if (this.repeats > 0 || this.isLooping) {
-				if (this.repeats > 0) --this.repeats;
+				if (this.repeats > 0) {
+					--this.repeats;
+				}
+
 				if (this.isAlternate) {
 					this.direction *= -1;
-					this._frame = Tools.codomainBounce(this._frame, 0, duration);
+					if (clip) {
+						this._frame = Tools.codomainBounce(this._frame, 0, clip.end  - clip.start);
+					}
+					else {
+						this._frame = Tools.codomainBounce(this._frame, 0, duration);
+					}
 				} else {
 					this.direction = 1;
-					this._frame = Tools.euclideanModulo(this._frame, duration);
+					if (clip) {
+						this._frame = Tools.euclideanModulo(this._frame, clip.end - clip.start);
+					}
+					else {
+						this._frame = Tools.euclideanModulo(this._frame, duration);
+					}
 				}
 			} else {
-				this._frame = Tools.clamp(this._frame, 0, duration);
+				if (clip) {
+					this._frame = Tools.clamp(this._frame, 0, clip.end - clip.start);
+				}
+				else {
+					this._frame = Tools.clamp(this._frame, 0, duration);
+				}
 			}
 		}
 
-		this._updateElements(this._resource.inPoint + this._frame);
+		if (clip) {
+			this._updateElements(this._resource.inPoint + this._frame + clip.start);
+		}
+		else {
+			this._updateElements(this._resource.inPoint + this._frame);
+		}
 	}
 
 	/**
 	 * is this time frame spill the range
 	 */
 	private _spill(): boolean {
+		let duration: number;
+
+		if (this._clip) {
+			const clip = this._clip;
+			duration = clip.end - clip.start;
+		}
+		else {
+			duration = this._resource.duration;
+		}
+
 		const bottomSpill = this._frame <= 0 && this.direction === -1;
-		const topSpill = this._frame >= this._resource.duration && this.direction === 1;
+		const topSpill = this._frame >= duration && this.direction === 1;
 		return bottomSpill || topSpill;
 	}
 

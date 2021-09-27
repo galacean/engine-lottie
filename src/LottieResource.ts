@@ -6,19 +6,26 @@ import {
 export type TypeLayer = {
 	ddd: number;
 	sr: number;
-  st: number;
-  nm: string;
-  op: number;
-  ks: any;
-  ao: number;
-  ip: any;
-  ind: number;
-  refId: string;
-  tm: any;
-  w: number;
-  h: number;
+	st: number;
+	nm: string;
+	op: number;
+	ks: any;
+	ao: number;
+	ip: any;
+	ind: number;
+	refId: string;
+	tm: any;
+	w: number;
+	h: number;
 	fr: number;
 	layers: TypeLayer[]
+}
+
+type TypeAnimationClip = {
+	name: string;
+	start: number;
+	end: number;
+	auto: boolean;
 }
 
 export type TypeRes = {
@@ -32,6 +39,7 @@ export type TypeRes = {
 	op: number;
 	layers: TypeLayer[];
 	assets: any[];
+	lolitaAnimations?: TypeAnimationClip[];
 }
 
 /**
@@ -43,12 +51,13 @@ export class LottieResource extends EngineObject {
 	inPoint: number;
 	outPoint: number;
 	height: number;
-	width: number; 
+	width: number;
 	layers: TypeLayer[];
 	animations: any[];
 	comps: any[];
 	atlas: any;
 	name: string;
+	clips: {};
 
 	constructor(engine: Engine, res: TypeRes, atlas: any) {
 		super(engine);
@@ -63,11 +72,12 @@ export class LottieResource extends EngineObject {
 		this.layers = res.layers;
 		this.comps = res.assets;
 		this.name = res.nm;
+		this.clips = {};
 
 		const compsMap = {};
 		const { comps } = this;
 
-		if(comps) {
+		if (comps) {
 			for (let i = 0, l = comps.length; i < l; i++) {
 				const comp = comps[i];
 				compsMap[comp.id] = comp;
@@ -76,7 +86,7 @@ export class LottieResource extends EngineObject {
 			for (let i = 0, l = this.layers.length; i < l; i++) {
 				const layer = this.layers[i];
 
-				const {refId} = layer;
+				const { refId } = layer;
 
 				if (refId && compsMap[refId]) {
 					layer.layers = compsMap[refId].layers;
@@ -85,13 +95,22 @@ export class LottieResource extends EngineObject {
 		}
 
 		this._buildTree(this.layers, compsMap);
+
+		if (res.lolitaAnimations) {
+			this._parseAnimations(res.lolitaAnimations);
+		}
 	}
 
-	private _parseAnimations () {
-
+	private _parseAnimations(clips: TypeAnimationClip[]) {
+		clips.forEach((clip) => {
+			this.clips[clip.name] = {
+				start: clip.start,
+				end: clip.end
+			}
+		})
 	}
 
-	private _buildTree(layers, compsMap){
+	private _buildTree(layers, compsMap) {
 		const layersMap = {};
 
 		for (let i = 0, l = layers.length; i < l; i++) {
@@ -100,7 +119,7 @@ export class LottieResource extends EngineObject {
 		}
 
 		const children = [];
-		
+
 		for (let i = 0, l = layers.length; i < l; i++) {
 			const layer = layers[i];
 			const { refId, parent } = layer;
