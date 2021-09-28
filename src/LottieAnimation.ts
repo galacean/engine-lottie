@@ -65,7 +65,12 @@ export class LottieAnimation extends Script {
 		this._frame = 0;
 
 		return new Promise((resolve) => {
-			this._clipEndCallbacks[name] = resolve;
+			if (name) {
+				this._clipEndCallbacks[name] = resolve;
+			}
+			else {
+				this._clipEndCallbacks['ALL'] = resolve;
+			}
 		})
 	}
 
@@ -258,6 +263,13 @@ export class LottieAnimation extends Script {
 					this._frame = Tools.clamp(this._frame, 0, clip.end - clip.start);
 				}
 				else {
+					if (this._frame >= duration) {
+						const endCallback = this._clipEndCallbacks['ALL'];
+						if(endCallback) {
+							endCallback();
+						}
+					}
+
 					this._frame = Tools.clamp(this._frame, 0, duration);
 				}
 			}
