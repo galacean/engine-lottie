@@ -21,7 +21,7 @@ export type TypeLayer = {
 	layers: TypeLayer[]
 }
 
-type TypeAnimationClip = {
+export type TypeAnimationClip = {
 	name: string;
 	start: number;
 	end: number;
@@ -103,10 +103,7 @@ export class LottieResource extends EngineObject {
 
 	private _parseAnimations(clips: TypeAnimationClip[]) {
 		clips.forEach((clip) => {
-			this.clips[clip.name] = {
-				start: clip.start,
-				end: clip.end
-			}
+			this.clips[clip.name] = { ...clip }
 		})
 	}
 

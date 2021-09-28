@@ -1,6 +1,6 @@
 import { CompLottieElement, SpriteLottieElement, Tools } from "./core";
-import { Script, Vector2, SpriteRenderer, BoundingBox, ignoreClone } from "oasis-engine";
-import { LottieResource } from "./LottieResource";
+import { Script, Vector2, BoundingBox, ignoreClone } from "oasis-engine";
+import { LottieResource, TypeAnimationClip } from "./LottieResource";
 import BaseLottieLayer from "./core/element/BaseLottieElement";
 
 export { LottieLoader } from "./LottieLoader";
@@ -23,7 +23,8 @@ export class LottieAnimation extends Script {
 	private _frame: number = 0;
 	private _resource: LottieResource;
 	private _clips: {};
-	private _clip: { start: number, end: number };
+	private _clip: TypeAnimationClip;
+	private _clipEndCallbacks: Object = {};
 
 	@ignoreClone
 	private _root: CompLottieElement = null;
@@ -51,7 +52,7 @@ export class LottieAnimation extends Script {
 	/**
 	 * Play the lottie animation
 	 */
-	play(name?: string): void {
+	play(name?: string): Promise<any> {
 		if (name) {
 			const clip = this._clips[name];
 			this._clip = clip;
@@ -62,6 +63,10 @@ export class LottieAnimation extends Script {
 
 		this._isPlaying = true;
 		this._frame = 0;
+
+		return new Promise((resolve) => {
+			this._clipEndCallbacks[name] = resolve;
+		})
 	}
 
 	/**
@@ -243,6 +248,13 @@ export class LottieAnimation extends Script {
 				}
 			} else {
 				if (clip) {
+					if (this._frame >= clip.end - clip.start) {
+						const endCallback = this._clipEndCallbacks[clip.name];
+						if(endCallback) {
+							endCallback(clip);
+						}
+					}
+
 					this._frame = Tools.clamp(this._frame, 0, clip.end - clip.start);
 				}
 				else {
