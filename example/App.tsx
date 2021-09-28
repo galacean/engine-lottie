@@ -18,7 +18,6 @@ function App() {
 		cameraEntity.transform.lookAt(new Vector3(0, 0, 0));
 		cameraEntity.addComponent(OrbitControl);
 
-		/*
 		// lion
 		engine.resourceManager.load<Entity>({
 			urls: [
@@ -89,7 +88,6 @@ function App() {
 			lottie.play();
 		});
 
-		// /*
 		// multi keyframe property
 		engine.resourceManager.load<Entity>({
 			urls: [
@@ -106,59 +104,26 @@ function App() {
 			lottie.play();
 		});
 
-
-		// /*
 		// layers in assets
 		engine.resourceManager.load<Entity>({
 			urls: [
-				"https://gw.alipayobjects.com/os/bmw-prod/40cb0849-5747-4962-9215-8dfe0981e7aa.json",
-				"https://gw.alipayobjects.com/os/bmw-prod/4af30cc0-0606-4636-bd5f-1c434df9b387.atlas"
-			],
-			type: 'lottie'
-		}).then((lottieEntity) => {
-			root.addChild(lottieEntity);
-			const lottie:LottieAnimation = lottieEntity.getComponent(LottieAnimation);
-			lottie.isLooping = true;
-			lottieEntity.transform.setPosition(0, -4, 0);
-			lottieEntity.transform.setScale(0.5, 0.5, 0.5);
-			lottie.play();
-		});
-
-
-		// /*
-		// layers in assets
-		engine.resourceManager.load<Entity>({
-			urls: [
-				"https://gw.alipayobjects.com/os/bmw-prod/51d538cc-f95a-4a63-a2cd-bde336257786.json",
-				"https://gw.alipayobjects.com/os/bmw-prod/bec5c755-00d4-4bbf-b3a2-2b5ad3195c7f.atlas"
-			],
-			type: 'lottie'
-		}).then((lottieEntity) => {
-			root.addChild(lottieEntity);
-			const lottie:LottieAnimation = lottieEntity.getComponent(LottieAnimation);
-			lottie.isLooping = true;
-			lottieEntity.transform.setPosition(4, -4, 0);
-			lottieEntity.transform.setScale(0.5, 0.5, 0.5);
-			lottie.play();
-		});
-		*/
-
-		// /*
-		// layers in assets
-		engine.resourceManager.load<Entity>({
-			urls: [
-				"https://gw.alipayobjects.com/os/bmw-prod/b3d8569c-9e04-44af-a2f6-bfd064de0cbc.json",
+				"https://gw.alipayobjects.com/os/bmw-prod/84c13df1-567c-4a67-aa1e-c378ee698c55.json",
 				"https://gw.alipayobjects.com/os/bmw-prod/965eb2ca-ee3c-4c54-a502-7fdc0673f1d7.atlas"
 			],
 			type: 'lottie'
-		}).then((lottieEntity) => {
+		}).then(async (lottieEntity) => {
 			root.addChild(lottieEntity);
 			const lottie:LottieAnimation = lottieEntity.getComponent(LottieAnimation);
 			lottie.isLooping = true;
-			// lottieEntity.transform.setPosition(2, -4, 0);
-			lottieEntity.transform.setPosition(0, -3, 0);
-			// lottieEntity.transform.setScale(0.5, 0.5, 0.5);
-			lottie.play();
+			lottieEntity.transform.setPosition(0, -3.5, 0);
+			lottieEntity.transform.setScale(0.5, 0.5, 0.5);
+			lottie.play('beforePlay');
+
+			setTimeout(async () => {
+				lottie.isLooping = false;
+				await lottie.play('onPlay');
+				await lottie.play('afterPlay');
+			}, 5000);
 		});
 		// */
 		engine.run();
