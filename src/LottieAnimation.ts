@@ -1,6 +1,6 @@
 import { CompLottieElement, SpriteLottieElement, Tools } from "./core";
-import { Script, Vector2, SpriteRenderer, BoundingBox, ignoreClone } from "oasis-engine";
-import { LottieResource } from "./LottieResource";
+import { Script, Vector2, BoundingBox, ignoreClone, Entity } from "oasis-engine";
+import { LottieResource, TypeAnimationClip } from "./LottieResource";
 import BaseLottieLayer from "./core/element/BaseLottieElement";
 
 export { LottieLoader } from "./LottieLoader";
@@ -22,6 +22,9 @@ export class LottieAnimation extends Script {
 	private _isPlaying: boolean = false;
 	private _frame: number = 0;
 	private _resource: LottieResource;
+	private _clips: {};
+	private _clip: TypeAnimationClip;
+	private _clipEndCallbacks: Object = {};
 
 	@ignoreClone
 	private _root: CompLottieElement = null;
@@ -32,6 +35,7 @@ export class LottieAnimation extends Script {
 		this._resource = value;
 		this._width = value.width;
 		this._height = value.height;
+		this._clips = value.clips;
 
 		this._createElements(value);
 
@@ -48,8 +52,26 @@ export class LottieAnimation extends Script {
 	/**
 	 * Play the lottie animation
 	 */
-	play(): void {
+	play(name?: string): Promise<any> {
+		if (name) {
+			const clip = this._clips[name];
+			this._clip = clip;
+		}
+		else {
+			this._clip = null;
+		}
+
 		this._isPlaying = true;
+		this._frame = 0;
+
+		return new Promise((resolve) => {
+			if (name) {
+				this._clipEndCallbacks[name] = resolve;
+			}
+			else {
+				this._clipEndCallbacks['ALL'] = resolve;
+			}
+		})
 	}
 
 	/**
@@ -59,13 +81,76 @@ export class LottieAnimation extends Script {
 		this._isPlaying = false;
 	}
 
-	private _createElements<T extends BaseLottieLayer>(value) {
+	private _createLayerElements(layers, mergeBounds, elements, parent, parentTreeIndex: number[], isCloned?: boolean) {
+		for (let i = 0, l = layers.length; i < l; i++) {
+			const layer = layers[i];
+			let element = null;
+
+			if (layer.td !== undefined) continue;
+
+			const treeIndex = parentTreeIndex.concat(i);
+			let childEntity: Entity = isCloned && this._findEntityInTree(treeIndex);
+
+			switch (layer.ty) {
+				case 0:
+					element = new CompLottieElement(layer, layer.id, this.engine, childEntity);
+					break;
+
+				case 2:
+					element = new SpriteLottieElement(layer, this._resource.atlas, this.entity, childEntity);
+
+					const curBounds = element.sprite.bounds;
+					BoundingBox.merge(curBounds, mergeBounds, mergeBounds);
+					element.spriteRenderer._customLocalBounds = mergeBounds;
+
+					break;
+
+				case 3:
+					if (layer?.ks?.o?.k === 0) {
+						layer.ks.o.k = 100;
+					}
+
+					element = new CompLottieElement(layer, layer.id, this.engine);
+
+					break;
+			}
+
+			if (element) {
+				element.treeIndex = treeIndex;
+
+				elements.push(element);
+				parent.addChild(element);
+				if (layer.layers) {
+					this._createLayerElements(layer.layers, mergeBounds, elements, element, element.treeIndex, isCloned);
+				}
+			}
+		}
+	}
+
+	private _findEntityInTree(treeIndex) {
+		let childEntity: Entity;
+
+		for (let i = 0, l = treeIndex.length; i < l; i++) {
+			const index = treeIndex[i];
+
+			if (childEntity) {
+				childEntity = childEntity.children[index];
+			}
+			else {
+				childEntity = this.entity.children[index];
+			}
+		}
+
+		return childEntity;
+	}
+
+	private _createElements(value, isCloned?: boolean) {
 		const root = new CompLottieElement(value, value.name, this.engine, this.entity);
 		this._root = root;
 
 		const { layers } = root;
-		const elementsMap = {};
-		const children = [];
+
+		const elements = [];
 
 		const mergeBounds = new BoundingBox();
 		const minValue = Number.MIN_SAFE_INTEGER;
@@ -73,52 +158,8 @@ export class LottieAnimation extends Script {
 		mergeBounds.min.setValue(maxValue, maxValue, maxValue);
 		mergeBounds.max.setValue(minValue, minValue, minValue);
 
-		for (let i = layers.length - 1; i >= 0; i--) {
-			const layer = layers[i];
-			let element = null;
+		this._createLayerElements(layers, mergeBounds, elements, root, root.treeIndex, isCloned);
 
-			if (layer.td !== undefined) continue;
-
-			switch (layer.ty) {
-				case 0:
-					layer.id = `layer_${layer.refId}` || `layer_${layer.nm}_${layer.ind}`;
-					element = new CompLottieElement(layer, layer.id, this.engine);
-					break;
-				case 2:
-					layer.id = layer.ind;
-					element = new SpriteLottieElement(layer, this._resource.atlas, this.entity, i);
-
-					const curBounds = element.sprite.bounds;
-					BoundingBox.merge(curBounds, mergeBounds, mergeBounds);
-					const spriteRenderer = element.entity.getComponent(SpriteRenderer);
-					spriteRenderer._customLocalBounds = mergeBounds;
-
-					break;
-			}
-
-			if (element) {
-				elementsMap[layer.id] = element;
-
-				if (layer.parent) {
-					children.push(layer);
-				}
-				else {
-					root.addChild(element);
-				}
-
-			}
-		}
-
-		for (let i = 0, l = children.length; i < l; i++) {
-			const layer = children[i];
-			const { parent } = layer;
-
-			if (elementsMap[parent]) {
-				elementsMap[parent].addChild(elementsMap[layer.id]);
-			}
-		}
-
-		const elements: T[] = Object.values(elementsMap);
 		this._elements = elements;
 	}
 
@@ -141,12 +182,17 @@ export class LottieAnimation extends Script {
 		const a = transform.a.v;
 		const s = transform.s.v;
 		const p = transform.p.v;
-		const o = layer.visible ? transform.o.v : 0;
+		const o = transform.o.v;
 		const pixelsPerUnit = sprite ? sprite.pixelsPerUnit : 128;
 
 		let rx = 0;
 		let ry = 0;
 		let rz = 0;
+
+		if (!layer.visible) {
+			entity.isActive = layer.visible;
+			return;
+		}
 
 		// 2d rotation
 		if (transform.r) {
@@ -168,6 +214,8 @@ export class LottieAnimation extends Script {
 			spriteRenderer.color.setValue(1, 1, 1, o);
 			sprite.pivot = new Vector2(a[0] / width, (height - a[1]) / height);
 		}
+
+		entity.isActive = layer.visible;
 
 		entityTransform.setScale(s[0], s[1], 1);
 		entityTransform.setRotation(rx, ry, rz);
@@ -197,32 +245,81 @@ export class LottieAnimation extends Script {
 
 		const time = this.direction * this.speed * deltaTime;
 		this._frame += time / this._resource.timePerFrame;
+		const clip = this._clip;
 
 		if (this._spill()) {
 			const { duration } = this._resource;
+
 			if (this.repeats > 0 || this.isLooping) {
-				if (this.repeats > 0) --this.repeats;
+				if (this.repeats > 0) {
+					--this.repeats;
+				}
+
 				if (this.isAlternate) {
 					this.direction *= -1;
-					this._frame = Tools.codomainBounce(this._frame, 0, duration);
+					if (clip) {
+						this._frame = Tools.codomainBounce(this._frame, 0, clip.end - clip.start);
+					}
+					else {
+						this._frame = Tools.codomainBounce(this._frame, 0, duration);
+					}
 				} else {
 					this.direction = 1;
-					this._frame = Tools.euclideanModulo(this._frame, duration);
+					if (clip) {
+						this._frame = Tools.euclideanModulo(this._frame, clip.end - clip.start);
+					}
+					else {
+						this._frame = Tools.euclideanModulo(this._frame, duration);
+					}
 				}
 			} else {
-				this._frame = Tools.clamp(this._frame, 0, duration);
+				if (clip) {
+					if (this._frame >= clip.end - clip.start) {
+						const endCallback = this._clipEndCallbacks[clip.name];
+						if (endCallback) {
+							endCallback(clip);
+						}
+					}
+
+					this._frame = Tools.clamp(this._frame, 0, clip.end - clip.start);
+				}
+				else {
+					if (this._frame >= duration) {
+						const endCallback = this._clipEndCallbacks['ALL'];
+						if (endCallback) {
+							endCallback();
+						}
+					}
+
+					this._frame = Tools.clamp(this._frame, 0, duration);
+				}
 			}
 		}
 
-		this._updateElements(this._resource.inPoint + this._frame);
+		if (clip) {
+			this._updateElements(this._resource.inPoint + this._frame + clip.start);
+		}
+		else {
+			this._updateElements(this._resource.inPoint + this._frame);
+		}
 	}
 
 	/**
 	 * is this time frame spill the range
 	 */
 	private _spill(): boolean {
+		let duration: number;
+
+		if (this._clip) {
+			const clip = this._clip;
+			duration = clip.end - clip.start;
+		}
+		else {
+			duration = this._resource.duration;
+		}
+
 		const bottomSpill = this._frame <= 0 && this.direction === -1;
-		const topSpill = this._frame >= this._resource.duration && this.direction === 1;
+		const topSpill = this._frame >= duration && this.direction === 1;
 		return bottomSpill || topSpill;
 	}
 
@@ -231,6 +328,6 @@ export class LottieAnimation extends Script {
 	 * @param target 
 	 */
 	_cloneTo(target) {
-		target._createElements(this._resource);
+		target._createElements(this._resource, true);
 	}
 }

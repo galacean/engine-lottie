@@ -6,11 +6,13 @@ import BaseLottieElement from './BaseLottieElement';
  */
 export default class CompLottieElement extends BaseLottieElement {
   layers: any;
+  comps: [];
 
   constructor(layer, name?: string, engine?: Engine, entity?: Entity) {
     super(layer);
 
     this.layers = layer.layers;
+    this.comps = layer.comps;
 
     if (entity) {
       this.entity = entity;
