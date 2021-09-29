@@ -1,5 +1,5 @@
 import { CompLottieElement, SpriteLottieElement, Tools } from "./core";
-import { Script, Vector2, BoundingBox, ignoreClone } from "oasis-engine";
+import { Script, Vector2, BoundingBox, ignoreClone, Entity } from "oasis-engine";
 import { LottieResource, TypeAnimationClip } from "./LottieResource";
 import BaseLottieLayer from "./core/element/BaseLottieElement";
 
@@ -81,21 +81,23 @@ export class LottieAnimation extends Script {
 		this._isPlaying = false;
 	}
 
-	private _createLayerElements(layers, mergeBounds, elements, parent) {
-		for (let i = layers.length - 1; i >= 0; i--) {
+	private _createLayerElements(layers, mergeBounds, elements, parent, parentTreeIndex: number[], isCloned?: boolean) {
+		for (let i = 0, l = layers.length; i < l; i++) {
 			const layer = layers[i];
 			let element = null;
 
 			if (layer.td !== undefined) continue;
 
-			switch (layer.ty) {
+			const treeIndex = parentTreeIndex.concat(i);
+			let childEntity: Entity = isCloned && this._findEntityInTree(treeIndex);
 
+			switch (layer.ty) {
 				case 0:
-					element = new CompLottieElement(layer, layer.id, this.engine);
+					element = new CompLottieElement(layer, layer.id, this.engine, childEntity);
 					break;
 
 				case 2:
-					element = new SpriteLottieElement(layer, this._resource.atlas, this.entity);
+					element = new SpriteLottieElement(layer, this._resource.atlas, this.entity, childEntity);
 
 					const curBounds = element.sprite.bounds;
 					BoundingBox.merge(curBounds, mergeBounds, mergeBounds);
@@ -111,19 +113,38 @@ export class LottieAnimation extends Script {
 					element = new CompLottieElement(layer, layer.id, this.engine);
 
 					break;
-
 			}
 
-			elements.push(element);
-			parent.addChild(element);
+			if (element) {
+				element.treeIndex = treeIndex;
 
-			if (layer.layers) {
-				this._createLayerElements(layer.layers, mergeBounds, elements, element);
+				elements.push(element);
+				parent.addChild(element);
+				if (layer.layers) {
+					this._createLayerElements(layer.layers, mergeBounds, elements, element, element.treeIndex, isCloned);
+				}
 			}
 		}
 	}
 
-	private _createElements(value) {
+	private _findEntityInTree(treeIndex) {
+		let childEntity: Entity;
+
+		for (let i = 0, l = treeIndex.length; i < l; i++) {
+			const index = treeIndex[i];
+
+			if (childEntity) {
+				childEntity = childEntity.children[index];
+			}
+			else {
+				childEntity = this.entity.children[index];
+			}
+		}
+
+		return childEntity;
+	}
+
+	private _createElements(value, isCloned?: boolean) {
 		const root = new CompLottieElement(value, value.name, this.engine, this.entity);
 		this._root = root;
 
@@ -137,7 +158,7 @@ export class LottieAnimation extends Script {
 		mergeBounds.min.setValue(maxValue, maxValue, maxValue);
 		mergeBounds.max.setValue(minValue, minValue, minValue);
 
-		this._createLayerElements(layers, mergeBounds, elements, root);
+		this._createLayerElements(layers, mergeBounds, elements, root, root.treeIndex, isCloned);
 
 		this._elements = elements;
 	}
@@ -237,7 +258,7 @@ export class LottieAnimation extends Script {
 				if (this.isAlternate) {
 					this.direction *= -1;
 					if (clip) {
-						this._frame = Tools.codomainBounce(this._frame, 0, clip.end  - clip.start);
+						this._frame = Tools.codomainBounce(this._frame, 0, clip.end - clip.start);
 					}
 					else {
 						this._frame = Tools.codomainBounce(this._frame, 0, duration);
@@ -255,7 +276,7 @@ export class LottieAnimation extends Script {
 				if (clip) {
 					if (this._frame >= clip.end - clip.start) {
 						const endCallback = this._clipEndCallbacks[clip.name];
-						if(endCallback) {
+						if (endCallback) {
 							endCallback(clip);
 						}
 					}
@@ -265,7 +286,7 @@ export class LottieAnimation extends Script {
 				else {
 					if (this._frame >= duration) {
 						const endCallback = this._clipEndCallbacks['ALL'];
-						if(endCallback) {
+						if (endCallback) {
 							endCallback();
 						}
 					}
@@ -307,6 +328,6 @@ export class LottieAnimation extends Script {
 	 * @param target 
 	 */
 	_cloneTo(target) {
-		target._createElements(this._resource);
+		target._createElements(this._resource, true);
 	}
 }

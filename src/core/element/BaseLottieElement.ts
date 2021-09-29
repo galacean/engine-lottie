@@ -21,6 +21,7 @@ export default class BaseLottieElement {
   visible: boolean = true;
   entity: Entity;
   startTime: number = 0;
+  treeIndex: number[] = [];
 
   private childLayers = [];
 
