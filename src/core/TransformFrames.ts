@@ -65,13 +65,16 @@ export default class TransformFrames {
         this.properties.push(this.x);
       }
 
+      // @ts-ignore
       if (data.p.y) {
-        console.log(data.p.y)
+        // @ts-ignore
         this.y = create(data.p.y, 1);
         this.properties.push(this.y);
       }
 
+      // @ts-ignore
       if (data.p.z) {
+      // @ts-ignore
         this.z = create(data.p.z, 1);
         this.properties.push(this.z);
       }
