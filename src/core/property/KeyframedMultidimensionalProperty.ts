@@ -22,10 +22,6 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
     this.newValue = new Float32Array(arrLen);
     this.v = new Float32Array(arrLen);
 
-    for (let i = 0; i < arrLen; i += 1) {
-      this.v[i] = 0;
-    }
-
     this._caching = { value: new Float32Array(arrLen), lastPoint: 0, addedLength: 0, lastIndex: 0 };
   }
 
@@ -53,6 +49,11 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
           keyData = nextKeyData;
         }
 
+        lastIndex = 0;
+        break;
+      }
+      // FIXED: some layer has properties that longer than the max frame num
+      else if (frameNum < keyData.t){
         lastIndex = 0;
         break;
       }

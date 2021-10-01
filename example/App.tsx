@@ -104,7 +104,7 @@ function App() {
 			lottie.play();
 		});
 
-		// layers in assets
+		// animation clips
 		engine.resourceManager.load<Entity>({
 			urls: [
 				"https://gw.alipayobjects.com/os/bmw-prod/84c13df1-567c-4a67-aa1e-c378ee698c55.json",
@@ -125,7 +125,24 @@ function App() {
 				await lottie.play('afterPlay');
 			}, 5000);
 		});
-		// */
+
+		
+    // some layer has properties that longer than the max frame num
+		engine.resourceManager.load<Entity>({
+			urls: [
+				"https://gw.alipayobjects.com/os/bmw-prod/bbf83713-c23f-4981-8b8d-241d905fc3bf.json",
+				"https://gw.alipayobjects.com/os/bmw-prod/d9b42223-b1ae-4f51-b489-75b2f36a2b2d.atlas"
+			],
+			type: 'lottie'
+		}).then(async (lottieEntity) => {
+			root.addChild(lottieEntity);
+			const lottie:LottieAnimation = lottieEntity.getComponent(LottieAnimation);
+			lottie.isLooping = true;
+			lottieEntity.transform.setPosition(2.5, -2, 0);
+			lottieEntity.transform.setScale(0.5, 0.5, 0.5);
+			lottie.play();
+		});
+
 		engine.run();
 	}, []);
 
