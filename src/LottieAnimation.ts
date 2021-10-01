@@ -181,9 +181,30 @@ export class LottieAnimation extends Script {
 		const entityTransform = entity.transform;
 		const a = transform.a.v;
 		const s = transform.s.v;
-		const p = transform.p.v;
 		const o = transform.o.v;
 		const pixelsPerUnit = sprite ? sprite.pixelsPerUnit : 128;
+
+		let x: number = 0, y: number = 0, z: number = 0;
+
+		if (transform.p) {
+			const p = transform.p.v;
+			x = p[0];
+			y = p[1];
+			z = p[2];
+		}
+		else {
+			if (transform.x) {
+				x = transform.x.v;
+			}
+
+			if (transform.y) {
+				y = transform.y.v;
+			}
+
+			if (transform.z) {
+				z = transform.z.v;
+			}
+		}
 
 		let rx = 0;
 		let ry = 0;
@@ -217,20 +238,20 @@ export class LottieAnimation extends Script {
 
 		entity.isActive = layer.visible;
 
-		entityTransform.setScale(s[0], s[1], 1);
+		entityTransform.setScale(s[0], s[1], s[2]);
 		entityTransform.setRotation(rx, ry, rz);
 
 		if (parent?.transform?.a) {
 			entityTransform.setPosition(
-				(p[0] - parent.transform.a.v[0]) / pixelsPerUnit,
-				(-p[1] + parent.transform.a.v[1]) / pixelsPerUnit,
-				p[2] / pixelsPerUnit,
+				(x - parent.transform.a.v[0]) / pixelsPerUnit,
+				(-y + parent.transform.a.v[1]) / pixelsPerUnit,
+				z / pixelsPerUnit,
 			);
 		} else {
 			entityTransform.setPosition(
-				(p[0] - this._width / 2) / pixelsPerUnit,
-				(-p[1] + this._height / 2) / pixelsPerUnit,
-				p[2] / pixelsPerUnit,
+				(x - this._width / 2) / pixelsPerUnit,
+				(-y + this._height / 2) / pixelsPerUnit,
+				z / pixelsPerUnit,
 			);
 		}
 	}

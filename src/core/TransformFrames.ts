@@ -21,6 +21,9 @@ type KeyFrames = {
  */
 export default class TransformFrames {
   p: ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty;
+  x: ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty;
+  y: ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty;
+  z: ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty;
   a: ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty;
   s: ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty;
   or: ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty;
@@ -52,8 +55,28 @@ export default class TransformFrames {
   constructor(data: KeyFrames) {
     const { create } = TransformFrames;
 
-    this.p = create(data.p, 1);
-    this.properties.push(this.p);
+    if (data.p.k) {
+      this.p = create(data.p, 1);
+      this.properties.push(this.p);
+    }
+    else {
+      if (data.p.x) {
+        this.x = create(data.p.x, 1);
+        this.properties.push(this.x);
+      }
+
+      if (data.p.y) {
+        console.log(data.p.y)
+        this.y = create(data.p.y, 1);
+        this.properties.push(this.y);
+      }
+
+      if (data.p.z) {
+        this.z = create(data.p.z, 1);
+        this.properties.push(this.z);
+      }
+    }
+
 
     this.a = create(data.a, 1);
     this.properties.push(this.a);
