@@ -256,6 +256,15 @@ export class LottieAnimation extends Script {
 		}
 	}
 
+	private _resetElements () {
+		const elements = this._elements;
+
+		for (let i = 0, l = elements.length; i < l; i++) {
+			const element = elements[i];
+			element.reset();
+		}
+	}
+
 	/**
 	 * @override
 	 */
@@ -270,6 +279,7 @@ export class LottieAnimation extends Script {
 
 		if (this._spill()) {
 			const { duration } = this._resource;
+			this._resetElements();
 
 			if (this.repeats > 0 || this.isLooping) {
 				if (this.repeats > 0) {
