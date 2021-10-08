@@ -22,6 +22,10 @@ export default class KeyframedValueProperty extends BaseProperty {
     }
   }
 
+  reset () {
+    this._caching = { lastIndex: 0, value: 0 };
+  }
+
   update(frameNum: number) {
     if (this.expression) {
       frameNum = this.expression.update(frameNum);

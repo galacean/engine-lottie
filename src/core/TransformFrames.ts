@@ -119,10 +119,16 @@ export default class TransformFrames {
     }
   }
 
+  reset () {
+    for (let i = 0, len = this.properties.length; i < len; i++) {
+      this.properties[i].reset();
+    }
+  }
+
   update(frameNum: number = 0) {
     const len = this.properties.length;
 
-    for (let i = 0; i < len; i += 1) {
+    for (let i = 0; i < len; i++) {
       this.properties[i].update(frameNum);
     }
 

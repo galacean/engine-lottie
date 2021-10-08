@@ -46,6 +46,16 @@ export default class BaseLottieElement {
     }
   }
 
+  reset () {
+    if (this.transform) {
+      this.transform.reset();
+    }
+
+    for (let i = 0; i < this.childLayers.length; i++) {
+      this.childLayers[i].reset();
+    }
+  }
+
   update(frameNum: number = 0, isParentVisible?: boolean) {
     const { startTime } = this;
     const frame = frameNum / this.stretch;

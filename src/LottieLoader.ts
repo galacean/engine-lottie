@@ -34,7 +34,7 @@ export class LottieLoader extends Loader<Entity> {
       const lottieEntity = new Entity(engine);
       const lottie = lottieEntity.addComponent(LottieAnimation);
 
-      lottie.res = resource;
+      lottie.resource = resource;
 
       return lottieEntity;
     })

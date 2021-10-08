@@ -8,7 +8,7 @@ export default class CompLottieElement extends BaseLottieElement {
   layers: any;
   comps: [];
 
-  constructor(layer, name?: string, engine?: Engine, entity?: Entity) {
+  constructor(layer, engine?: Engine, entity?: Entity, name?: string) {
     super(layer);
 
     this.layers = layer.layers;

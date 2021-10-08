@@ -98,4 +98,7 @@ export default class BaseProperty {
 
     return startValue + (endValue - startValue) * perc;
   }
+
+  protected reset () {
+  }
 }

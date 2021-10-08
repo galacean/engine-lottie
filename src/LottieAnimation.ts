@@ -25,13 +25,14 @@ export class LottieAnimation extends Script {
 	private _clips: {};
 	private _clip: TypeAnimationClip;
 	private _clipEndCallbacks: Object = {};
+	private _autoPlay: boolean = false;
 
 	@ignoreClone
 	private _root: CompLottieElement = null;
 	@ignoreClone
 	private _elements: BaseLottieLayer[];
 
-	set res(value: LottieResource) {
+	set resource(value: LottieResource) {
 		this._resource = value;
 		this._width = value.width;
 		this._height = value.height;
@@ -42,11 +43,26 @@ export class LottieAnimation extends Script {
 		// update the first frame
 		this.play();
 		this.onUpdate(0);
-		this.pause();
+
+		if (!this.autoPlay) {
+			this.pause();
+		}
 	}
 
-	get res(): LottieResource {
+	get resource(): LottieResource {
 		return this._resource;
+	}
+
+	set autoPlay(value: boolean) {
+		this._autoPlay = value;
+
+		if (value) {
+			this.play();
+		}
+	}
+
+	get autoPlay(): boolean {
+		return this._autoPlay;
 	}
 
 	/**
@@ -93,7 +109,7 @@ export class LottieAnimation extends Script {
 
 			switch (layer.ty) {
 				case 0:
-					element = new CompLottieElement(layer, layer.id, this.engine, childEntity);
+					element = new CompLottieElement(layer, this.engine, layer.id, childEntity);
 					break;
 
 				case 2:
@@ -110,7 +126,7 @@ export class LottieAnimation extends Script {
 						layer.ks.o.k = 100;
 					}
 
-					element = new CompLottieElement(layer, layer.id, this.engine);
+					element = new CompLottieElement(layer, this.engine, layer.id);
 
 					break;
 			}
@@ -145,7 +161,7 @@ export class LottieAnimation extends Script {
 	}
 
 	private _createElements(value, isCloned?: boolean) {
-		const root = new CompLottieElement(value, value.name, this.engine, this.entity);
+		const root = new CompLottieElement(value, this.engine, this.entity);
 		this._root = root;
 
 		const { layers } = root;
@@ -256,11 +272,20 @@ export class LottieAnimation extends Script {
 		}
 	}
 
+	private _resetElements() {
+		const elements = this._elements;
+
+		for (let i = 0, l = elements.length; i < l; i++) {
+			const element = elements[i];
+			element.reset();
+		}
+	}
+
 	/**
 	 * @override
 	 */
 	onUpdate(deltaTime: number): void {
-		if (!this._isPlaying) {
+		if (!this._isPlaying || !this._resource) {
 			return null;
 		}
 
@@ -270,6 +295,7 @@ export class LottieAnimation extends Script {
 
 		if (this._spill()) {
 			const { duration } = this._resource;
+			this._resetElements();
 
 			if (this.repeats > 0 || this.isLooping) {
 				if (this.repeats > 0) {
