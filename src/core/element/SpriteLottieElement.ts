@@ -51,4 +51,10 @@ export default class SpriteLottieLayer extends BaseLottieElement {
       }
     }
   }
+
+  destroy() {
+    super.destroy();
+    this.sprite = null;
+    this.spriteRenderer = null;
+  }
 }

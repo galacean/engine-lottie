@@ -3,8 +3,6 @@ import { Script, Vector2, BoundingBox, ignoreClone, Entity } from "oasis-engine"
 import { LottieResource, TypeAnimationClip } from "./LottieResource";
 import BaseLottieLayer from "./core/element/BaseLottieElement";
 
-export { LottieLoader } from "./LottieLoader";
-
 export class LottieAnimation extends Script {
 	/** The number of units in world space that correspond to one pixel in the sprite. */
 	/** Repeat times of the animation. */
@@ -33,6 +31,11 @@ export class LottieAnimation extends Script {
 	private _elements: BaseLottieLayer[];
 
 	set resource(value: LottieResource) {
+		if (this._resource) {
+			this.pause();
+			this._destroyElements();
+		}
+
 		this._resource = value;
 		this._width = value.width;
 		this._height = value.height;
@@ -276,8 +279,7 @@ export class LottieAnimation extends Script {
 		const elements = this._elements;
 
 		for (let i = 0, l = elements.length; i < l; i++) {
-			const element = elements[i];
-			element.reset();
+			elements[i].reset();
 		}
 	}
 
@@ -376,5 +378,13 @@ export class LottieAnimation extends Script {
 	 */
 	_cloneTo(target) {
 		target._createElements(this._resource, true);
+	}
+
+	private _destroyElements() {
+		const elements = this._elements;
+
+		for (let i = 0, l = elements.length; i < l; i++) {
+			elements[i].destroy();
+		}
 	}
 }

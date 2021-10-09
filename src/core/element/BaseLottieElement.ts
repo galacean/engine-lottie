@@ -46,7 +46,7 @@ export default class BaseLottieElement {
     }
   }
 
-  reset () {
+  reset() {
     if (this.transform) {
       this.transform.reset();
     }
@@ -83,5 +83,13 @@ export default class BaseLottieElement {
     node.parent = this;
     node.entity.parent = this.entity;
     this.childLayers.push(node);
+  }
+
+  destroy() {
+    this.entity.parent = null;
+    this.entity.destroy();
+    this.entity = null;
+    this.transform = null;
+    this.parent = null;
   }
 }
