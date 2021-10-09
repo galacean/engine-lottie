@@ -25,4 +25,10 @@ export default class CompLottieElement extends BaseLottieElement {
       this.entity = compEntity;
     }
   }
+
+  destroy() {
+    super.destroy();
+    this.layers = null;
+    this.comps = null;
+  }
 }
