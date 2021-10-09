@@ -87,6 +87,7 @@ export default class BaseLottieElement {
 
   destroy() {
     this.entity.parent = null;
+    this.entity.destroy();
     this.entity = null;
     this.transform = null;
     this.parent = null;
