@@ -80,7 +80,9 @@ export class LottieResource extends EngineObject {
 		if (comps) {
 			for (let i = 0, l = comps.length; i < l; i++) {
 				const comp = comps[i];
-				compsMap[comp.id] = comp;
+				if (comp.id) {
+					compsMap[comp.id] = comp;
+				}
 			}
 
 			for (let i = 0, l = this.layers.length; i < l; i++) {
@@ -132,6 +134,7 @@ export class LottieResource extends EngineObject {
 
 			if (refId && compsMap[refId]) {
 				layer.layers = compsMap[refId].layers;
+				layer.layers.isComp = true;
 
 				this._buildTree(layer.layers, compsMap);
 			}

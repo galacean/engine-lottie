@@ -5,7 +5,7 @@
   "dependencies": {
     "@oasis-engine/controls": "^0.5.0",
     "bezier-easing": "^2.1.0",
-    "oasis-engine": "^0.5.0"
+    "oasis-engine": "^0.5.6"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.12.1",

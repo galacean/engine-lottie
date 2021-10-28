@@ -100,7 +100,7 @@ export class LottieAnimation extends Script {
 		this._isPlaying = false;
 	}
 
-	private _createLayerElements(layers, mergeBounds, elements, parent, parentTreeIndex: number[], isCloned?: boolean) {
+	private _createLayerElements(layers, mergeBounds, elements, parent, parentTreeIndex: number[], indexUnit: number = 1, isCloned?: boolean) {
 		for (let i = 0, l = layers.length; i < l; i++) {
 			const layer = layers[i];
 			let element = null;
@@ -108,6 +108,15 @@ export class LottieAnimation extends Script {
 			if (layer.td !== undefined) continue;
 
 			const treeIndex = parentTreeIndex.concat(i);
+
+			let childIndexUnit = indexUnit;
+
+			// Calculate the index of layer in composition
+			if (layers.isComp) {
+				layer.ind = parent.index - (l - 1 - i) * indexUnit / l;
+				childIndexUnit = indexUnit / l;
+			}
+
 			let childEntity: Entity = isCloned && this._findEntityInTree(treeIndex);
 
 			switch (layer.ty) {
@@ -140,7 +149,7 @@ export class LottieAnimation extends Script {
 				elements.push(element);
 				parent.addChild(element);
 				if (layer.layers) {
-					this._createLayerElements(layer.layers, mergeBounds, elements, element, element.treeIndex, isCloned);
+					this._createLayerElements(layer.layers, mergeBounds, elements, element, element.treeIndex, childIndexUnit, isCloned);
 				}
 			}
 		}
@@ -177,7 +186,7 @@ export class LottieAnimation extends Script {
 		mergeBounds.min.setValue(maxValue, maxValue, maxValue);
 		mergeBounds.max.setValue(minValue, minValue, minValue);
 
-		this._createLayerElements(layers, mergeBounds, elements, root, root.treeIndex, isCloned);
+		this._createLayerElements(layers, mergeBounds, elements, root, root.treeIndex, 1, isCloned);
 
 		this._elements = elements;
 	}
