@@ -100,14 +100,14 @@ export class LottieAnimation extends Script {
 		this._isPlaying = false;
 	}
 
-	private _createLayerElements(layers, mergeBounds, elements, parent, parentTreeIndex: number[], indexUnit: number = 1, isCloned?: boolean) {
+	private _createLayerElements(layers, mergeBounds, elements, parent, indexUnit: number = 1, isCloned?: boolean) {
 		for (let i = 0, l = layers.length; i < l; i++) {
 			const layer = layers[i];
 			let element = null;
 
 			if (layer.td !== undefined) continue;
 
-			const treeIndex = parentTreeIndex.concat(i);
+			const treeIndex = parent.treeIndex.concat(i);
 
 			let childIndexUnit = indexUnit;
 
@@ -149,7 +149,7 @@ export class LottieAnimation extends Script {
 				elements.push(element);
 				parent.addChild(element);
 				if (layer.layers) {
-					this._createLayerElements(layer.layers, mergeBounds, elements, element, element.treeIndex, childIndexUnit, isCloned);
+					this._createLayerElements(layer.layers, mergeBounds, elements, element, childIndexUnit, isCloned);
 				}
 			}
 		}
@@ -186,7 +186,7 @@ export class LottieAnimation extends Script {
 		mergeBounds.min.setValue(maxValue, maxValue, maxValue);
 		mergeBounds.max.setValue(minValue, minValue, minValue);
 
-		this._createLayerElements(layers, mergeBounds, elements, root, root.treeIndex, 1, isCloned);
+		this._createLayerElements(layers, mergeBounds, elements, root, 1, isCloned);
 
 		this._elements = elements;
 	}
