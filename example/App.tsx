@@ -160,6 +160,23 @@ function App() {
 			engine.run();
 		});
 
+		// percent 100
+		engine.resourceManager.load<Entity>({
+			urls: [
+				"https://gw.alipayobjects.com/os/OasisHub/cb3c7c17-d0c0-4ba3-bbb6-bb009ccd6f96/lottie.json",
+				"https://gw.alipayobjects.com/os/OasisHub/62c1e950-49c7-4428-a47d-d628696330ea/lottie.atlas"
+			],
+			type: 'lottie'
+		}).then(async (lottieEntity) => {
+			root.addChild(lottieEntity);
+			const lottie:LottieAnimation = lottieEntity.getComponent(LottieAnimation);
+			lottie.isLooping = true;
+			lottieEntity.transform.setPosition(5.5, 2, 0);
+			lottieEntity.transform.setScale(0.5, 0.5, 0.5);
+			lottie.play();
+			engine.run();
+		});
+
 
 		engine.run();
 	}, []);
