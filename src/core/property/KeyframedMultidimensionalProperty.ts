@@ -79,8 +79,13 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
 
       // Time bezier easing
       const bezier = bez.getBezierEasing(keyData.o.x, keyData.o.y, keyData.i.x, keyData.i.y, keyData.n);
-      let t = (frameNum - keyTime) / (nextKeyTime - keyTime);
-      t = Math.min(Math.max(0, t), 1) % 1;
+
+      let t = 0;
+
+      if (keyTime >= 0) {
+        t = (frameNum - keyTime) / (nextKeyTime - keyTime);
+        t = Math.min(Math.max(0, t), 1);
+      }
 
       const percent: number = bezier(t);
 
