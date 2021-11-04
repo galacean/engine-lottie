@@ -23,6 +23,7 @@ export type TypeKeyframe = {
   ti?: number[];
   to?: number[];
   beziers?: BezierEasing.EasingFunction[];
+  timeBezier?: BezierEasing.EasingFunction;
   bezierData?: { segmentLength: number, points: TypePoint[] },
   n?: string,
 }

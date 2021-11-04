@@ -77,8 +77,13 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
 
       const { points, segmentLength } = keyData.bezierData;
 
-      // Time bezier easing
-      const bezier = bez.getBezierEasing(keyData.o.x, keyData.o.y, keyData.i.x, keyData.i.y, keyData.n);
+      let bezier = keyData.timeBezier;
+
+      // Cache time bezier easing
+      if (!bezier) {
+        bezier = bez.getBezierEasing(keyData.o.x, keyData.o.y, keyData.i.x, keyData.i.y, keyData.n);
+        keyData.timeBezier = bezier;
+      }
 
       let t = 0;
 
@@ -124,9 +129,11 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
       caching.lastPoint = lastPoint;
       caching.addedLength = addedLength;
     } else {
-      keyData.beziers = [];
+      if (!keyData.beziers) {
+        keyData.beziers = [];
+      }
 
-      for (let i = 0, len = keyData.s.length; i < len; i += 1) {
+      for (let i = 0, len = keyData.s.length; i < len; i++) {
         newValue[i] = this.getValue(frameNum, i, keyData, nextKeyData);
       }
     }
