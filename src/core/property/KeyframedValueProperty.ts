@@ -59,7 +59,10 @@ export default class KeyframedValueProperty extends BaseProperty {
     }
 
     caching.lastIndex = lastIndex;
-    keyData.beziers = [];
+
+    if (!keyData.beziers) {
+      keyData.beziers = [];
+    }
 
     this.v = this.getValue(frameNum, 0, keyData, nextKeyData) * this.mult;
   }
