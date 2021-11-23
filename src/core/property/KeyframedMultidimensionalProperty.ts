@@ -14,11 +14,18 @@ type TypeCaching = {
  */
 export default class KeyframedMultidimensionalProperty extends BaseProperty {
   private _caching: TypeCaching;
+  private _frames: number;
 
-  constructor(data: TypeMultiDimensionalKeyframedProperty, mult: number = 1) {
+  constructor(data: TypeMultiDimensionalKeyframedProperty, mult: number = 1, frames?: number) {
     super(data, mult);
 
     let arrLen = this.value[0].s.length;
+
+    // Set bezier segments according to frames, which is better for performance.
+    if (frames) {
+      this._frames = frames >> 0;
+    }
+
     this.newValue = new Float32Array(arrLen);
     this.v = new Float32Array(arrLen);
 
@@ -72,7 +79,7 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
       let keyTime: number = keyData.t;
 
       if (!keyData.bezierData) {
-        keyData.bezierData = bez.buildBezierData(keyData.s, nextKeyData.s || keyData.e, keyData.to, keyData.ti);
+        keyData.bezierData = bez.buildBezierData(keyData.s, nextKeyData.s || keyData.e, keyData.to, keyData.ti, this._frames);
       }
 
       const { points, segmentLength } = keyData.bezierData;

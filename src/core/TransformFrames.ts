@@ -44,7 +44,7 @@ export default class TransformFrames {
     }
     else {
       if (type) {
-        return new KeyframedMultidimensionalProperty(data, mult);
+        return new KeyframedMultidimensionalProperty(data, mult, data.k[data.k.length - 1].t - data.k[0].t);
       }
       else {
         return new KeyframedValueProperty(data, mult);
