@@ -22,11 +22,11 @@ function getBezierEasing(a: number, b: number, c: number, d: number, nm?: string
 
 const storedData = {};
 
-function buildBezierData(s: number[], e: number[], to: number[], ti: number[]) {
-  const bezierName = (s[0] + '_' + s[1] + '_' + e[0] + '_' + e[1] + '_' + to[0] + '_' + to[1] + '_' + ti[0] + '_' + ti[1]).replace(/\./g, 'p');
+function buildBezierData(s: number[], e: number[], to: number[], ti: number[], segments?: number) {
+  const curveSegments: number = segments ? Math.min(segments, defaultCurveSegments) : defaultCurveSegments;
+  const bezierName = (s[0] + '_' + s[1] + '_' + e[0] + '_' + e[1] + '_' + to[0] + '_' + to[1] + '_' + ti[0] + '_' + ti[1] + '_' + curveSegments).replace(/\./g, 'p');
 
   if (!storedData[bezierName]) {
-    let curveSegments: number = defaultCurveSegments;
     let segmentLength: number = 0;
     let lastPoint: number[];
     let points = [];
