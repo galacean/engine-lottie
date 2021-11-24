@@ -4,7 +4,7 @@
 ![npm-size](https://img.shields.io/bundlephobia/minzip/@oasis-engine/lottie)
 ![npm-download](https://img.shields.io/npm/dm/@oasis-engine/lottie)
 
-This is a [lottie](https://airbnb.design/lottie/) runtime created by [oasis engine](https://github.com/oasis-engine/engine). Currently, It can only render **sprite elements** in the lottie tree. It is high-performance owing to drawing all sprites in batch, which is different from svg or canvas renderer of [lottie-web](https://github.com/airbnb/lottie-web). See more info: [documentation](https://oasisengine.cn/0.5/docs/lottie-cn).
+This is a [lottie](https://airbnb.design/lottie/) runtime created by [oasis engine](https://github.com/oasis-engine/engine). Currently, It can only render **sprite elements** in the lottie tree. It is high-performance owing to drawing all sprites in batch, which is different from svg or canvas renderer of [lottie-web](https://github.com/airbnb/lottie-web). See more info: [documentation](https://oasisengine.cn/0.6/docs/lottie-cn).
 
 ## Features
 - [x] Sprite element: transform and opacity animation.
