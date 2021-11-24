@@ -177,6 +177,22 @@ function App() {
 			engine.run();
 		});
 
+		// comps asset clone
+		engine.resourceManager.load<Entity>({
+			urls: [
+				"https://gw.alipayobjects.com/os/bmw-prod/da290d57-5d7a-4169-bfa3-b61e3dbe34f9.json",
+				"https://gw.alipayobjects.com/os/bmw-prod/7e1416d6-64d6-4649-8bc1-fefce8d45adc.atlas"
+			],
+			type: 'lottie'
+		}).then(async (lottieEntity) => {
+			root.addChild(lottieEntity);
+			const lottie:LottieAnimation = lottieEntity.getComponent(LottieAnimation);
+			lottie.isLooping = true;
+			lottieEntity.transform.setScale(0.2, 0.2, 0.2);
+			lottieEntity.transform.setPosition(-5.5, 0, 0);
+			lottie.play();
+			engine.run();
+		});
 
 		engine.run();
 	}, []);
