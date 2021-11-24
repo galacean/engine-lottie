@@ -91,7 +91,8 @@ export class LottieResource extends EngineObject {
 				const { refId } = layer;
 
 				if (refId && compsMap[refId]) {
-					layer.layers = compsMap[refId].layers;
+					// clone the layers in comp asset
+					layer.layers = [...compsMap[refId].layers];
 				}
 			}
 		}
@@ -133,7 +134,8 @@ export class LottieResource extends EngineObject {
 			}
 
 			if (refId && compsMap[refId]) {
-				layer.layers = compsMap[refId].layers;
+				// clone the layers in comp asset
+				layer.layers = [...compsMap[refId].layers];
 				layer.layers.isComp = true;
 
 				this._buildTree(layer.layers, compsMap);
