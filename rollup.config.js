@@ -23,8 +23,18 @@ export default {
 
 		// Compile TypeScript/JavaScript files
 		babel({
-			babelHelpers: 'bundled',
-			presets: [["@babel/preset-env"], "@babel/preset-typescript"],
+			babelHelpers: "bundled",
+			presets: [
+				[
+					"@babel/preset-env",
+					{
+						loose: true,
+						targets: ">0.3%, not dead",
+						bugfixes: true,
+					},
+				],
+				"@babel/preset-typescript",
+			],
 			extensions,
 			include: ["src/**/*"],
 			plugins: [
@@ -34,7 +44,7 @@ export default {
 				"@babel/plugin-transform-object-assign",
 			],
 		}),
-		terser()
+		terser(),
 	],
 
 	output: [
