@@ -94,7 +94,7 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
 
       let t = 0;
 
-      if (keyTime >= 0) {
+      if (!(nextKeyTime < 0 && keyTime < 0)) {
         t = (frameNum - keyTime) / (nextKeyTime - keyTime);
         t = Math.min(Math.max(0, t), 1);
       }
