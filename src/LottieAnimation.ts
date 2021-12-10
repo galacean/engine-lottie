@@ -209,7 +209,7 @@ export class LottieAnimation extends Script {
 		const entityTransform = entity.transform;
 		const a = transform.a.v;
 		const s = transform.s.v;
-		const o = transform.o.v;
+		let o = transform.o.v;
 		const pixelsPerUnit = sprite ? sprite.pixelsPerUnit : 128;
 
 		let x: number = 0, y: number = 0, z: number = 0;
@@ -259,6 +259,11 @@ export class LottieAnimation extends Script {
 			rz = v[2];
 		}
 
+		// parent opacity
+		if (parent?.transform?.o) {
+			o *= parent?.transform.o.v;
+		}
+
 		if (sprite) {
 			spriteRenderer.color.setValue(1, 1, 1, o);
 			sprite.pivot = new Vector2(a[0] / width, (height - a[1]) / height);
@@ -266,9 +271,11 @@ export class LottieAnimation extends Script {
 
 		entity.isActive = layer.visible;
 
+		// scale
 		entityTransform.setScale(s[0], s[1], s[2]);
 		entityTransform.setRotation(rx, ry, rz);
 
+		// anchor
 		if (parent?.transform?.a) {
 			entityTransform.setPosition(
 				(x - parent.transform.a.v[0]) / pixelsPerUnit,
