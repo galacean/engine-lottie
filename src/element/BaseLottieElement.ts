@@ -1,4 +1,4 @@
-import { TypeLayer } from '../../LottieResource';
+import { TypeLayer } from '../LottieResource';
 import TransformFrames from '../TransformFrames';
 import { Entity } from 'oasis-engine';
 

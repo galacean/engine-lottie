@@ -4,7 +4,7 @@ import BaseLottieElement from './BaseLottieElement';
 /**
  * @internal
  */
-export default class SpriteLottieLayer extends BaseLottieElement {
+export default class SpriteLottieElement extends BaseLottieElement {
   sprite: Sprite;
   spriteRenderer: SpriteRenderer;
 

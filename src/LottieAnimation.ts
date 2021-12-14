@@ -1,7 +1,9 @@
-import { CompLottieElement, SpriteLottieElement, Tools } from "./core";
+import CompLottieElement from "./element/CompLottieElement";
+import SpriteLottieElement from "./element/SpriteLottieElement";
+import Tools from "./tools";
 import { Script, Vector2, BoundingBox, ignoreClone, Entity } from "oasis-engine";
 import { LottieResource, TypeAnimationClip } from "./LottieResource";
-import BaseLottieLayer from "./core/element/BaseLottieElement";
+import BaseLottieLayer from "./element/BaseLottieElement";
 
 export class LottieAnimation extends Script {
 	/** The number of units in world space that correspond to one pixel in the sprite. */
