@@ -6,6 +6,8 @@ import { LottieResource, TypeAnimationClip } from "./LottieResource";
 import BaseLottieLayer from "./element/BaseLottieElement";
 
 export class LottieAnimation extends Script {
+	static _pivotVector: Vector2 = new Vector2();
+
 	/** The number of units in world space that correspond to one pixel in the sprite. */
 	/** Repeat times of the animation. */
 	repeats: number = 0;
@@ -27,7 +29,6 @@ export class LottieAnimation extends Script {
 	private _clip: TypeAnimationClip;
 	private _clipEndCallbacks: Object = {};
 	private _autoPlay: boolean = false;
-	private _pivotVector: Vector2 = new Vector2();
 
 	@ignoreClone
 	private _root: CompLottieElement = null;
@@ -297,7 +298,7 @@ export class LottieAnimation extends Script {
 			sprite.pixelsPerUnit = pixelsPerUnit;
 
 			// update pivot of sprite
-			sprite.pivot = this._pivotVector.setValue(a[0] / width, (height - a[1]) / height);
+			sprite.pivot = LottieAnimation._pivotVector.setValue(a[0] / width, (height - a[1]) / height);
 		}
 
 		entity.isActive = layer.visible;
