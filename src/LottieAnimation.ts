@@ -16,6 +16,7 @@ export class LottieAnimation extends Script {
 	/** The direction of animation, 1 means play for */
 	direction: 1 | -1 = 1;
 	speed: number = 1;
+	pixelsPerUnit: number = 128;
 
 	private _width: number;
 	private _height: number;
@@ -213,7 +214,7 @@ export class LottieAnimation extends Script {
 		const a = transform.a.v;
 		const s = transform.s.v;
 		let o = transform.o.v;
-		const pixelsPerUnit = sprite ? sprite.pixelsPerUnit : 128;
+		const { pixelsPerUnit } = this;
 
 		let x: number = 0, y: number = 0, z: number = 0;
 
@@ -270,6 +271,7 @@ export class LottieAnimation extends Script {
 		if (sprite) {
 			// update color of sprite
 			const { r, g, b } = spriteRenderer.color;
+			spriteRenderer.sprite.pixelsPerUnit = pixelsPerUnit;
       spriteRenderer.color.setValue(r, g, b, o);
 
 			// update pivot of sprite
