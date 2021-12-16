@@ -291,8 +291,10 @@ export class LottieAnimation extends Script {
 		if (sprite) {
 			// update color of sprite
 			const { r, g, b } = spriteRenderer.color;
-			spriteRenderer.sprite.pixelsPerUnit = pixelsPerUnit;
 			spriteRenderer.color.setValue(r, g, b, o);
+
+			// update pixels per unit of sprite
+			sprite.pixelsPerUnit = pixelsPerUnit;
 
 			// update pivot of sprite
 			sprite.pivot = this._pivotVector.setValue(a[0] / width, (height - a[1]) / height);
