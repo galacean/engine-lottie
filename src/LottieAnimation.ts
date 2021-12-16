@@ -6,7 +6,7 @@ import { LottieResource, TypeAnimationClip } from "./LottieResource";
 import BaseLottieLayer from "./element/BaseLottieElement";
 
 export class LottieAnimation extends Script {
-	static _pivotVector: Vector2 = new Vector2();
+	private static _pivotVector: Vector2 = new Vector2();
 
 	/** The number of units in world space that correspond to one pixel in the sprite. */
 	/** Repeat times of the animation. */
