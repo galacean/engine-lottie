@@ -1,7 +1,7 @@
 import CompLottieElement from "./element/CompLottieElement";
 import SpriteLottieElement from "./element/SpriteLottieElement";
 import Tools from "./tools";
-import { Script, Vector2, BoundingBox, ignoreClone, Entity } from "oasis-engine";
+import { Script, Vector2, BoundingBox, ignoreClone, Entity, Layer } from "oasis-engine";
 import { LottieResource, TypeAnimationClip } from "./LottieResource";
 import BaseLottieLayer from "./element/BaseLottieElement";
 
@@ -102,6 +102,26 @@ export class LottieAnimation extends Script {
 	 */
 	pause(): void {
 		this._isPlaying = false;
+	}
+
+	/**
+	 * Set layer of rendering
+	 * @param entity The entity lottie component belongs to
+	 * @param layer Layer of rendering
+	 */
+	setLayer(layer: Layer, entity?: Entity) {
+		if (!entity) {
+			entity = this.entity;
+		}
+
+		entity.layer = layer;
+		const children = entity.children;
+
+		for (let i = children.length - 1; i >= 0; i--) {
+			const child = children[i];
+			child.layer = layer;
+			this.setLayer(layer, child);
+		}
 	}
 
 	private _createLayerElements(layers, mergeBounds, elements, parent, indexUnit: number = 1, isCloned?: boolean) {
@@ -272,7 +292,7 @@ export class LottieAnimation extends Script {
 			// update color of sprite
 			const { r, g, b } = spriteRenderer.color;
 			spriteRenderer.sprite.pixelsPerUnit = pixelsPerUnit;
-      spriteRenderer.color.setValue(r, g, b, o);
+			spriteRenderer.color.setValue(r, g, b, o);
 
 			// update pivot of sprite
 			sprite.pivot = this._pivotVector.setValue(a[0] / width, (height - a[1]) / height);
