@@ -268,7 +268,11 @@ export class LottieAnimation extends Script {
 		}
 
 		if (sprite) {
-			spriteRenderer.color.setValue(1, 1, 1, o);
+			// update color of sprite
+			const { r, g, b } = spriteRenderer.color;
+      spriteRenderer.color.setValue(r, g, b, o);
+
+			// update pivot of sprite
 			sprite.pivot = this._pivotVector.setValue(a[0] / width, (height - a[1]) / height);
 		}
 
