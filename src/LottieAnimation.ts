@@ -26,6 +26,7 @@ export class LottieAnimation extends Script {
 	private _clip: TypeAnimationClip;
 	private _clipEndCallbacks: Object = {};
 	private _autoPlay: boolean = false;
+	private _pivotVector: Vector2 = new Vector2();
 
 	@ignoreClone
 	private _root: CompLottieElement = null;
@@ -268,7 +269,7 @@ export class LottieAnimation extends Script {
 
 		if (sprite) {
 			spriteRenderer.color.setValue(1, 1, 1, o);
-			sprite.pivot = new Vector2(a[0] / width, (height - a[1]) / height);
+			sprite.pivot = this._pivotVector.setValue(a[0] / width, (height - a[1]) / height);
 		}
 
 		entity.isActive = layer.visible;
