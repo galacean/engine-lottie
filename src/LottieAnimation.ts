@@ -1,11 +1,13 @@
 import CompLottieElement from "./element/CompLottieElement";
 import SpriteLottieElement from "./element/SpriteLottieElement";
 import Tools from "./tools";
-import { Script, Vector2, BoundingBox, ignoreClone, Entity } from "oasis-engine";
+import { Script, Vector2, BoundingBox, ignoreClone, Entity, Layer } from "oasis-engine";
 import { LottieResource, TypeAnimationClip } from "./LottieResource";
 import BaseLottieLayer from "./element/BaseLottieElement";
 
 export class LottieAnimation extends Script {
+	private static _pivotVector: Vector2 = new Vector2();
+
 	/** The number of units in world space that correspond to one pixel in the sprite. */
 	/** Repeat times of the animation. */
 	repeats: number = 0;
@@ -16,6 +18,7 @@ export class LottieAnimation extends Script {
 	/** The direction of animation, 1 means play for */
 	direction: 1 | -1 = 1;
 	speed: number = 1;
+	pixelsPerUnit: number = 128;
 
 	private _width: number;
 	private _height: number;
@@ -100,6 +103,26 @@ export class LottieAnimation extends Script {
 	 */
 	pause(): void {
 		this._isPlaying = false;
+	}
+
+	/**
+	 * Set layer of rendering
+	 * @param entity The entity lottie component belongs to
+	 * @param layer Layer of rendering
+	 */
+	setLayer(layer: Layer, entity?: Entity) {
+		if (!entity) {
+			entity = this.entity;
+		}
+
+		entity.layer = layer;
+		const children = entity.children;
+
+		for (let i = children.length - 1; i >= 0; i--) {
+			const child = children[i];
+			child.layer = layer;
+			this.setLayer(layer, child);
+		}
 	}
 
 	private _createLayerElements(layers, mergeBounds, elements, parent, indexUnit: number = 1, isCloned?: boolean) {
@@ -212,7 +235,7 @@ export class LottieAnimation extends Script {
 		const a = transform.a.v;
 		const s = transform.s.v;
 		let o = transform.o.v;
-		const pixelsPerUnit = sprite ? sprite.pixelsPerUnit : 128;
+		const { pixelsPerUnit } = this;
 
 		let x: number = 0, y: number = 0, z: number = 0;
 
@@ -267,8 +290,15 @@ export class LottieAnimation extends Script {
 		}
 
 		if (sprite) {
-			spriteRenderer.color.setValue(1, 1, 1, o);
-			sprite.pivot = new Vector2(a[0] / width, (height - a[1]) / height);
+			// update color of sprite
+			const { r, g, b } = spriteRenderer.color;
+			spriteRenderer.color.setValue(r, g, b, o);
+
+			// update pixels per unit of sprite
+			sprite.pixelsPerUnit = pixelsPerUnit;
+
+			// update pivot of sprite
+			sprite.pivot = LottieAnimation._pivotVector.setValue(a[0] / width, (height - a[1]) / height);
 		}
 
 		entity.isActive = layer.visible;
