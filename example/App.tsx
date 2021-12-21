@@ -54,10 +54,18 @@ function App() {
 			'大桔': [
 				"https://gw.alipayobjects.com/os/bmw-prod/da290d57-5d7a-4169-bfa3-b61e3dbe34f9.json",
 				"https://gw.alipayobjects.com/os/bmw-prod/7e1416d6-64d6-4649-8bc1-fefce8d45adc.atlas"
+			],
+			'年年有鱼': [
+				'https://gw.alipayobjects.com/os/OasisHub/14a29798-ea24-42db-93be-462be45f2a85/lottie.json',
+				'https://gw.alipayobjects.com/os/OasisHub/b60595c5-3d59-42a8-8bf9-f4323c704189/lottie.atlas'
+			],
+			'base64': [
+				'https://gw.alipayobjects.com/os/OasisHub/62ee911f-04ac-414c-b100-a18bae585f35/data.json'
+				// 'https://gw.alipayobjects.com/os/OasisHub/13a05f71-8e93-4569-847f-eb7fbd8dca2d/data.json'
 			]
 		}
 
-		gui.add({name: '贝壳红包'}, 'name', Object.keys(demos)).onChange((v) => {
+		gui.add({name: 'base64'}, 'name', Object.keys(demos)).onChange((v) => {
 			loadLottie(v);
 		})
 
@@ -92,7 +100,7 @@ function App() {
 		cameraEntity.transform.lookAt(new Vector3(0, 0, 0));
 		cameraEntity.addComponent(OrbitControl);
 
-		loadLottie('贝壳红包');
+		loadLottie('base64');
 		
 		engine.run();
 	}, []);
