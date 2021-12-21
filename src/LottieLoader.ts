@@ -15,11 +15,11 @@ import { LottieResource, TypeRes } from './LottieResource';
 import { LottieAnimation } from './LottieAnimation';
 
 class Base64Atlas {
-	private sprites = {};
+  private sprites = {};
   private assetsPromises = [];
 
-	constructor(assets, engine: Engine) {
-		this.assetsPromises = assets.map(asset => {
+  constructor(assets, engine: Engine) {
+    this.assetsPromises = assets.map(asset => {
       return engine.resourceManager.load<Texture2D>({
         url: asset.p,
         type: AssetType.Texture2D
@@ -29,15 +29,15 @@ class Base64Atlas {
         this.sprites[asset.id] = sprite;
       });
     });
-	}
+  }
 
   request() {
     return Promise.all(this.assetsPromises);
   }
-  
-	getSprite(id) {
-		return this.sprites[id];
-	}
+
+  getSprite(id) {
+    return this.sprites[id];
+  }
 }
 
 /**
