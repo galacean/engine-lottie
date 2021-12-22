@@ -74,8 +74,8 @@ export class LottieLoader extends Loader<Entity> {
     else {
       return AssetPromise.all([jsonPromise]).then(([res]) => {
         const { engine } = resourceManager;
-        const spriteAssets = res.assets.filter((asset) => asset.p);
-        res.assets = res.assets.filter((asset) => !asset.p);
+        const spriteAssets = (res as TypeRes).assets.filter((asset) => asset.p);
+        (res as TypeRes).assets = (res as TypeRes).assets.filter((asset) => !asset.p);
 
         const atlas = new Base64Atlas(spriteAssets, engine);
 
