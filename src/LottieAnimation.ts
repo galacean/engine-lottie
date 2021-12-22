@@ -273,7 +273,7 @@ export class LottieAnimation extends Script {
 			rz = -transform.r.v;
 		}
 		// 3d rotation
-		else if (transform.rx || transform.ry) {
+		else if (transform.rx || transform.ry || transform.rz) {
 			rx = transform.rx ? transform.rx.v : 0;
 			ry = transform.ry ? transform.ry.v : 0;
 			rz = transform.rz ? transform.rz.v : 0;
@@ -305,7 +305,7 @@ export class LottieAnimation extends Script {
 
 		// scale
 		entityTransform.setScale(s[0], s[1], s[2]);
-		entityTransform.setRotation(rx, ry, rz);
+		entityTransform.setRotation(rx, ry, -rz);
 
 		// anchor
 		if (parent?.transform?.a) {
