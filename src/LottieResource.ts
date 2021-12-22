@@ -110,7 +110,7 @@ export class LottieResource extends EngineObject {
 		})
 	}
 
-	private _buildTree(layers, compsMap) {
+	private _buildTree(layers, compsMap, isCompLayer: boolean = false) {
 		const layersMap = {};
 
 		for (let i = 0, l = layers.length; i < l; i++) {
@@ -124,6 +124,8 @@ export class LottieResource extends EngineObject {
 			const layer = layers[i];
 			const { refId, parent } = layer;
 
+			layer.isCompLayer = isCompLayer;
+
 			if (parent) {
 				if (!layersMap[parent].layers) {
 					layersMap[parent].layers = [];
@@ -136,9 +138,8 @@ export class LottieResource extends EngineObject {
 			if (refId && compsMap[refId]) {
 				// clone the layers in comp asset
 				layer.layers = [...compsMap[refId].layers];
-				layer.layers.isComp = true;
 
-				this._buildTree(layer.layers, compsMap);
+				this._buildTree(layer.layers, compsMap, true);
 			}
 		}
 

@@ -137,8 +137,8 @@ export class LottieAnimation extends Script {
 			let childIndexUnit = indexUnit;
 
 			// Calculate the index of layer in composition
-			if (layers.isComp) {
-				layer.ind = parent.index - (l - 1 - i) * indexUnit / l;
+			if (layer.isCompLayer) {
+				layer.ind = parent.index - (l - i) * indexUnit / l;
 				childIndexUnit = indexUnit / l;
 			}
 
