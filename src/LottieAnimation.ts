@@ -270,7 +270,7 @@ export class LottieAnimation extends Script {
 
 		// 2d rotation
 		if (transform.r) {
-			rz = -transform.r.v;
+			rz = transform.r.v;
 		}
 		// 3d rotation
 		else if (transform.rx || transform.ry || transform.rz) {
