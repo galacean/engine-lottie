@@ -68,6 +68,7 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
 
       if (nextKeyData.t > frameNum) {
         lastIndex = i;
+        this.reset();
         break;
       }
     }
