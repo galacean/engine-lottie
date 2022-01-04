@@ -1,20 +1,15 @@
 import Expression from '../Expression';
 import BaseProperty, { TypeKeyframe, TypeValueKeyframedProperty } from './BaseProperty';
 
-type TypeCaching = {
-  lastIndex: number;
-  value: number;
-}
-
 /**
  * keyframed unidimensional value property
  */
 export default class KeyframedValueProperty extends BaseProperty {
-  private _caching: TypeCaching;
+  private _lastIndex: number = 0;
+  private _value: number = 0;
 
   constructor(data: TypeValueKeyframedProperty, mult: number = 1) {
     super(data, mult);
-    this._caching = { lastIndex: 0, value: 0 };
     this.v = 0;
 
     if (Expression.hasSupportExpression(data)) {
@@ -23,7 +18,8 @@ export default class KeyframedValueProperty extends BaseProperty {
   }
 
   reset () {
-    this._caching = { lastIndex: 0, value: 0 };
+    this._lastIndex = 0;
+    this._value = 0;
   }
 
   update(frameNum: number) {
@@ -31,8 +27,7 @@ export default class KeyframedValueProperty extends BaseProperty {
       frameNum = this.expression.update(frameNum);
     }
 
-    const caching = this._caching;
-    let { lastIndex } = caching;
+    let lastIndex = this._lastIndex;
     const { value } = this;
 
     let keyData: TypeKeyframe = value[lastIndex];
@@ -58,7 +53,7 @@ export default class KeyframedValueProperty extends BaseProperty {
       }
     }
 
-    caching.lastIndex = lastIndex;
+    this._lastIndex = lastIndex;
 
     if (!keyData.beziers) {
       keyData.beziers = [];
