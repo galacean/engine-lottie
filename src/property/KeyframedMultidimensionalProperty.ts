@@ -2,18 +2,13 @@
 import bez from '../bezier';
 import BaseProperty, { TypeKeyframe, TypeMultiDimensionalKeyframedProperty } from './BaseProperty';
 
-type TypeCaching = {
-  lastIndex: number;
-  value: Float32Array;
-  lastPoint?: number;
-  addedLength?: number;
-}
-
 /**
  * keyframed multidimensional value property
  */
 export default class KeyframedMultidimensionalProperty extends BaseProperty {
-  private _caching: TypeCaching;
+  private _lastPoint: number = 0;
+  private _addedLength: number = 0;
+  private _lastIndex: number = 0;
   private _frames: number;
 
   constructor(data: TypeMultiDimensionalKeyframedProperty, mult: number = 1, frames?: number) {
@@ -28,14 +23,12 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
 
     this.newValue = new Float32Array(arrLen);
     this.v = new Float32Array(arrLen);
-
-    this._caching = { value: new Float32Array(arrLen), lastPoint: 0, addedLength: 0, lastIndex: 0 };
   }
 
   reset () {
-    this._caching.lastPoint = 0;
-    this._caching.addedLength = 0;
-    this._caching.lastIndex = 0;
+    this._lastPoint = 0;
+    this._addedLength = 0;
+    this._lastIndex = 0;
   }
 
   update(frameNum: number) {
@@ -43,8 +36,7 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
       frameNum = this.expression.update(frameNum);
     }
 
-    const caching = this._caching;
-    let { lastIndex } = caching;
+    let lastIndex = this._lastIndex;
     const { value } = this;
     let { newValue } = this;
 
@@ -68,11 +60,12 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
 
       if (nextKeyData.t > frameNum) {
         lastIndex = i;
+        this.reset();
         break;
       }
     }
 
-    caching.lastIndex = lastIndex;
+    this._lastIndex = lastIndex;
 
     if (keyData.to) {
       let nextKeyTime: number = nextKeyData.t;
@@ -103,7 +96,8 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
 
       let distanceInLine: number = segmentLength * percent;
 
-      let { addedLength, lastPoint } = caching;
+      let addedLength = this._addedLength;
+      let lastPoint = this._lastIndex;
 
       for (let i = lastPoint, l = points.length; i < l; i++) {
         if (i === l - 1) {
@@ -133,8 +127,8 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
         addedLength += partialLength;
       }
 
-      caching.lastPoint = lastPoint;
-      caching.addedLength = addedLength;
+      this._lastPoint = lastPoint;
+      this._addedLength = addedLength;
     } else {
       if (!keyData.beziers) {
         keyData.beziers = [];
