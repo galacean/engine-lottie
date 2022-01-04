@@ -1,4 +1,4 @@
-import { Entity, Sprite, SpriteAtlas, SpriteRenderer } from 'oasis-engine';
+import { Entity, Sprite, SpriteAtlas, SpriteRenderer, TextureWrapMode } from 'oasis-engine';
 import BaseLottieElement from './BaseLottieElement';
 
 /**
@@ -11,44 +11,33 @@ export default class SpriteLottieElement extends BaseLottieElement {
   constructor(layer, atlas: SpriteAtlas, entity: Entity, childEntity?: Entity) {
     super(layer);
 
+    let spriteRenderer;
+
     if (layer.refId) {
       if (childEntity) {
         this.entity = childEntity;
-
-        const spriteRenderer = childEntity.getComponent(SpriteRenderer);
-
-        this.spriteRenderer = spriteRenderer;
+        spriteRenderer = childEntity.getComponent(SpriteRenderer);
         this.sprite = spriteRenderer.sprite;
-
-        const { atlasRegion, texture } = this.sprite;
-
-        // @ts-ignore
-        spriteRenderer._renderSortId = this.index;
-        // @ts-ignore
-        spriteRenderer._customRootEntity = entity;
-
-        this.width = atlasRegion.width * texture.width;
-        this.height = atlasRegion.height * texture.height;
       }
       else {
         this.sprite = atlas.getSprite(layer.refId);
-        const { atlasRegion, texture } = this.sprite;
-
         const spriteEntity = new Entity(entity.engine, layer.nm);
-        const spriteRenderer = spriteEntity.addComponent(SpriteRenderer);
-
+        spriteRenderer = spriteEntity.addComponent(SpriteRenderer);
         spriteRenderer.sprite = this.sprite;
-        // @ts-ignore
-        spriteRenderer._renderSortId = this.index;
-        // @ts-ignore
-        spriteRenderer._customRootEntity = entity;
-
         this.entity = spriteEntity;
-        this.spriteRenderer = spriteRenderer;
-
-        this.width = atlasRegion.width * texture.width;
-        this.height = atlasRegion.height * texture.height;
       }
+
+      const { atlasRegion, texture } = this.sprite;
+      texture.wrapModeU = texture.wrapModeV = TextureWrapMode.Clamp;
+      this.spriteRenderer = spriteRenderer;
+
+      // @ts-ignore
+      spriteRenderer._renderSortId = this.index;
+      // @ts-ignore
+      spriteRenderer._customRootEntity = entity;
+
+      this.width = atlasRegion.width * texture.width;
+      this.height = atlasRegion.height * texture.height;
     }
   }
 
