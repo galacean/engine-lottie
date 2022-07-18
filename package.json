@@ -3,11 +3,13 @@
   "browser": "dist/browser.js",
   "module": "dist/module.js",
   "dependencies": {
-    "@oasis-engine/controls": "^0.6.0",
-    "bezier-easing": "^2.1.0",
-    "oasis-engine": "^0.6.0"
+    "bezier-easing": "^2.1.0"
+  },
+  "peerDependencies": {
+    "oasis-engine": "^0.7.0-beta.8"
   },
   "devDependencies": {
+    "@oasis-engine/controls": "^0.7.0-beta.8",
     "@babel/plugin-proposal-class-properties": "^7.12.1",
     "@babel/plugin-proposal-decorators": "^7.12.1",
     "@babel/plugin-proposal-optional-chaining": "^7.12.1",
@@ -25,7 +27,7 @@
     "vite": "1.0.0-rc.5",
     "vite-plugin-react": "^3.0.0"
   },
-  "version": "0.6.13",
+  "version": "0.7.1",
   "description": "Lotte runtime of oasis engine",
   "name": "@oasis-engine/lottie",
   "ci": {

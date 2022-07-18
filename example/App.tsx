@@ -60,7 +60,8 @@ function App() {
 				'https://gw.alipayobjects.com/os/OasisHub/b60595c5-3d59-42a8-8bf9-f4323c704189/lottie.atlas'
 			],
 			'base64': [
-				'https://gw.alipayobjects.com/os/finxbff/lolita/97cecb8f-ff16-4fe1-8344-3b8f04ac3713/lottie.json'
+				"https://gw.alipayobjects.com/os/bmw-prod/6521d990-6218-4308-aa98-bd7514b9e18f.json",
+				// 'https://gw.alipayobjects.com/os/finxbff/lolita/97cecb8f-ff16-4fe1-8344-3b8f04ac3713/lottie.json'
 				// 'https://gw.alipayobjects.com/os/OasisHub/d9d330ca-26fe-45c4-8127-d59a2620dc15/data.json'
 				// 'https://gw.alipayobjects.com/os/OasisHub/62ee911f-04ac-414c-b100-a18bae585f35/data.json'
 				// 'https://gw.alipayobjects.com/os/OasisHub/13a05f71-8e93-4569-847f-eb7fbd8dca2d/data.json'
@@ -86,6 +87,7 @@ function App() {
 				lastLottieEntity = lottieEntity;
 				const lottie:LottieAnimation = lottieEntity.getComponent(LottieAnimation);
 				lottie.isLooping = true;
+				// lottie.speed = 0.05;
 				lottie.play();
 			});
 		}
