@@ -25,12 +25,6 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
     this.v = new Float32Array(arrLen);
   }
 
-  reset () {
-    this._lastPoint = 0;
-    this._addedLength = 0;
-    this._lastIndex = 0;
-  }
-
   update(frameNum: number) {
     if (this.expression) {
       frameNum = this.expression.update(frameNum);
@@ -60,7 +54,8 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
 
       if (nextKeyData.t > frameNum) {
         lastIndex = i;
-        this.reset();
+        this._lastPoint = 0;
+        this._addedLength = 0;
         break;
       }
     }
@@ -97,7 +92,7 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
       let distanceInLine: number = segmentLength * percent;
 
       let addedLength = this._addedLength;
-      let lastPoint = this._lastIndex;
+      let lastPoint = this._lastPoint;
 
       for (let i = lastPoint, l = points.length; i < l; i++) {
         if (i === l - 1) {
