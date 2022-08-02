@@ -6,10 +6,10 @@
     "bezier-easing": "^2.1.0"
   },
   "peerDependencies": {
-    "oasis-engine": "^0.7.0-beta.8"
+    "oasis-engine": "^0.8.0-beta.2",
+    "@oasis-engine-toolkit/controls": "^0.8.0-beta.1"
   },
   "devDependencies": {
-    "@oasis-engine/controls": "^0.7.0-beta.8",
     "@babel/plugin-proposal-class-properties": "^7.12.1",
     "@babel/plugin-proposal-decorators": "^7.12.1",
     "@babel/plugin-proposal-optional-chaining": "^7.12.1",
@@ -28,7 +28,7 @@
     "vite-plugin-react": "^3.0.0"
   },
   "version": "0.7.1",
-  "description": "Lotte runtime of oasis engine",
+  "description": "Lottie runtime of oasis engine",
   "name": "@oasis-engine/lottie",
   "ci": {
     "type": "aci",
