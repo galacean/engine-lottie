@@ -40,6 +40,7 @@ export default class SpriteLottieElement extends BaseLottieElement {
 
   destroy() {
     super.destroy();
+    this.sprite?.texture?.destroy();
     this.sprite = null;
     this.spriteRenderer = null;
   }
