@@ -1,7 +1,7 @@
 import CompLottieElement from "./element/CompLottieElement";
 import SpriteLottieElement from "./element/SpriteLottieElement";
 import Tools from "./tools";
-import { Script, Vector2, BoundingBox, ignoreClone, Entity, Layer } from "oasis-engine";
+import { Script, Vector2, BoundingBox, ignoreClone, Entity, Layer, Engine } from "oasis-engine";
 import { LottieResource, TypeAnimationClip } from "./LottieResource";
 import BaseLottieLayer from "./element/BaseLottieElement";
 
@@ -18,7 +18,7 @@ export class LottieAnimation extends Script {
 	/** The direction of animation, 1 means play for */
 	direction: 1 | -1 = 1;
 	speed: number = 1;
-	pixelsPerUnit: number = 100;
+	pixelsPerUnit: number = Engine._pixelsPerUnit;
 
 	private _width: number;
 	private _height: number;
