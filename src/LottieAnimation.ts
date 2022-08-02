@@ -18,7 +18,7 @@ export class LottieAnimation extends Script {
 	/** The direction of animation, 1 means play for */
 	direction: 1 | -1 = 1;
 	speed: number = 1;
-	pixelsPerUnit: number = 128;
+	pixelsPerUnit: number = 100;
 
 	private _width: number;
 	private _height: number;
@@ -138,7 +138,7 @@ export class LottieAnimation extends Script {
 
 			// Calculate the index of layer in composition
 			if (layer.isCompLayer) {
-				layer.ind = parent.index - (l - i - 0.5) * indexUnit / l;
+				layer.ind = parent.index - (l - i) * indexUnit / l;
 				childIndexUnit = indexUnit / l;
 			}
 

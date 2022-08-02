@@ -106,7 +106,7 @@ function App() {
 		cameraEntity.transform.lookAt(new Vector3(0, 0, 0));
 		cameraEntity.addComponent(OrbitControl);
 
-		loadLottie('小狮子');
+		loadLottie('频道氛围1');
 		
 		engine.run();
 	}, []);

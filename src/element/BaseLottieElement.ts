@@ -29,7 +29,7 @@ export default class BaseLottieElement {
     this.is3D = !!layer.ddd;
     this.stretch = layer.sr || 1;
     this.name = layer.nm || '';
-    this.index = -layer.ind;
+    this.index = layer.ind;
     this.timeRemapping = layer.tm;
     this.width = layer.w;
     this.height = layer.h;
