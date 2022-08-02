@@ -18,6 +18,7 @@ export class LottieAnimation extends Script {
 	/** The direction of animation, 1 means play for */
 	direction: 1 | -1 = 1;
 	speed: number = 1;
+	// @ts-ignore
 	pixelsPerUnit: number = Engine._pixelsPerUnit;
 
 	private _width: number;
