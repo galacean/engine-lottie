@@ -1,7 +1,7 @@
 import CompLottieElement from "./element/CompLottieElement";
 import SpriteLottieElement from "./element/SpriteLottieElement";
 import Tools from "./tools";
-import { Script, Vector2, BoundingBox, ignoreClone, Entity, Layer } from "oasis-engine";
+import { Script, Vector2, BoundingBox, ignoreClone, Entity, Layer, Engine } from "oasis-engine";
 import { LottieResource, TypeAnimationClip } from "./LottieResource";
 import BaseLottieLayer from "./element/BaseLottieElement";
 
@@ -18,7 +18,8 @@ export class LottieAnimation extends Script {
 	/** The direction of animation, 1 means play for */
 	direction: 1 | -1 = 1;
 	speed: number = 1;
-	pixelsPerUnit: number = 128;
+	// @ts-ignore
+	pixelsPerUnit: number = Engine._pixelsPerUnit;
 
 	private _width: number;
 	private _height: number;
@@ -125,7 +126,7 @@ export class LottieAnimation extends Script {
 		}
 	}
 
-	private _createLayerElements(layers, mergeBounds, elements, parent, indexUnit: number = 1, isCloned?: boolean) {
+	private _createLayerElements(layers, elements, parent, indexUnit: number = 1, isCloned?: boolean) {
 		for (let i = 0, l = layers.length; i < l; i++) {
 			const layer = layers[i];
 			let element = null;
@@ -152,10 +153,6 @@ export class LottieAnimation extends Script {
 				case 2:
 					element = new SpriteLottieElement(layer, this._resource.atlas, this.entity, childEntity);
 
-					const curBounds = element.sprite.bounds;
-					BoundingBox.merge(curBounds, mergeBounds, mergeBounds);
-					element.spriteRenderer._customLocalBounds = mergeBounds;
-
 					break;
 
 				case 3:
@@ -174,7 +171,7 @@ export class LottieAnimation extends Script {
 				elements.push(element);
 				parent.addChild(element);
 				if (layer.layers) {
-					this._createLayerElements(layer.layers, mergeBounds, elements, element, childIndexUnit, isCloned);
+					this._createLayerElements(layer.layers, elements, element, childIndexUnit, isCloned);
 				}
 			}
 		}
@@ -205,13 +202,7 @@ export class LottieAnimation extends Script {
 
 		const elements = [];
 
-		const mergeBounds = new BoundingBox();
-		const minValue = Number.MIN_SAFE_INTEGER;
-		const maxValue = Number.MAX_SAFE_INTEGER;
-		mergeBounds.min.setValue(maxValue, maxValue, maxValue);
-		mergeBounds.max.setValue(minValue, minValue, minValue);
-
-		this._createLayerElements(layers, mergeBounds, elements, root, 1, isCloned);
+		this._createLayerElements(layers, elements, root, 1, isCloned);
 
 		this._elements = elements;
 	}
@@ -292,13 +283,13 @@ export class LottieAnimation extends Script {
 		if (sprite) {
 			// update color of sprite
 			const { r, g, b } = spriteRenderer.color;
-			spriteRenderer.color.setValue(r, g, b, o);
+			spriteRenderer.color.set(r, g, b, o);
 
 			// update pixels per unit of sprite
 			sprite.pixelsPerUnit = pixelsPerUnit;
 
 			// update pivot of sprite
-			sprite.pivot = LottieAnimation._pivotVector.setValue(a[0] / width, (height - a[1]) / height);
+			sprite.pivot = LottieAnimation._pivotVector.set(a[0] / width, (height - a[1]) / height);
 		}
 
 		entity.isActive = layer.visible;
@@ -434,5 +425,9 @@ export class LottieAnimation extends Script {
 		for (let i = 0, l = elements.length; i < l; i++) {
 			elements[i].destroy();
 		}
+	}
+
+	onDestroy(): void {
+		this._destroyElements();
 	}
 }
