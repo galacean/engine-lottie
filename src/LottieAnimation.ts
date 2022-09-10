@@ -43,11 +43,13 @@ export class LottieAnimation extends Script {
 		}
 
 		this._resource = value;
-		this._width = value.width;
-		this._height = value.height;
-		this._clips = value.clips;
+		if (value) {
+			this._width = value.width;
+			this._height = value.height;
+			this._clips = value.clips;
 
-		this._createElements(value);
+			this._createElements(value);
+		}
 
 		// update the first frame
 		this.play();
