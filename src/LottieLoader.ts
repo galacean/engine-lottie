@@ -8,7 +8,8 @@ import {
   Texture2D,
   Entity,
   Sprite,
-  Engine
+  Engine,
+  SpriteAtlas
 } from "oasis-engine";
 
 import { LottieResource, TypeRes } from './LottieResource';
@@ -53,7 +54,7 @@ export class LottieLoader extends Loader<Entity> {
 
     // atlas
     if (urls[1]) {
-      const atlasPromise: Promise<Texture2D> = resourceManager.load({
+      const atlasPromise = resourceManager.load({
         url: urls[1],
         type: AssetType.SpriteAtlas,
       });

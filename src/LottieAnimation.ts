@@ -43,11 +43,13 @@ export class LottieAnimation extends Script {
 		}
 
 		this._resource = value;
-		this._width = value.width;
-		this._height = value.height;
-		this._clips = value.clips;
+		if (value) {
+			this._width = value.width;
+			this._height = value.height;
+			this._clips = value.clips;
 
-		this._createElements(value);
+			this._createElements(value);
+		}
 
 		// update the first frame
 		this.play();
@@ -81,8 +83,7 @@ export class LottieAnimation extends Script {
 		if (name) {
 			const clip = this._clips[name];
 			this._clip = clip;
-		}
-		else {
+		} else {
 			this._clip = null;
 		}
 
@@ -92,11 +93,10 @@ export class LottieAnimation extends Script {
 		return new Promise((resolve) => {
 			if (name) {
 				this._clipEndCallbacks[name] = resolve;
+			} else {
+				this._clipEndCallbacks["ALL"] = resolve;
 			}
-			else {
-				this._clipEndCallbacks['ALL'] = resolve;
-			}
-		})
+		});
 	}
 
 	/**
@@ -139,7 +139,7 @@ export class LottieAnimation extends Script {
 
 			// Calculate the index of layer in composition
 			if (layer.isCompLayer) {
-				layer.ind = parent.index - (l - i) * indexUnit / l;
+				layer.ind = parent.index - ((l - i) * indexUnit) / l;
 				childIndexUnit = indexUnit / l;
 			}
 
@@ -185,8 +185,7 @@ export class LottieAnimation extends Script {
 
 			if (childEntity) {
 				childEntity = childEntity.children[index];
-			}
-			else {
+			} else {
 				childEntity = this.entity.children[index];
 			}
 		}
@@ -228,15 +227,16 @@ export class LottieAnimation extends Script {
 		let o = transform.o.v;
 		const { pixelsPerUnit } = this;
 
-		let x: number = 0, y: number = 0, z: number = 0;
+		let x: number = 0,
+			y: number = 0,
+			z: number = 0;
 
 		if (transform.p) {
 			const p = transform.p.v;
 			x = p[0];
 			y = p[1];
 			z = p[2];
-		}
-		else {
+		} else {
 			if (transform.x) {
 				x = transform.x.v;
 			}
@@ -347,16 +347,14 @@ export class LottieAnimation extends Script {
 					this.direction *= -1;
 					if (clip) {
 						this._frame = Tools.codomainBounce(this._frame, 0, clip.end - clip.start);
-					}
-					else {
+					} else {
 						this._frame = Tools.codomainBounce(this._frame, 0, duration);
 					}
 				} else {
 					this.direction = 1;
 					if (clip) {
 						this._frame = Tools.euclideanModulo(this._frame, clip.end - clip.start);
-					}
-					else {
+					} else {
 						this._frame = Tools.euclideanModulo(this._frame, duration);
 					}
 				}
@@ -370,10 +368,9 @@ export class LottieAnimation extends Script {
 					}
 
 					this._frame = Tools.clamp(this._frame, 0, clip.end - clip.start);
-				}
-				else {
+				} else {
 					if (this._frame >= duration) {
-						const endCallback = this._clipEndCallbacks['ALL'];
+						const endCallback = this._clipEndCallbacks["ALL"];
 						if (endCallback) {
 							endCallback();
 						}
@@ -386,8 +383,7 @@ export class LottieAnimation extends Script {
 
 		if (clip) {
 			this._updateElements(this._resource.inPoint + this._frame + clip.start);
-		}
-		else {
+		} else {
 			this._updateElements(this._resource.inPoint + this._frame);
 		}
 	}
@@ -401,8 +397,7 @@ export class LottieAnimation extends Script {
 		if (this._clip) {
 			const clip = this._clip;
 			duration = clip.end - clip.start;
-		}
-		else {
+		} else {
 			duration = this._resource.duration;
 		}
 
@@ -413,7 +408,7 @@ export class LottieAnimation extends Script {
 
 	/**
 	 * @override
-	 * @param target 
+	 * @param target
 	 */
 	_cloneTo(target) {
 		target._createElements(this._resource, true);
@@ -421,9 +416,10 @@ export class LottieAnimation extends Script {
 
 	private _destroy() {
 		const elements = this._elements;
-
-		for (let i = 0, l = elements.length; i < l; i++) {
-			elements[i].destroy();
+		if (elements) {
+			for (let i = 0, l = elements.length; i < l; i++) {
+				elements[i].destroy();
+			}
 		}
 
 		this._resource?.destroy();
