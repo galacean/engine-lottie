@@ -39,7 +39,7 @@ export class LottieAnimation extends Script {
 	set resource(value: LottieResource) {
 		if (this._resource) {
 			this.pause();
-			this._destroyElements();
+			this._destroy();
 		}
 
 		this._resource = value;
@@ -414,16 +414,18 @@ export class LottieAnimation extends Script {
 		target._createElements(this._resource, true);
 	}
 
-	private _destroyElements() {
+	private _destroy() {
 		const elements = this._elements;
 		if (elements) {
 			for (let i = 0, l = elements.length; i < l; i++) {
 				elements[i].destroy();
 			}
 		}
+
+		this._resource?.destroy();
 	}
 
 	onDestroy(): void {
-		this._destroyElements();
+		this._destroy();
 	}
 }

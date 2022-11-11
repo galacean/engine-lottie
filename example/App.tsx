@@ -91,6 +91,12 @@ function App() {
 				lottie.isLooping = true;
 				// lottie.speed = 0.05;
 				lottie.play();
+
+				// test destroy
+				// setTimeout(() => {
+				// 	console.log('destroy')
+				// 	lottieEntity.destroy();
+				// }, 2000);
 			});
 		}
 
