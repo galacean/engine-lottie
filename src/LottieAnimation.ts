@@ -2,7 +2,7 @@ import CompLottieElement from "./element/CompLottieElement";
 import SpriteLottieElement from "./element/SpriteLottieElement";
 import Tools from "./tools";
 import { Script, Vector2, BoundingBox, ignoreClone, Entity, Layer, Engine } from "oasis-engine";
-import { LottieResource, TypeAnimationClip } from "./LottieResource";
+import { LottieResource, TypeAnimationClip, TypeLayer } from "./LottieResource";
 import BaseLottieLayer from "./element/BaseLottieElement";
 
 export class LottieAnimation extends Script {
@@ -126,56 +126,59 @@ export class LottieAnimation extends Script {
 		}
 	}
 
-	private _createLayerElements(layers, elements, parent, indexUnit: number = 1, isCloned?: boolean) {
-		for (let i = 0, l = layers.length; i < l; i++) {
-			const layer = layers[i];
-			let element = null;
+	private _createLayerElements(layers: TypeLayer[], elements, parent, indexUnit: number = 1, isCloned?: boolean) {
+        for (let i = 0, l = layers.length; i < l; i++) {
+            const layer = layers[i];
+            let element = null;
 
-			if (layer.td !== undefined) continue;
+            if (layer.td !== undefined) continue;
 
-			const treeIndex = parent.treeIndex.concat(i);
+            const treeIndex = parent.treeIndex.concat(i);
 
-			let childIndexUnit = indexUnit;
+            let childIndexUnit = indexUnit;
 
-			// Calculate the index of layer in composition
-			if (layer.isCompLayer) {
-				layer.ind = parent.index - ((l - i) * indexUnit) / l;
-				childIndexUnit = indexUnit / l;
-			}
+            // Calculate the index of layer in composition
+            let index: number;
+            if (layer.inMain) {
+                index = layer.ind;
+            } else {
+                index = parent.index + ((i + 0.5) * indexUnit) / l;
+                childIndexUnit = indexUnit / l;
+            }
 
-			let childEntity: Entity = isCloned && this._findEntityInTree(treeIndex);
+            let childEntity: Entity = isCloned && this._findEntityInTree(treeIndex);
 
-			switch (layer.ty) {
-				case 0:
-					element = new CompLottieElement(layer, this.engine, childEntity, layer.id);
-					break;
+            switch (layer.ty) {
+                case 0:
+                    element = new CompLottieElement(index, layer, this.engine, childEntity, layer.nm);
+                    break;
 
-				case 2:
-					element = new SpriteLottieElement(layer, this._resource.atlas, this.entity, childEntity);
+                case 2:
+                    element = new SpriteLottieElement(index, layer, this._resource.atlas, this.entity, childEntity);
 
-					break;
+                    break;
 
-				case 3:
-					if (layer?.ks?.o?.k === 0) {
-						layer.ks.o.k = 100;
-					}
+                case 3:
+                    if (layer?.ks?.o?.k === 0) {
+                        layer.ks.o.k = 100;
+                    }
 
-					element = new CompLottieElement(layer, this.engine, undefined, layer.id);
+                    element = new CompLottieElement(index, layer, this.engine, undefined, layer.nm);
 
-					break;
-			}
+                    break;
+            }
 
-			if (element) {
-				element.treeIndex = treeIndex;
+            if (element) {
+                element.treeIndex = treeIndex;
 
-				elements.push(element);
-				parent.addChild(element);
-				if (layer.layers) {
-					this._createLayerElements(layer.layers, elements, element, childIndexUnit, isCloned);
-				}
-			}
-		}
-	}
+                elements.push(element);
+                parent.addChild(element);
+                if (layer.layers) {
+                    this._createLayerElements(layer.layers, elements, element, childIndexUnit, isCloned);
+                }
+            }
+        }
+    }
 
 	private _findEntityInTree(treeIndex) {
 		let childEntity: Entity;
@@ -194,7 +197,7 @@ export class LottieAnimation extends Script {
 	}
 
 	private _createElements(value, isCloned?: boolean) {
-		const root = new CompLottieElement(value, this.engine, this.entity);
+		const root = new CompLottieElement(0, value, this.engine, this.entity);
 		this._root = root;
 
 		const { layers } = root;

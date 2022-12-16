@@ -8,11 +8,10 @@ export default class SpriteLottieElement extends BaseLottieElement {
   sprite: Sprite;
   spriteRenderer: SpriteRenderer;
 
-  constructor(layer, atlas: SpriteAtlas, entity: Entity, childEntity?: Entity) {
-    super(layer);
+  constructor(index:number, layer, atlas: SpriteAtlas, entity: Entity, childEntity?: Entity) {
+    super(index, layer);
 
     let spriteRenderer;
-
     if (layer.refId) {
       if (childEntity) {
         this.entity = childEntity;
