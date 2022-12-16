@@ -27,7 +27,6 @@ export default class BaseLottieElement {
 
   constructor(layer: TypeLayer) {
     this.is3D = !!layer.ddd;
-    this.stretch = layer.sr || 1;
     this.name = layer.nm || "";
     this.index = layer.ind;
     this.timeRemapping = layer.tm;
@@ -41,6 +40,8 @@ export default class BaseLottieElement {
       this.startTime = layer.st;
     }
 
+    this.stretch = layer.stretch || 1;
+    this.offsetTime = layer.offsetTime || 0;
     if (layer.ks) {
       this.transform = new TransformFrames(layer.ks);
     }
@@ -57,8 +58,7 @@ export default class BaseLottieElement {
   }
 
   update(frameNum: number = 0, isParentVisible?: boolean) {
-    const { startTime } = this;
-    const frame = frameNum / this.stretch;
+    const frame = (frameNum - this.offsetTime) / this.stretch;
 
     if (isParentVisible === true) {
       this.visible = this.inPoint <= frame && this.outPoint >= frame;
@@ -71,7 +71,7 @@ export default class BaseLottieElement {
     }
 
     for (let i = 0; i < this.childLayers.length; i++) {
-      this.childLayers[i].update(frame - startTime, this.visible);
+      this.childLayers[i].update(frameNum, this.visible);
     }
   }
 

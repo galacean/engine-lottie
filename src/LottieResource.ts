@@ -16,6 +16,10 @@ export type TypeLayer = {
   h: number;
   fr: number;
   layers: TypeLayer[];
+
+  // todo: delete
+  offsetTime: number;
+  stretch: number;
 };
 
 export type TypeAnimationClip = {
@@ -107,7 +111,7 @@ export class LottieResource extends EngineObject {
     });
   }
 
-  private _buildTree(layers, compsMap, isCompLayer: boolean = false) {
+  private _buildTree(layers, compsMap, isCompLayer: boolean = false, startTime: number = 0, stretch: number = 1) {
     const layersMap = {};
 
     for (let i = 0, l = layers.length; i < l; i++) {
@@ -120,8 +124,14 @@ export class LottieResource extends EngineObject {
     for (let i = 0, l = layers.length; i < l; i++) {
       const layer = layers[i];
       const { refId, parent } = layer;
-
-      layer.isCompLayer = isCompLayer;
+      if (isCompLayer) {
+        layer.isCompLayer = true;
+        layer.offsetTime = startTime;
+        layer.stretch = stretch;
+      } else {
+        layer.offsetTime = 0;
+        layer.stretch = 1;
+      }
 
       if (parent) {
         if (!layersMap[parent].layers) {
@@ -135,8 +145,11 @@ export class LottieResource extends EngineObject {
       if (refId && compsMap[refId]) {
         // clone the layers in comp asset
         layer.layers = [...compsMap[refId].layers];
-
-        this._buildTree(layer.layers, compsMap, true);
+        // 这条合成的 offsetTime
+        const offsetTime = (layer.offsetTime || 0) + (layer.st || 0);
+        // 这条合成的 stretch
+        const stretch = (layer.stretch || 1) * (layer.sr || 1);
+        this._buildTree(layer.layers, compsMap, true, offsetTime, stretch);
       }
     }
 
