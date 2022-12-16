@@ -5,7 +5,6 @@ import BaseProperty, { TypeKeyframe, TypeValueKeyframedProperty } from './BasePr
  * keyframed unidimensional value property
  */
 export default class KeyframedValueProperty extends BaseProperty {
-  private _lastIndex: number = 0;
   private _value: number = 0;
 
   constructor(data: TypeValueKeyframedProperty, mult: number = 1) {
@@ -18,7 +17,6 @@ export default class KeyframedValueProperty extends BaseProperty {
   }
 
   reset () {
-    this._lastIndex = 0;
     this._value = 0;
   }
 
@@ -27,33 +25,19 @@ export default class KeyframedValueProperty extends BaseProperty {
       frameNum = this.expression.update(frameNum);
     }
 
-    let lastIndex = this._lastIndex;
     const { value } = this;
 
-    let keyData: TypeKeyframe = value[lastIndex];
-    let nextKeyData: TypeKeyframe = value[lastIndex + 1];
+    let keyData: TypeKeyframe;
+    let nextKeyData: TypeKeyframe;
 
     // Find current frame
-    for (let i = lastIndex, l = value.length - 1; i < l; i++) {
+    for (let i = 0, l = value.length - 1; i < l; i++) {
       keyData = value[i];
       nextKeyData = value[i + 1];
-
-      if (i === l - 1 && frameNum >= nextKeyData.t) {
-        if (keyData.h) {
-          keyData = nextKeyData;
-        }
-
-        lastIndex = 0;
-        break;
-      }
-
       if (nextKeyData.t > frameNum) {
-        lastIndex = i;
         break;
       }
     }
-
-    this._lastIndex = lastIndex;
 
     if (!keyData.beziers) {
       keyData.beziers = [];

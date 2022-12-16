@@ -8,7 +8,6 @@ import BaseProperty, { TypeKeyframe, TypeMultiDimensionalKeyframedProperty } fro
 export default class KeyframedMultidimensionalProperty extends BaseProperty {
   private _lastPoint: number = 0;
   private _addedLength: number = 0;
-  private _lastIndex: number = 0;
   private _frames: number;
 
   constructor(data: TypeMultiDimensionalKeyframedProperty, mult: number = 1, frames?: number) {
@@ -30,37 +29,23 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
       frameNum = this.expression.update(frameNum);
     }
 
-    let lastIndex = this._lastIndex;
     const { value } = this;
     let { newValue } = this;
 
-    let i: number = lastIndex;
-    let keyData: TypeKeyframe = value[lastIndex];
-    let nextKeyData: TypeKeyframe = value[lastIndex + 1];
+    let keyData: TypeKeyframe;
+    let nextKeyData: TypeKeyframe;
 
     // Find current frame
-    for (let l = value.length - 1; i < l; i++) {
+    for (let i = 0, l = value.length - 1; i < l; i++) {
       keyData = value[i];
       nextKeyData = value[i + 1];
 
-      if (i === l - 1 && frameNum >= nextKeyData.t) {
-        if (keyData.h) {
-          keyData = nextKeyData;
-        }
-
-        lastIndex = 0;
-        break;
-      }
-
       if (nextKeyData.t > frameNum) {
-        lastIndex = i;
         this._lastPoint = 0;
         this._addedLength = 0;
         break;
       }
     }
-
-    this._lastIndex = lastIndex;
 
     if (keyData.to) {
       let nextKeyTime: number = nextKeyData.t;
