@@ -1,4 +1,4 @@
-import BaseProperty, { TypeMultiDimensionalProperty } from './BaseProperty';
+import BaseProperty, { TypeMultiDimensionalProperty } from "./BaseProperty";
 
 /**
  * multidimensional value property

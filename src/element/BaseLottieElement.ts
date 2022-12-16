@@ -1,6 +1,6 @@
-import { TypeLayer } from '../LottieResource';
-import TransformFrames from '../TransformFrames';
-import { Entity } from 'oasis-engine';
+import { TypeLayer } from "../LottieResource";
+import TransformFrames from "../TransformFrames";
+import { Entity } from "oasis-engine";
 
 /**
  * @internal
@@ -28,7 +28,7 @@ export default class BaseLottieElement {
   constructor(layer: TypeLayer) {
     this.is3D = !!layer.ddd;
     this.stretch = layer.sr || 1;
-    this.name = layer.nm || '';
+    this.name = layer.nm || "";
     this.index = layer.ind;
     this.timeRemapping = layer.tm;
     this.width = layer.w;
@@ -62,8 +62,7 @@ export default class BaseLottieElement {
 
     if (isParentVisible === true) {
       this.visible = this.inPoint <= frame && this.outPoint >= frame;
-    }
-    else if (isParentVisible === false) {
+    } else if (isParentVisible === false) {
       this.visible = false;
     }
 

@@ -1,6 +1,5 @@
-
-import bez from '../bezier';
-import BaseProperty, { TypeKeyframe, TypeMultiDimensionalKeyframedProperty } from './BaseProperty';
+import bez from "../bezier";
+import BaseProperty, { TypeKeyframe, TypeMultiDimensionalKeyframedProperty } from "./BaseProperty";
 
 /**
  * keyframed multidimensional value property
@@ -52,7 +51,13 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
       let keyTime: number = keyData.t;
 
       if (!keyData.bezierData) {
-        keyData.bezierData = bez.buildBezierData(keyData.s, nextKeyData.s || keyData.e, keyData.to, keyData.ti, this._frames);
+        keyData.bezierData = bez.buildBezierData(
+          keyData.s,
+          nextKeyData.s || keyData.e,
+          keyData.to,
+          keyData.ti,
+          this._frames
+        );
       }
 
       const { points, segmentLength } = keyData.bezierData;

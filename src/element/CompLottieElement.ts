@@ -1,5 +1,5 @@
-import { Engine, Entity } from 'oasis-engine';
-import BaseLottieElement from './BaseLottieElement';
+import { Engine, Entity } from "oasis-engine";
+import BaseLottieElement from "./BaseLottieElement";
 
 /**
  * @internal
@@ -19,8 +19,7 @@ export default class CompLottieElement extends BaseLottieElement {
       if (name) {
         this.entity.name = name;
       }
-    }
-    else {
+    } else {
       const compEntity = new Entity(engine, name);
       this.entity = compEntity;
     }

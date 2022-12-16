@@ -1,5 +1,5 @@
-import Expression from '../Expression';
-import BaseProperty, { TypeKeyframe, TypeValueKeyframedProperty } from './BaseProperty';
+import Expression from "../Expression";
+import BaseProperty, { TypeKeyframe, TypeValueKeyframedProperty } from "./BaseProperty";
 
 /**
  * keyframed unidimensional value property
@@ -16,7 +16,7 @@ export default class KeyframedValueProperty extends BaseProperty {
     }
   }
 
-  reset () {
+  reset() {
     this._value = 0;
   }
 
