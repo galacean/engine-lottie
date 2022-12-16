@@ -128,7 +128,6 @@ export class LottieResource extends EngineObject {
         layer.isCompLayer = true;
         layer.offsetTime = startTime;
         layer.stretch = stretch;
-        console.log(layer.nm, layer.offsetTime, layer.stretch);
       } else {
         layer.offsetTime = 0;
         layer.stretch = 1;
@@ -146,7 +145,9 @@ export class LottieResource extends EngineObject {
       if (refId && compsMap[refId]) {
         // clone the layers in comp asset
         layer.layers = [...compsMap[refId].layers];
+        // 这条合成的 offsetTime
         const offsetTime = (layer.offsetTime || 0) + (layer.st || 0);
+        // 这条合成的 stretch
         const stretch = (layer.stretch || 1) * (layer.sr || 1);
         this._buildTree(layer.layers, compsMap, true, offsetTime, stretch);
       }
