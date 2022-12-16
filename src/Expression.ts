@@ -1,5 +1,5 @@
 // @ts-nocheck
-import Tools from './tools';
+import Tools from "./tools";
 
 const EX_REG = /(loopIn|loopOut)\(([^)]+)/;
 const STR_REG = /["']\w+["']/;
@@ -29,10 +29,10 @@ class Cycle {
    * @return {number} progress
    */
   update(progress) {
-    if (this.type === 'in') {
+    if (this.type === "in") {
       if (progress >= this.begin) return progress;
       return this.end - Tools.euclideanModulo(this.begin - progress, this.total);
-    } else if (this.type === 'out') {
+    } else if (this.type === "out") {
       if (progress <= this.end) return progress;
       return this.begin + Tools.euclideanModulo(progress - this.end, this.total);
     }
@@ -64,7 +64,7 @@ class Pingpong {
    * @return {number} progress
    */
   update(progress) {
-    if ((this.type === 'in' && progress < this.begin) || (this.type === 'out' && progress > this.end)) {
+    if ((this.type === "in" && progress < this.begin) || (this.type === "out" && progress > this.end)) {
       const space = progress - this.end;
       return this.pingpong(space);
     }
@@ -93,10 +93,10 @@ const FN_MAPS = {
     const endIdx = Math.min(last, offset);
     const end = datak[endIdx].t;
     switch (mode) {
-      case 'cycle':
-        return new Cycle('in', begin, end);
-      case 'pingpong':
-        return new Pingpong('in', begin, end);
+      case "cycle":
+        return new Cycle("in", begin, end);
+      case "pingpong":
+        return new Pingpong("in", begin, end);
       default:
         break;
     }
@@ -108,15 +108,15 @@ const FN_MAPS = {
     const begin = datak[beginIdx].t;
     const end = datak[last].t;
     switch (mode) {
-      case 'cycle':
-        return new Cycle('out', begin, end);
-      case 'pingpong':
-        return new Pingpong('out', begin, end);
+      case "cycle":
+        return new Cycle("out", begin, end);
+      case "pingpong":
+        return new Pingpong("out", begin, end);
       default:
         break;
     }
     return null;
-  },
+  }
 };
 
 /**
@@ -128,7 +128,7 @@ const FN_MAPS = {
 function parseParams(pStr) {
   const params = pStr.split(/\s*,\s*/);
   return params.map((it) => {
-    if (STR_REG.test(it)) return it.replace(/"|'/g, '');
+    if (STR_REG.test(it)) return it.replace(/"|'/g, "");
     return parseInt(it);
   });
 }
@@ -145,7 +145,7 @@ function parseEx(ex) {
   return {
     name: rs[1],
     mode: ps[0],
-    offset: ps[1],
+    offset: ps[1]
   };
 }
 

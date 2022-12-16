@@ -1,12 +1,12 @@
-import bez from '../bezier';
-import Expression from '../Expression';
+import bez from "../bezier";
+import Expression from "../Expression";
 
 export type TypeValueProperty = {
   k: number;
   x?: Function;
   ix?: number;
-  a: boolean
-}
+  a: boolean;
+};
 
 type TypePoint = {
   partialLength: number;
@@ -17,37 +17,37 @@ export type TypeKeyframe = {
   e: number[];
   s: number[];
   t: number;
-  i?: { x: number, y: number };
-  o?: { x: number, y: number };
+  i?: { x: number; y: number };
+  o?: { x: number; y: number };
   h?: number;
   ti?: number[];
   to?: number[];
   beziers?: BezierEasing.EasingFunction[];
   timeBezier?: BezierEasing.EasingFunction;
-  bezierData?: { segmentLength: number, points: TypePoint[] },
-  n?: string,
-}
+  bezierData?: { segmentLength: number; points: TypePoint[] };
+  n?: string;
+};
 
 export type TypeValueKeyframedProperty = {
   k: TypeKeyframe[];
   x?: Function;
   ix?: number;
-  a: boolean
-}
+  a: boolean;
+};
 
 export type TypeMultiDimensionalProperty = {
   k: number[];
   x?: Function;
   ix?: number;
-  a: boolean
-}
+  a: boolean;
+};
 
 export type TypeMultiDimensionalKeyframedProperty = {
   k: TypeKeyframe[];
   x?: Function;
   ix?: number;
   a: boolean;
-}
+};
 /**
  * basic property for animate property unit
  * @internal
@@ -61,10 +61,17 @@ export default class BaseProperty {
   expression: any;
   animated: boolean;
 
-  constructor(data: TypeValueProperty | TypeValueKeyframedProperty | TypeMultiDimensionalProperty | TypeMultiDimensionalKeyframedProperty, mult?: number) {
+  constructor(
+    data:
+      | TypeValueProperty
+      | TypeValueKeyframedProperty
+      | TypeMultiDimensionalProperty
+      | TypeMultiDimensionalKeyframedProperty,
+    mult?: number
+  ) {
     this.mult = mult || 1;
     this.value = data.k;
-    this.animated = data.a
+    this.animated = data.a;
 
     if (Expression.hasSupportExpression(data)) {
       this.expression = Expression.getExpression(data);
@@ -100,6 +107,5 @@ export default class BaseProperty {
     return startValue + (endValue - startValue) * perc;
   }
 
-  protected reset () {
-  }
+  protected reset() {}
 }
