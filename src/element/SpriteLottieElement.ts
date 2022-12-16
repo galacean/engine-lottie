@@ -1,5 +1,5 @@
-import { Entity, Sprite, SpriteAtlas, SpriteRenderer, TextureWrapMode } from 'oasis-engine';
-import BaseLottieElement from './BaseLottieElement';
+import { Entity, Sprite, SpriteAtlas, SpriteRenderer, TextureWrapMode } from "oasis-engine";
+import BaseLottieElement from "./BaseLottieElement";
 
 /**
  * @internal
@@ -18,8 +18,7 @@ export default class SpriteLottieElement extends BaseLottieElement {
         this.entity = childEntity;
         spriteRenderer = childEntity.getComponent(SpriteRenderer);
         this.sprite = spriteRenderer.sprite;
-      }
-      else {
+      } else {
         this.sprite = atlas.getSprite(layer.refId);
         const spriteEntity = new Entity(entity.engine, layer.nm);
         spriteRenderer = spriteEntity.addComponent(SpriteRenderer);

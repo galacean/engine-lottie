@@ -37,7 +37,7 @@ const Tools = {
    * @return {Number} clamp in range
    */
   clamp: function (x, a, b) {
-    return (x < a) ? a : ((x > b) ? b : x);
+    return x < a ? a : x > b ? b : x;
   }
 };
 

@@ -1,8 +1,8 @@
-import ValueProperty from './property/ValueProperty';
-import MultiDimensionalProperty from './property/MultiDimensionalProperty';
-import KeyframedValueProperty from './property/KeyframedValueProperty';
-import KeyframedMultidimensionalProperty from './property/KeyframedMultidimensionalProperty';
-import { TypeMultiDimensionalKeyframedProperty, TypeValueKeyframedProperty } from './property/BaseProperty';
+import ValueProperty from "./property/ValueProperty";
+import MultiDimensionalProperty from "./property/MultiDimensionalProperty";
+import KeyframedValueProperty from "./property/KeyframedValueProperty";
+import KeyframedMultidimensionalProperty from "./property/KeyframedMultidimensionalProperty";
+import { TypeMultiDimensionalKeyframedProperty, TypeValueKeyframedProperty } from "./property/BaseProperty";
 
 type KeyFrames = {
   a: TypeMultiDimensionalKeyframedProperty;
@@ -14,7 +14,7 @@ type KeyFrames = {
   rx?: TypeValueKeyframedProperty;
   ry?: TypeValueKeyframedProperty;
   rz?: TypeValueKeyframedProperty;
-}
+};
 
 /**
  * transform property origin from tr or ks
@@ -35,18 +35,19 @@ export default class TransformFrames {
   private properties = [];
   private autoOrient: boolean = false;
 
-  static create(data, type = 0, mult = 1): ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty {
+  static create(
+    data,
+    type = 0,
+    mult = 1
+  ): ValueProperty | MultiDimensionalProperty | KeyframedValueProperty | KeyframedMultidimensionalProperty {
     if (!data.k.length) {
       return new ValueProperty(data, mult);
-    }
-    else if (typeof (data.k[0]) === 'number') {
+    } else if (typeof data.k[0] === "number") {
       return new MultiDimensionalProperty(data, mult);
-    }
-    else {
+    } else {
       if (type) {
         return new KeyframedMultidimensionalProperty(data, mult, data.k[data.k.length - 1].t - data.k[0].t);
-      }
-      else {
+      } else {
         return new KeyframedValueProperty(data, mult);
       }
     }
@@ -58,8 +59,7 @@ export default class TransformFrames {
     if (data.p.k) {
       this.p = create(data.p, 1);
       this.properties.push(this.p);
-    }
-    else {
+    } else {
       if (data.p.x) {
         this.x = create(data.p.x, 1);
         this.properties.push(this.x);
@@ -74,12 +74,11 @@ export default class TransformFrames {
 
       // @ts-ignore
       if (data.p.z) {
-      // @ts-ignore
+        // @ts-ignore
         this.z = create(data.p.z, 1);
         this.properties.push(this.z);
       }
     }
-
 
     this.a = create(data.a, 1);
     this.properties.push(this.a);
@@ -119,7 +118,7 @@ export default class TransformFrames {
     }
   }
 
-  reset () {
+  reset() {
     for (let i = 0, len = this.properties.length; i < len; i++) {
       this.properties[i].reset();
     }

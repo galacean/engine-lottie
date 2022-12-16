@@ -1,5 +1,5 @@
-import BaseProperty from './BaseProperty';
-import { TypeValueProperty } from './BaseProperty';
+import BaseProperty from "./BaseProperty";
+import { TypeValueProperty } from "./BaseProperty";
 
 /**
  * unidimensional value property
