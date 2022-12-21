@@ -106,10 +106,10 @@ export class LottieResource extends EngineObject {
    * 在构建树结构的同时，继承合成的时间条关系
    * @param layers
    * @param compsMap
-   * @param startTime
-   * @param stretch
-   * @param indStart
-   * @param indFactor
+   * @param startTime - 这条合成的 offsetTime
+   * @param stretch - 这条合成的 stretch
+   * @param indStart - 这条合成的基础 ind
+   * @param indFactor - 这条合成的 ind 缩放因子
    */
   private _buildTree(
     layers,
@@ -147,15 +147,10 @@ export class LottieResource extends EngineObject {
         for (let j = 0; j < compsMap[refId].layers.length; j++) {
           refLayers.push(this._deepClone(compsMap[refId].layers[j]));
         }
-        // 这条合成的 offsetTime
         const offsetTime = (layer.offsetTime || 0) + (layer.st || 0);
-        // 这条合成的 stretch
         const stretch = (layer.stretch || 1) * (layer.sr || 1);
-        // 这条合成的 ind 缩放因子
         const compIndFactor = (indFactor / (refLayers[refLayers.length - 1].ind + 1)) * indFactor;
-        // 这条合成的基础 ind
-        const baseInd = layer.index;
-        this._buildTree(refLayers, compsMap, offsetTime, stretch, baseInd, compIndFactor);
+        this._buildTree(refLayers, compsMap, offsetTime, stretch, layer.index, compIndFactor);
         if (layer.layers) {
           layer.layers.push(...refLayers);
         } else {
