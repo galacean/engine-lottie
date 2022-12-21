@@ -18,8 +18,10 @@ export type TypeLayer = {
   layers: TypeLayer[];
 
   // todo: delete
+  // 继承了时间条的时序与渲染关系
   offsetTime: number;
   stretch: number;
+  index: number;
 };
 
 export type TypeAnimationClip = {
@@ -85,17 +87,6 @@ export class LottieResource extends EngineObject {
           compsMap[comp.id] = comp;
         }
       }
-
-      for (let i = 0, l = this.layers.length; i < l; i++) {
-        const layer = this.layers[i];
-
-        const { refId } = layer;
-
-        if (refId && compsMap[refId]) {
-          // clone the layers in comp asset
-          layer.layers = [...compsMap[refId].layers];
-        }
-      }
     }
 
     this._buildTree(this.layers, compsMap);
@@ -111,7 +102,23 @@ export class LottieResource extends EngineObject {
     });
   }
 
-  private _buildTree(layers, compsMap, isCompLayer: boolean = false, startTime: number = 0, stretch: number = 1) {
+  /**
+   * 在构建树结构的同时，继承合成的时间条关系
+   * @param layers
+   * @param compsMap
+   * @param startTime
+   * @param stretch
+   * @param indStart
+   * @param indFactor
+   */
+  private _buildTree(
+    layers,
+    compsMap,
+    startTime: number = 0,
+    stretch: number = 1,
+    indStart: number = 0,
+    indFactor: number = 1
+  ) {
     const layersMap = {};
 
     for (let i = 0, l = layers.length; i < l; i++) {
@@ -119,37 +126,36 @@ export class LottieResource extends EngineObject {
       layersMap[layer.ind] = layer;
     }
 
-    const children = [];
-
-    for (let i = 0, l = layers.length; i < l; i++) {
+    for (let i = layers.length - 1; i >= 0; i--) {
       const layer = layers[i];
       const { refId, parent } = layer;
-      if (isCompLayer) {
-        layer.isCompLayer = true;
-        layer.offsetTime = startTime;
-        layer.stretch = stretch;
-      } else {
-        layer.offsetTime = 0;
-        layer.stretch = 1;
-      }
-
+      layer.offsetTime = startTime;
+      layer.stretch = stretch;
+      layer.index = layer.ind * indFactor + indStart;
       if (parent) {
         if (!layersMap[parent].layers) {
           layersMap[parent].layers = [];
         }
 
         layersMap[parent].layers.push(layer);
-        children.push(layer);
+        layers.splice(i, 1);
       }
 
       if (refId && compsMap[refId]) {
-        // clone the layers in comp asset
-        const refLayers = [...compsMap[refId].layers];
+        const refLayers = [];
+        // deep clone the layers in comp asset
+        for (let j = 0; j < compsMap[refId].layers.length; j++) {
+          refLayers.push(this._deepClone(compsMap[refId].layers[j]));
+        }
         // 这条合成的 offsetTime
         const offsetTime = (layer.offsetTime || 0) + (layer.st || 0);
         // 这条合成的 stretch
         const stretch = (layer.stretch || 1) * (layer.sr || 1);
-        this._buildTree(refLayers, compsMap, true, offsetTime, stretch);
+        // 这条合成的 ind 缩放因子
+        const compIndFactor = (indFactor / (refLayers[refLayers.length - 1].ind + 1)) * indFactor;
+        // 这条合成的基础 ind
+        const baseInd = layer.index;
+        this._buildTree(refLayers, compsMap, offsetTime, stretch, baseInd, compIndFactor);
         if (layer.layers) {
           layer.layers.push(...refLayers);
         } else {
@@ -157,11 +163,17 @@ export class LottieResource extends EngineObject {
         }
       }
     }
+  }
 
-    // remove children belong to the parent in layersMap
-    for (let i = 0, l = children.length; i < l; i++) {
-      const index = layers.indexOf(children[i]);
-      layers.splice(index, 1);
-    }
+  private _deepClone(from: Object): Object {
+    let out = Array.isArray(from) ? [...from] : { ...from };
+    Reflect.ownKeys(out).map((key) => {
+      out[key] = this._isObject(from[key]) ? this._deepClone(from[key]) : from[key];
+    });
+    return out;
+  }
+
+  private _isObject(obj: Object) {
+    return (typeof obj === "object" || typeof obj === "function") && typeof obj !== null;
   }
 }

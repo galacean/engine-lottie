@@ -126,7 +126,7 @@ export class LottieAnimation extends Script {
     }
   }
 
-  private _createLayerElements(layers, elements, parent, indexUnit: number = 1, isCloned?: boolean) {
+  private _createLayerElements(layers, elements, parent, isCloned?: boolean) {
     for (let i = 0, l = layers.length; i < l; i++) {
       const layer = layers[i];
       let element = null;
@@ -134,14 +134,6 @@ export class LottieAnimation extends Script {
       if (layer.td !== undefined) continue;
 
       const treeIndex = parent.treeIndex.concat(i);
-
-      let childIndexUnit = indexUnit;
-
-      // Calculate the index of layer in composition
-      if (layer.isCompLayer) {
-        layer.ind = parent.index - ((l - i) * indexUnit) / l;
-        childIndexUnit = indexUnit / l;
-      }
 
       let childEntity: Entity = isCloned && this._findEntityInTree(treeIndex);
 
@@ -171,7 +163,7 @@ export class LottieAnimation extends Script {
         elements.push(element);
         parent.addChild(element);
         if (layer.layers) {
-          this._createLayerElements(layer.layers, elements, element, childIndexUnit, isCloned);
+          this._createLayerElements(layer.layers, elements, element, isCloned);
         }
       }
     }
@@ -201,7 +193,7 @@ export class LottieAnimation extends Script {
 
     const elements = [];
 
-    this._createLayerElements(layers, elements, root, 1, isCloned);
+    this._createLayerElements(layers, elements, root, isCloned);
 
     this._elements = elements;
   }
