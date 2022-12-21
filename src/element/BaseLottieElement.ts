@@ -28,7 +28,7 @@ export default class BaseLottieElement {
   constructor(layer: TypeLayer) {
     this.is3D = !!layer.ddd;
     this.name = layer.nm || "";
-    this.index = layer.ind;
+    this.index = layer.index;
     this.timeRemapping = layer.tm;
     this.width = layer.w;
     this.height = layer.h;
