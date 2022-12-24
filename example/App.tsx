@@ -90,7 +90,11 @@ function App() {
 				const lottie:LottieAnimation = lottieEntity.getComponent(LottieAnimation);
 				lottie.isLooping = true;
 				// lottie.speed = 0.05;
+				// destroy resource if need not clone
+				lottie.resource.destroy();
 				lottie.play();
+
+				// lottieEntity.clone();
 
 				// test destroy
 				// setTimeout(() => {
