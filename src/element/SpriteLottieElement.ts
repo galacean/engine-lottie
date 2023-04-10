@@ -1,4 +1,4 @@
-import { Entity, Sprite, SpriteAtlas, SpriteRenderer, TextureWrapMode } from "oasis-engine";
+import { Entity, Sprite, SpriteAtlas, SpriteRenderer, TextureWrapMode } from "@galacean/engine";
 import BaseLottieElement from "./BaseLottieElement";
 
 /**

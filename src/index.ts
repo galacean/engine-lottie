@@ -1,4 +1,4 @@
-import { Loader } from 'oasis-engine';
+import { Loader } from '@galacean/engine';
 import { LottieAnimation } from './LottieAnimation';
 
 export { LottieAnimation } ;

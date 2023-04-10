@@ -1,4 +1,4 @@
-import { resourceLoader, AssetPromise, Loader, LoadItem, ResourceManager, AssetType } from "oasis-engine";
+import { resourceLoader, AssetPromise, Loader, LoadItem, ResourceManager, AssetType } from "@galacean/engine";
 import { LottieResource, TypeRes } from "./LottieResource";
 
 /**

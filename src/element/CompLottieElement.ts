@@ -1,4 +1,4 @@
-import { Engine, Entity } from "oasis-engine";
+import { Engine, Entity } from "@galacean/engine";
 import BaseLottieElement from "./BaseLottieElement";
 
 /**

@@ -1,6 +1,6 @@
 import { TypeLayer } from "../LottieResource";
 import TransformFrames from "../TransformFrames";
-import { Entity } from "oasis-engine";
+import { Entity } from "@galacean/engine";
 
 /**
  * @internal
