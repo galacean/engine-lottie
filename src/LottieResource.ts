@@ -56,7 +56,6 @@ export class LottieResource extends EngineObject {
   height: number;
   width: number;
   layers: TypeLayer[];
-  animations: any[];
   comps: any[];
   atlas: any;
   name: string;
@@ -170,5 +169,12 @@ export class LottieResource extends EngineObject {
 
   private _isObject(obj: Object) {
     return (typeof obj === "object" || typeof obj === "function") && typeof obj !== null;
+  }
+
+  destroy(): void {
+    this.layers = null;
+    this.clips = null;
+    this.comps = null;
+    this.atlas = null;
   }
 }
