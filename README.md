@@ -1,10 +1,10 @@
 # Oasis Lottie
 
-<a href="https://www.npmjs.com/package/@oasis-engine/lottie"><img src="https://img.shields.io/npm/v/@oasis-engine/lottie"/></a>
-![npm-size](https://img.shields.io/bundlephobia/minzip/@oasis-engine/lottie)
-![npm-download](https://img.shields.io/npm/dm/@oasis-engine/lottie)
+<a href="https://www.npmjs.com/package/@galacean/engine-lottie"><img src="https://img.shields.io/npm/v/@galacean/engine"/></a>
+![npm-size](https://img.shields.io/bundlephobia/minzip/@galacean/engine-lottie)
+![npm-download](https://img.shields.io/npm/dm/@galacean/engine-lottie)
 
-This is a [lottie](https://airbnb.design/lottie/) runtime created by [oasis engine](https://github.com/oasis-engine/engine). Currently, It can only render **sprite elements** in the lottie tree. It is high-performance owing to drawing all sprites in batch, which is different from svg or canvas renderer of [lottie-web](https://github.com/airbnb/lottie-web). See more info: [documentation](https://oasisengine.cn/0.6/docs/lottie-cn).
+This is a [lottie](https://airbnb.design/lottie/) runtime created by [Galacean Engine](https://github.com/galacean/engine). Currently, It can only render **sprite elements** in the lottie tree. It is high-performance owing to drawing all sprites in batch, which is different from svg or canvas renderer of [lottie-web](https://github.com/airbnb/lottie-web). See more info: [documentation](https://oasisengine.cn/0.6/docs/lottie-cn).
 
 ## Features
 - [x] Sprite element: transform and opacity animation.
@@ -19,10 +19,10 @@ This is a [lottie](https://airbnb.design/lottie/) runtime created by [oasis engi
 
 ## Usage
 
-Before using the code below, you should transform original lottie JSON file ( images must be base64-encoding strings) to oasis standard lottie files. It's convenient to complete the task with [tool-atlas-lottie](https://www.npmjs.com/package/@oasis-engine/tool-atlas-lottie) which will generate a folder which contains three files: a processed lottie JSON file, an atlas file and an image.
+Before using the code below, you should transform original lottie JSON file ( images must be base64-encoding strings) to Galacean standard lottie files. It's convenient to complete the task with [tool-atlas-lottie](https://www.npmjs.com/package/@galacean/tool-atlas-lottie) which will generate a folder which contains three files: a processed lottie JSON file, an atlas file and an image.
 
 ```typescript
-import { LottieAnimation } from "@oasis-engine/lottie";
+import { LottieAnimation } from "@galacean/engine-lottie";
 
 // Load lottie json、atlas file with engine's `resourceManager`
 engine.resourceManager.load({
@@ -45,11 +45,11 @@ engine.resourceManager.load({
 ## Install
 
 ```bash
-npm i @oasis-engine/lottie --save
+npm i @galacean/engine-lottie --save
 ```
 
 ## Contributing
-This project is [work-in-progress](https://github.com/orgs/oasis-engine/projects/1). Everyone is welcome to create issues or submit pull requests. Make sure to read the [Contributing Guide](https://github.com/oasis-engine/engine/blob/main/.github/HOW_TO_CONTRIBUTE.md) before submitting changes.
+This project is [work-in-progress](https://github.com/orgs/galacean/projects/1). Everyone is welcome to create issues or submit pull requests. Make sure to read the [Contributing Guide](https://github.com/galacean/engine/blob/main/.github/HOW_TO_CONTRIBUTE.md) before submitting changes.
 
 ## Dev
 

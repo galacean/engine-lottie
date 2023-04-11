@@ -8,9 +8,8 @@ import {
   Texture2D,
   Entity,
   Sprite,
-  Engine,
-  SpriteAtlas
-} from "oasis-engine";
+  Engine
+} from "@galacean/engine";
 
 import { LottieResource, TypeRes } from "./LottieResource";
 import { LottieAnimation } from "./LottieAnimation";

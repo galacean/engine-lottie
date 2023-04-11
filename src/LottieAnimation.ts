@@ -1,7 +1,7 @@
 import CompLottieElement from "./element/CompLottieElement";
 import SpriteLottieElement from "./element/SpriteLottieElement";
 import Tools from "./tools";
-import { Script, Vector2, BoundingBox, ignoreClone, Entity, Layer, Engine } from "oasis-engine";
+import { Script, Vector2, BoundingBox, ignoreClone, Entity, Layer, Engine } from "@galacean/engine";
 import { LottieResource, TypeAnimationClip } from "./LottieResource";
 import BaseLottieLayer from "./element/BaseLottieElement";
 

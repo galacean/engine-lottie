@@ -1,4 +1,4 @@
-import { Engine, EngineObject } from "oasis-engine";
+import { Engine, EngineObject } from "@galacean/engine";
 
 export type TypeLayer = {
   ddd: number;

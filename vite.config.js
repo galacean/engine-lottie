@@ -8,7 +8,7 @@ const config = {
   jsx: "react",
   plugins: [reactPlugin],
   optimizeDeps: {
-    exclude: ["oasis-engine"]
+    exclude: ["@galacean/engine"]
   }
 };
 
