@@ -413,8 +413,6 @@ export class LottieAnimation extends Script {
         elements[i].destroy();
       }
     }
-
-    this._resource?.destroy();
   }
 
   onDestroy(): void {
