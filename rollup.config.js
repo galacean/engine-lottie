@@ -61,7 +61,7 @@ export default {
 			format: "umd",
 			name,
 			globals: {
-				"@galacean/engine": "@galacean/engine",
+				"@galacean/engine": "Galacean",
 			},
 		},
 	],
