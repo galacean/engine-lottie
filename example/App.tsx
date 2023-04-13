@@ -67,6 +67,10 @@ function App() {
 				// 'https://gw.alipayobjects.com/os/OasisHub/d9d330ca-26fe-45c4-8127-d59a2620dc15/data.json'
 				// 'https://gw.alipayobjects.com/os/OasisHub/62ee911f-04ac-414c-b100-a18bae585f35/data.json'
 				// 'https://gw.alipayobjects.com/os/OasisHub/13a05f71-8e93-4569-847f-eb7fbd8dca2d/data.json'
+			],
+			"kais": [
+				'example/kais3.json',
+				'example/kais3.atlas'
 			]
 		}
 
