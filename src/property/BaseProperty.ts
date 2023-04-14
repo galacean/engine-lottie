@@ -97,7 +97,11 @@ export default class BaseProperty {
       let bezier: BezierEasing.EasingFunction = keyData.beziers[i];
 
       if (!bezier) {
-        bezier = bez.getBezierEasing(keyData.o.x[i], keyData.o.y[i], keyData.i.x[i], keyData.i.y[i]);
+        if (typeof keyData.o.x === "number") {
+          bezier = bez.getBezierEasing(keyData.o.x, keyData.o.y, keyData.i.x, keyData.i.y);
+        } else {
+          bezier = bez.getBezierEasing(keyData.o.x[i], keyData.o.y[i], keyData.i.x[i], keyData.i.y[i]);
+        }
         keyData.beziers[i] = bezier;
       }
 
