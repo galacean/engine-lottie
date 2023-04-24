@@ -5,11 +5,9 @@
   "dependencies": {
     "bezier-easing": "^2.1.0"
   },
-  "peerDependencies": {
-    "@galacean/engine": "^0.9.0-alpha",
-    "@galacean/engine-toolkit-controls": "^0.9.0-alpha"
-  },
   "devDependencies": {
+    "@galacean/engine": "^0.9.0",
+    "@galacean/engine-toolkit-controls": "^0.9.0",
     "@babel/plugin-proposal-class-properties": "^7.12.1",
     "@babel/plugin-proposal-decorators": "^7.12.1",
     "@babel/plugin-proposal-optional-chaining": "^7.12.1",
@@ -27,7 +25,7 @@
     "vite": "1.0.0-rc.5",
     "vite-plugin-react": "^3.0.0"
   },
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "Lottie runtime of oasis engine",
   "name": "@galacean/engine-lottie",
   "ci": {
