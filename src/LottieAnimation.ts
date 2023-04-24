@@ -322,7 +322,7 @@ export class LottieAnimation extends Script {
       return null;
     }
 
-    const time = this.direction * this.speed * deltaTime;
+    const time = this.direction * this.speed * deltaTime * 1000;
     this._frame += time / this._resource.timePerFrame;
     const clip = this._clip;
 
