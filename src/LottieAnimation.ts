@@ -152,7 +152,7 @@ export class LottieAnimation extends Script {
             layer.ks.o.k = 100;
           }
 
-          element = new CompLottieElement(layer, this.engine, undefined, layer.id);
+          element = new CompLottieElement(layer, this.engine, childEntity, layer.id);
 
           break;
       }
