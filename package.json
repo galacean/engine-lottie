@@ -25,7 +25,7 @@
     "vite": "1.0.0-rc.5",
     "vite-plugin-react": "^3.0.0"
   },
-  "version": "0.9.4",
+  "version": "0.9.5",
   "description": "Lottie runtime of oasis engine",
   "name": "@galacean/engine-lottie",
   "ci": {
