@@ -51,7 +51,7 @@ export class LottieLoader extends Loader<Entity> {
   // @ts-ignore
   load(item: LoadItem, resourceManager: ResourceManager): Promise<Entity> {
     const { urls } = item;
-    const jsonPromise = this.request(urls[0], resourceManager);
+    const jsonPromise = this.request(urls[0], { type: "json" });
 
     // atlas
     if (urls[1]) {
