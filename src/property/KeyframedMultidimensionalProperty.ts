@@ -46,6 +46,13 @@ export default class KeyframedMultidimensionalProperty extends BaseProperty {
       }
     }
 
+    if (frameNum > nextKeyData.t) {
+      for (let i = 0, len = this.v.length; i < len; i++) {
+        this.v[i] = this.getValue(frameNum, i, keyData, nextKeyData) * this.mult;
+      }
+      return;
+    }
+
     if (keyData.to) {
       let nextKeyTime: number = nextKeyData.t;
       let keyTime: number = keyData.t;
