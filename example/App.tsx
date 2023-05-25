@@ -59,13 +59,18 @@ async function init() {
 			'https://gw.alipayobjects.com/os/OasisHub/b60595c5-3d59-42a8-8bf9-f4323c704189/lottie.atlas'
 		],
 		'base64': [
-			// "https://gw.alipayobjects.com/os/bmw-prod/6521d990-6218-4308-aa98-bd7514b9e18f.json",
-			'https://gw.alipayobjects.com/os/bmw-prod/3cb395d8-5196-4382-9459-e4379f9414f3.json',
-			'https://gw.alipayobjects.com/os/bmw-prod/4bd3f75c-ce9f-4d67-bf28-adbc65fad8b2.atlas'
+			"https://gw.alipayobjects.com/os/bmw-prod/6521d990-6218-4308-aa98-bd7514b9e18f.json",
 			// 'https://gw.alipayobjects.com/os/finxbff/lolita/97cecb8f-ff16-4fe1-8344-3b8f04ac3713/lottie.json'
 			// 'https://gw.alipayobjects.com/os/OasisHub/d9d330ca-26fe-45c4-8127-d59a2620dc15/data.json'
 			// 'https://gw.alipayobjects.com/os/OasisHub/62ee911f-04ac-414c-b100-a18bae585f35/data.json'
 			// 'https://gw.alipayobjects.com/os/OasisHub/13a05f71-8e93-4569-847f-eb7fbd8dca2d/data.json'
+		],
+		'818': [
+			'https://gw.alipayobjects.com/os/bmw-prod/3cb395d8-5196-4382-9459-e4379f9414f3.json',
+			'https://gw.alipayobjects.com/os/bmw-prod/4bd3f75c-ce9f-4d67-bf28-adbc65fad8b2.atlas'
+		],
+		"碎片": [
+			"https://mdn.alipayobjects.com/huamei_w1o8la/afts/file/A*GxWPRbeur0MAAAAAAAAAAAAADsB_AQ"
 		]
 	}
 
@@ -88,7 +93,7 @@ async function init() {
 			lastLottieEntity = lottieEntity;
 			const lottie: LottieAnimation = lottieEntity.getComponent(LottieAnimation);
 			lottie.isLooping = true;
-			// lottie.speed = 0.05;
+			// lottie.speed = 0.5;
 			// destroy resource if need not clone
 			lottie.resource.destroy();
 			lottie.play();
@@ -115,7 +120,7 @@ async function init() {
 	cameraEntity.transform.lookAt(new Vector3(0, 0, 0));
 	cameraEntity.addComponent(OrbitControl);
 
-	loadLottie('频道氛围1');
+	loadLottie('base64');
 
 	engine.run();
 

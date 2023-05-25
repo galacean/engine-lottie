@@ -1,10 +1,10 @@
-# Oasis Lottie
+# Galacean Lottie
 
 <a href="https://www.npmjs.com/package/@galacean/engine-lottie"><img src="https://img.shields.io/npm/v/@galacean/engine"/></a>
 ![npm-size](https://img.shields.io/bundlephobia/minzip/@galacean/engine-lottie)
 ![npm-download](https://img.shields.io/npm/dm/@galacean/engine-lottie)
 
-This is a [lottie](https://airbnb.design/lottie/) runtime created by [Galacean Engine](https://github.com/galacean/engine). Currently, It can only render **sprite elements** in the lottie tree. It is high-performance owing to drawing all sprites in batch, which is different from svg or canvas renderer of [lottie-web](https://github.com/airbnb/lottie-web). See more info: [documentation](https://oasisengine.cn/0.6/docs/lottie-cn).
+This is a [lottie](https://airbnb.design/lottie/) runtime created by [Galacean Engine](https://github.com/galacean/engine). Currently, It can only render **sprite elements** in the lottie tree. It is high-performance owing to drawing all sprites in batch, which is different from svg or canvas renderer of [lottie-web](https://github.com/airbnb/lottie-web). See more info: [documentation](hhttps://galacean.antgroup.com/#/docs/latest/cn/lottie).
 
 ## Features
 - [x] Sprite element: transform and opacity animation.
