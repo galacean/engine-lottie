@@ -1,12 +1,21 @@
 import CompLottieElement from "./element/CompLottieElement";
 import SpriteLottieElement from "./element/SpriteLottieElement";
 import Tools from "./tools";
-import { Script, Vector2, BoundingBox, ignoreClone, Entity, Layer, Engine } from "@galacean/engine";
+import {
+  Script,
+  Vector2,
+  ignoreClone,
+  Entity,
+  Layer,
+  Engine,
+  SpriteRenderer,
+} from "@galacean/engine";
 import { LottieResource, TypeAnimationClip } from "./LottieResource";
 import BaseLottieLayer from "./element/BaseLottieElement";
 
 export class LottieAnimation extends Script {
   private static _pivotVector: Vector2 = new Vector2();
+  private static _tempRenderers: Array<SpriteRenderer> = [];
 
   /** The number of units in world space that correspond to one pixel in the sprite. */
   /** Repeat times of the animation. */
@@ -26,6 +35,8 @@ export class LottieAnimation extends Script {
   private _isPlaying: boolean = false;
   private _frame: number = 0;
   private _resource: LottieResource;
+  private _priority: number = 0;
+  private _priorityDirty: boolean = true;
   private _clips: {};
   private _clip: TypeAnimationClip;
   private _clipEndCallbacks: Object = {};
@@ -49,6 +60,7 @@ export class LottieAnimation extends Script {
       this._clips = value.clips;
 
       this._createElements(value);
+      this._priorityDirty = true;
     }
 
     // update the first frame
@@ -62,6 +74,17 @@ export class LottieAnimation extends Script {
 
   get resource(): LottieResource {
     return this._resource;
+  }
+
+  set priority(value: number) {
+    if (this._priority !== value) {
+      this._priority = value;
+      this._priorityDirty = true;
+    }
+  }
+
+  get priority(): number {
+    return this._priority;
   }
 
   set autoPlay(value: boolean) {
@@ -320,6 +343,21 @@ export class LottieAnimation extends Script {
   onUpdate(deltaTime: number): void {
     if (!this._isPlaying || !this._resource) {
       return null;
+    }
+
+    if (this._priorityDirty) {
+      this._priorityDirty = false;
+      const renderers = LottieAnimation._tempRenderers;
+      renderers.length = 0;
+      this.entity.getComponentsIncludeChildren(SpriteRenderer, renderers);
+      let priorityDiff = 0;
+      for (let i = 0, l = renderers.length; i < l; ++i) {
+        const renderer = renderers[i];
+        if (i === 0) {
+          priorityDiff = this._priority - Math.floor(renderer.priority);
+        }
+        renderer.priority = renderer.priority + priorityDiff;
+      }
     }
 
     const time = this.direction * this.speed * deltaTime * 1000;

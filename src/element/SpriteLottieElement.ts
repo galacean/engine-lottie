@@ -30,7 +30,8 @@ export default class SpriteLottieElement extends BaseLottieElement {
       texture.wrapModeU = texture.wrapModeV = TextureWrapMode.Clamp;
       this.spriteRenderer = spriteRenderer;
 
-      spriteRenderer.priority = -this.index;
+      // priority 范围控制在 （0, 1），同时为了尽可能避免精度问题，this.index * 1000000
+      spriteRenderer.priority =  (Number.MAX_SAFE_INTEGER - this.index * 1000000) / Number.MAX_SAFE_INTEGER;
 
       this.width = atlasRegion.width * texture.width;
       this.height = atlasRegion.height * texture.height;
