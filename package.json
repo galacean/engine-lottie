@@ -9,7 +9,7 @@
     "@galacean/engine": ">=1.0.0"
   },
   "devDependencies": {
-    "@galacean/engine": "^1.0.0-beta.5",
+    "@galacean/engine": "^1.0.0-beta.6",
     "@galacean/engine-toolkit-controls": "^1.0.0-beta.0",
     "@babel/plugin-proposal-class-properties": "^7.12.1",
     "@babel/plugin-proposal-decorators": "^7.12.1",
