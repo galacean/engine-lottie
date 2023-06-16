@@ -1,15 +1,7 @@
 import CompLottieElement from "./element/CompLottieElement";
 import SpriteLottieElement from "./element/SpriteLottieElement";
 import Tools from "./tools";
-import {
-  Script,
-  Vector2,
-  ignoreClone,
-  Entity,
-  Layer,
-  Engine,
-  SpriteRenderer,
-} from "@galacean/engine";
+import { Script, Vector2, ignoreClone, Entity, Layer, Engine, SpriteRenderer } from "@galacean/engine";
 import { LottieResource, TypeAnimationClip } from "./LottieResource";
 import BaseLottieLayer from "./element/BaseLottieElement";
 
@@ -350,10 +342,12 @@ export class LottieAnimation extends Script {
       const renderers = LottieAnimation._tempRenderers;
       renderers.length = 0;
       this.entity.getComponentsIncludeChildren(SpriteRenderer, renderers);
+      // global priority 的差值
       let priorityDiff = 0;
       for (let i = 0, l = renderers.length; i < l; ++i) {
         const renderer = renderers[i];
         if (i === 0) {
+          // this._priority 表示 global priority，Math.floor(renderer.priority) 取出当前 global priority
           priorityDiff = this._priority - Math.floor(renderer.priority);
         }
         renderer.priority = renderer.priority + priorityDiff;
