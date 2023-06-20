@@ -7,7 +7,7 @@ import glslify from "rollup-plugin-glslify";
 import serve from "rollup-plugin-serve";
 import miniProgramPlugin from "./rollup.miniprogram.plugin";
 import replace from "@rollup/plugin-replace";
-import { swc, defineRollupSwcOption, minify } from "rollup-plugin-swc3";
+import { swc, defineRollupSwcOption } from "rollup-plugin-swc3";
 
 const { BUILD_TYPE, NODE_ENV } = process.env;
 
@@ -51,8 +51,8 @@ const commonPlugins = [
 
 function config({ location, pkgJson }) {
   const input = path.join(location, "src", "index.ts");
-  const dependencies = Object.assign({}, pkgJson.dependencies ?? {}, pkgJson.peerDependencies ?? {});
-  const external = Object.keys(dependencies);
+  const dependencies = Object.assign(pkgJson.peerDependencies ?? {});
+  const commonExternal = Object.keys(dependencies);
   commonPlugins.push(
     replace({
       preventAssignment: true,
@@ -61,34 +61,27 @@ function config({ location, pkgJson }) {
   );
 
   return {
-    umd: (compress) => {
-      const umdConfig = pkgJson.umd;
+    umd: () => {
       let file = path.join(location, "dist", "browser.js");
       const plugins = [...commonPlugins];
-      if (compress) {
-        plugins.push(minify());
-        file = path.join(location, "dist", "browser.min.js");
-      }
-
-      const umdExternal = Object.keys(umdConfig.globals ?? {});
-
       return {
         input,
-        external: umdExternal,
+        external: commonExternal,
         output: [
           {
             file,
-            name: umdConfig.name,
+            name: "Galacean.Lottie",
             format: "umd",
-            sourcemap: false,
-            globals: umdConfig.globals
+            globals: {
+              "@galacean/engine": "Galacean"
+            }
           }
         ],
         plugins
       };
     },
     mini: () => {
-      const external = Object.keys(Object.assign(pkgJson.dependencies ?? {}, pkgJson.peerDependencies ?? {}))
+      const external = commonExternal
         .concat("@galacean/engine-miniprogram-adapter")
         .map((name) => `${name}/dist/miniprogram`);
       const plugins = [...commonPlugins, ...miniProgramPlugin];
@@ -109,7 +102,7 @@ function config({ location, pkgJson }) {
       const plugins = [...commonPlugins];
       return {
         input,
-        external,
+        external: commonExternal,
         output: [
           {
             file: path.join(location, pkgJson.module),
@@ -152,19 +145,8 @@ switch (BUILD_TYPE) {
 }
 
 function getUMD() {
-  const configs = pkgs.filter((pkg) => pkg.pkgJson.umd);
-  return configs
-    .map((config) => makeRollupConfig({ ...config, type: "umd" }))
-    .concat(
-      configs.map((config) =>
-        makeRollupConfig({
-          ...config,
-          type: "umd",
-          compress: false,
-          visualizer: false
-        })
-      )
-    );
+  const configs = [...pkgs];
+  return configs.map((config) => makeRollupConfig({ ...config, type: "umd" }));
 }
 
 function getModule() {
