@@ -91,6 +91,10 @@ export class LottieAnimation extends Script {
     return this._autoPlay;
   }
 
+  get frame(): number {
+    return this._frame;
+  }
+
   /**
    * Play the lottie animation
    */
