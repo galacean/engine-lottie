@@ -95,10 +95,15 @@ export class LottieResource extends EngineObject {
     }
   }
 
-  private _parseAnimations(clips: TypeAnimationClip[]) {
+  /**
+   * @internal
+   */
+  _parseAnimations(clips: TypeAnimationClip[]) {
     clips.forEach((clip) => {
       this.clips[clip.name] = { ...clip };
     });
+
+    return this.clips;
   }
 
   /**

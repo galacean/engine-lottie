@@ -88,11 +88,15 @@ export class LottieAnimation extends Script {
   }
 
   get autoPlay(): boolean {
-    return this._autoPlay;
+    return this._autoPlay
   }
 
   get frame(): number {
     return this._frame;
+  }
+
+  set clips(value: TypeAnimationClip[]) {
+    this._clips = this._resource._parseAnimations(value);
   }
 
   /**
