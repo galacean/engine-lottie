@@ -59,7 +59,7 @@ export class LottieResource extends EngineObject {
   comps: any[];
   atlas: any;
   name: string;
-  clips: {};
+  clips: { [name: string]: TypeAnimationClip };
 
   constructor(engine: Engine, res: TypeRes, atlas: any) {
     super(engine);
@@ -93,6 +93,11 @@ export class LottieResource extends EngineObject {
     if (res.lolitaAnimations) {
       this._parseAnimations(res.lolitaAnimations);
     }
+  }
+
+  setClips(v: TypeAnimationClip[]) {
+    this.clips = {};
+    this._parseAnimations(v);
   }
 
   private _parseAnimations(clips: TypeAnimationClip[]) {

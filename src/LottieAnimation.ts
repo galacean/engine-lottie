@@ -88,7 +88,11 @@ export class LottieAnimation extends Script {
   }
 
   get autoPlay(): boolean {
-    return this._autoPlay;
+    return this._autoPlay
+  }
+
+  get frame(): number {
+    return this._frame;
   }
 
   /**

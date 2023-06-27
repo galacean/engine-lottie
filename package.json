@@ -38,7 +38,7 @@
     "typescript": "^4.8.4",
     "cross-env": "^5.2.0"
   },
-  "version": "1.0.0-beta.7",
+  "version": "1.0.0-beta.10",
   "description": "Lottie runtime of oasis engine",
   "name": "@galacean/engine-lottie",
   "repository": "https://github.com/galacean/engine-lottie.git",
