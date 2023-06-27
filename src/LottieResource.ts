@@ -100,10 +100,7 @@ export class LottieResource extends EngineObject {
     this._parseAnimations(v);
   }
 
-  /**
-   * @private
-   */
-  _parseAnimations(clips: TypeAnimationClip[]) {
+  private _parseAnimations(clips: TypeAnimationClip[]) {
     clips.forEach((clip) => {
       this.clips[clip.name] = { ...clip };
     });
