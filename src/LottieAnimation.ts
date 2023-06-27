@@ -29,7 +29,6 @@ export class LottieAnimation extends Script {
   private _resource: LottieResource;
   private _priority: number = 0;
   private _priorityDirty: boolean = true;
-  private _clips: {};
   private _clip: TypeAnimationClip;
   private _clipEndCallbacks: Object = {};
   private _autoPlay: boolean = false;
@@ -49,7 +48,6 @@ export class LottieAnimation extends Script {
     if (value) {
       this._width = value.width;
       this._height = value.height;
-      this._clips = value.clips;
 
       this._createElements(value);
       this._priorityDirty = true;
@@ -100,7 +98,7 @@ export class LottieAnimation extends Script {
    */
   play(name?: string): Promise<any> {
     if (name) {
-      const clip = this._clips[name];
+      const clip = this.resource.clips[name];
       this._clip = clip;
     } else {
       this._clip = null;
