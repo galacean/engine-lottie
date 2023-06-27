@@ -95,10 +95,6 @@ export class LottieAnimation extends Script {
     return this._frame;
   }
 
-  set clips(value: TypeAnimationClip[]) {
-    this._clips = this._resource._parseAnimations(value);
-  }
-
   /**
    * Play the lottie animation
    */
