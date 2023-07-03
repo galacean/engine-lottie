@@ -8,3 +8,5 @@ tsconfig.tsbuildinfo
 package-lock.json
 yarn.lock
 .npmrc
+
+pnpm-lock.yaml

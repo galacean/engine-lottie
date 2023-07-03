@@ -22,6 +22,9 @@ export class LottieAnimation extends Script {
   // @ts-ignore
   pixelsPerUnit: number = Engine._pixelsPerUnit;
 
+  private _alpha: number = 1;
+  private _childrenAlpha: number[] = [];
+
   private _width: number;
   private _height: number;
   private _isPlaying: boolean = false;
@@ -77,6 +80,31 @@ export class LottieAnimation extends Script {
     return this._priority;
   }
 
+  /**
+   * global alpha
+   */
+  set alpha(value: number) {
+    const renderers = LottieAnimation._tempRenderers;
+    renderers.length = 0;
+    this.entity.getComponentsIncludeChildren(SpriteRenderer, renderers);
+    
+    // cache the alpha of children
+    if (this._childrenAlpha.length === 0) {
+      this._childrenAlpha = renderers.map((renderer) => renderer.color.a);
+    }
+
+    renderers.forEach((renderer, i) => {
+      renderer.color.a = this._childrenAlpha[i] * value;
+    })
+
+    // update in updateElement
+    this._alpha = value;
+  }
+
+  get alpha(): number {
+    return this._alpha;
+  }
+
   set autoPlay(value: boolean) {
     this._autoPlay = value;
 
@@ -91,6 +119,10 @@ export class LottieAnimation extends Script {
 
   get frame(): number {
     return this._frame;
+  }
+
+  get isPlaying(): boolean {
+    return this._isPlaying;
   }
 
   /**
@@ -292,7 +324,7 @@ export class LottieAnimation extends Script {
     if (sprite) {
       // update color of sprite
       const { r, g, b } = spriteRenderer.color;
-      spriteRenderer.color.set(r, g, b, o);
+      spriteRenderer.color.set(r, g, b, o * this._alpha);
 
       // update pixels per unit of sprite
       sprite.pixelsPerUnit = pixelsPerUnit;

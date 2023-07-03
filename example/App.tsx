@@ -74,9 +74,30 @@ async function init() {
 		]
 	}
 
+	let curLottie: LottieAnimation | null;
+
 	gui.add({ name: 'base64' }, 'name', Object.keys(demos)).onChange((v) => {
 		loadLottie(v);
 	})
+	gui.add({ alpha: 1 }, 'alpha', 0, 1).onChange((v) => {
+		if (curLottie) {
+			curLottie.alpha = v;
+		}
+	})
+	// gui add button
+	gui.add(
+		{ 
+			play: () => {
+				if (curLottie) {
+					if (curLottie.isPlaying) {
+						curLottie.pause();
+					}
+					else {
+						curLottie.play();
+					}
+				}
+			},
+		}, 'play').name('Play');
 
 	let lastLottieEntity: Entity;
 
@@ -92,11 +113,12 @@ async function init() {
 			root.addChild(lottieEntity);
 			lastLottieEntity = lottieEntity;
 			const lottie: LottieAnimation = lottieEntity.getComponent(LottieAnimation);
+			curLottie = lottie;
 			lottie.isLooping = true;
 			// lottie.speed = 0.5;
 			// destroy resource if need not clone
 			lottie.resource.destroy();
-			lottie.play();
+			// lottie.play();
 
 			// lottieEntity.clone();
 
