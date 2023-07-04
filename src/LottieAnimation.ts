@@ -89,13 +89,10 @@ export class LottieAnimation extends Script {
     if (this._alpha !== value) {
       this._alpha = value;
 
-      const isPlaying = this.isPlaying;
-      if (!isPlaying) {
+      if (!this.isPlaying) {
         this.play();
-      }
-      this.onUpdate(0);
-      if (!isPlaying) {
-        this.pause()
+        this.onUpdate(0);
+        this.pause();
       }
     }
   }
