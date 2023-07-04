@@ -76,14 +76,51 @@ async function init() {
 
 	let curLottie: LottieAnimation | null;
 
-	gui.add({ name: 'base64' }, 'name', Object.keys(demos)).onChange((v) => {
-		loadLottie(v);
+	let lastLottieEntity: Entity;
+	const reloadLottie = async (v: string) => {
+		const lottieEntity = await engine.resourceManager.load<Entity>({
+			urls: demos[v],
+			type: 'lottie'
+		})
+
+		if (lastLottieEntity) {
+			lastLottieEntity.destroy();
+		}
+
+		root.addChild(lottieEntity);
+		lastLottieEntity = lottieEntity;
+
+		const lottie: LottieAnimation = lottieEntity.getComponent(LottieAnimation);
+		lottie.isLooping = true;
+		// lottie.speed = 0.5;
+		// destroy resource if need not clone
+		lottie.resource.destroy();
+		// lottie.play();
+
+		// lottieEntity.clone();
+
+		// test destroy
+		// setTimeout(() => {
+		// 	console.log('destroy')
+		// 	lottieEntity.destroy();
+		// }, 2000);
+
+		return lottie
+	}
+
+	let alphaController: dat.GUIController;
+
+	gui.add({ name: 'base64' }, 'name', Object.keys(demos)).onChange(async (v) => {
+		curLottie = await reloadLottie(v);
+		alphaController.setValue(curLottie.alpha);
 	})
-	gui.add({ alpha: 1 }, 'alpha', 0, 1).onChange((v) => {
+
+	alphaController = gui.add({ alpha: 1 }, 'alpha', 0, 1).onChange((v) => {
 		if (curLottie) {
 			curLottie.alpha = v;
 		}
 	})
+
 	// gui add button
 	gui.add(
 		{ 
@@ -99,37 +136,6 @@ async function init() {
 			},
 		}, 'play').name('Play');
 
-	let lastLottieEntity: Entity;
-
-	const loadLottie = (v) => {
-		engine.resourceManager.load<Entity>({
-			urls: demos[v],
-			type: 'lottie'
-		}).then((lottieEntity) => {
-			if (lastLottieEntity) {
-				lastLottieEntity.destroy();
-			}
-
-			root.addChild(lottieEntity);
-			lastLottieEntity = lottieEntity;
-			const lottie: LottieAnimation = lottieEntity.getComponent(LottieAnimation);
-			curLottie = lottie;
-			lottie.isLooping = true;
-			// lottie.speed = 0.5;
-			// destroy resource if need not clone
-			lottie.resource.destroy();
-			// lottie.play();
-
-			// lottieEntity.clone();
-
-			// test destroy
-			// setTimeout(() => {
-			// 	console.log('destroy')
-			// 	lottieEntity.destroy();
-			// }, 2000);
-		});
-	}
-
 	const engine = await WebGLEngine.create({ canvas: "canvas" })
 
 	engine.canvas.resizeByClientSize();
@@ -142,10 +148,10 @@ async function init() {
 	cameraEntity.transform.lookAt(new Vector3(0, 0, 0));
 	cameraEntity.addComponent(OrbitControl);
 
-	loadLottie('base64');
+	curLottie = await reloadLottie('base64');
+	lastLottieEntity = curLottie.entity;
 
 	engine.run();
-
 }
 
 function App() {
