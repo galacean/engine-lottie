@@ -95,7 +95,7 @@ async function init() {
 		// lottie.speed = 0.5;
 		// destroy resource if need not clone
 		lottie.resource.destroy();
-		// lottie.play();
+		lottie.play();
 
 		// lottieEntity.clone();
 
