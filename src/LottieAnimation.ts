@@ -22,6 +22,9 @@ export class LottieAnimation extends Script {
   // @ts-ignore
   pixelsPerUnit: number = Engine._pixelsPerUnit;
 
+  private _alpha: number = 1;
+  private _curFrame: number = 0;
+
   private _width: number;
   private _height: number;
   private _isPlaying: boolean = false;
@@ -54,6 +57,7 @@ export class LottieAnimation extends Script {
     }
 
     // update the first frame
+    this._curFrame = 0;
     this.play();
     this.onUpdate(0);
 
@@ -77,6 +81,26 @@ export class LottieAnimation extends Script {
     return this._priority;
   }
 
+  /**
+   * global alpha
+   */
+  set alpha(value: number) {
+    // update in updateElement
+    if (this._alpha !== value) {
+      this._alpha = value;
+
+      if (!this.isPlaying) {
+        this.play();
+        this.onUpdate(0);
+        this.pause();
+      }
+    }
+  }
+
+  get alpha(): number {
+    return this._alpha;
+  }
+
   set autoPlay(value: boolean) {
     this._autoPlay = value;
 
@@ -93,6 +117,10 @@ export class LottieAnimation extends Script {
     return this._frame;
   }
 
+  get isPlaying(): boolean {
+    return this._isPlaying;
+  }
+
   /**
    * Play the lottie animation
    */
@@ -105,7 +133,7 @@ export class LottieAnimation extends Script {
     }
 
     this._isPlaying = true;
-    this._frame = 0;
+    this._frame = this._curFrame;
 
     return new Promise((resolve) => {
       if (name) {
@@ -121,6 +149,13 @@ export class LottieAnimation extends Script {
    */
   pause(): void {
     this._isPlaying = false;
+    this._curFrame = this._frame;
+  }
+
+  stop() {
+    this._isPlaying = false;
+    this._curFrame = 0;
+    this._frame = 0;
   }
 
   /**
@@ -144,6 +179,8 @@ export class LottieAnimation extends Script {
   }
 
   private _createLayerElements(layers, elements, parent, isCloned?: boolean) {
+    if (!layers) return;
+
     for (let i = 0, l = layers.length; i < l; i++) {
       const layer = layers[i];
       let element = null;
@@ -292,7 +329,7 @@ export class LottieAnimation extends Script {
     if (sprite) {
       // update color of sprite
       const { r, g, b } = spriteRenderer.color;
-      spriteRenderer.color.set(r, g, b, o);
+      spriteRenderer.color.set(r, g, b, o * this._alpha);
 
       // update pixels per unit of sprite
       sprite.pixelsPerUnit = pixelsPerUnit;

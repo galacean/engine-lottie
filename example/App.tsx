@@ -74,39 +74,67 @@ async function init() {
 		]
 	}
 
-	gui.add({ name: 'base64' }, 'name', Object.keys(demos)).onChange((v) => {
-		loadLottie(v);
-	})
+	let curLottie: LottieAnimation | null;
 
 	let lastLottieEntity: Entity;
-
-	const loadLottie = (v) => {
-		engine.resourceManager.load<Entity>({
+	const reloadLottie = async (v: string) => {
+		const lottieEntity = await engine.resourceManager.load<Entity>({
 			urls: demos[v],
 			type: 'lottie'
-		}).then((lottieEntity) => {
-			if (lastLottieEntity) {
-				lastLottieEntity.destroy();
-			}
+		})
 
-			root.addChild(lottieEntity);
-			lastLottieEntity = lottieEntity;
-			const lottie: LottieAnimation = lottieEntity.getComponent(LottieAnimation);
-			lottie.isLooping = true;
-			// lottie.speed = 0.5;
-			// destroy resource if need not clone
-			lottie.resource.destroy();
-			lottie.play();
+		if (lastLottieEntity) {
+			lastLottieEntity.destroy();
+		}
 
-			// lottieEntity.clone();
+		root.addChild(lottieEntity);
+		lastLottieEntity = lottieEntity;
 
-			// test destroy
-			// setTimeout(() => {
-			// 	console.log('destroy')
-			// 	lottieEntity.destroy();
-			// }, 2000);
-		});
+		const lottie: LottieAnimation = lottieEntity.getComponent(LottieAnimation);
+		lottie.isLooping = true;
+		// lottie.speed = 0.5;
+		// destroy resource if need not clone
+		lottie.resource.destroy();
+		lottie.play();
+
+		// lottieEntity.clone();
+
+		// test destroy
+		// setTimeout(() => {
+		// 	console.log('destroy')
+		// 	lottieEntity.destroy();
+		// }, 2000);
+
+		return lottie
 	}
+
+	let alphaController: dat.GUIController;
+
+	gui.add({ name: 'base64' }, 'name', Object.keys(demos)).onChange(async (v) => {
+		curLottie = await reloadLottie(v);
+		alphaController.setValue(curLottie.alpha);
+	})
+
+	alphaController = gui.add({ alpha: 1 }, 'alpha', 0, 1).onChange((v) => {
+		if (curLottie) {
+			curLottie.alpha = v;
+		}
+	})
+
+	// gui add button
+	gui.add(
+		{ 
+			play: () => {
+				if (curLottie) {
+					if (curLottie.isPlaying) {
+						curLottie.pause();
+					}
+					else {
+						curLottie.play();
+					}
+				}
+			},
+		}, 'play').name('Play');
 
 	const engine = await WebGLEngine.create({ canvas: "canvas" })
 
@@ -120,10 +148,10 @@ async function init() {
 	cameraEntity.transform.lookAt(new Vector3(0, 0, 0));
 	cameraEntity.addComponent(OrbitControl);
 
-	loadLottie('base64');
+	curLottie = await reloadLottie('base64');
+	lastLottieEntity = curLottie.entity;
 
 	engine.run();
-
 }
 
 function App() {
