@@ -22,6 +22,8 @@ export type TypeLayer = {
   offsetTime: number;
   stretch: number;
   index: number;
+
+  t?: TypeText;
 };
 
 export type TypeAnimationClip = {
@@ -44,6 +46,24 @@ export type TypeRes = {
   assets: any[];
   lolitaAnimations?: TypeAnimationClip[];
 };
+
+export type TypeText = {
+  d: {
+    k: TypeTextKeyframe[];
+  }
+}
+
+// 字段解释：https://lottiefiles.github.io/lottie-docs/text/#text-document
+export type TypeTextKeyframe = {
+  s: {
+    t: string;
+    f: string;
+    s: number;
+    fc: number[];
+    lh: number;
+  };
+  t: number;
+}
 
 /**
  * @internal
