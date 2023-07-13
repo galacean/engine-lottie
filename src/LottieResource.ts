@@ -53,7 +53,7 @@ export type TypeText = {
   }
 }
 
-// 字段解释：https://lottiefiles.github.io/lottie-docs/text/#text-document
+// field explanation：https://lottiefiles.github.io/lottie-docs/text/#text-document
 export type TypeTextKeyframe = {
   s: {
     t: string;

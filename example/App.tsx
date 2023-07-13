@@ -73,7 +73,7 @@ async function init() {
 			"https://mdn.alipayobjects.com/huamei_w1o8la/afts/file/A*GxWPRbeur0MAAAAAAAAAAAAADsB_AQ"
 		],
 		'福袋(金额文字)': [
-			"https://mdn.alipayobjects.com/marketing/afts/file/A*Vf4QQLY4tdYAAAAAAAAAAAAADviWAQ",
+			"https://mdn.alipayobjects.com/marketing/afts/file/A*LmhJSp_Owt8AAAAAAAAAAAAADviWAQ",
       "https://mdn.alipayobjects.com/marketing/afts/file/A*XnCbR7BvZGAAAAAAAAAAAAAADviWAQ"
 		],
 	}

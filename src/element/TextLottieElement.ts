@@ -18,28 +18,29 @@ export default class TextLottieElement extends BaseLottieElement {
       this.entity = new Entity(engine, layer.nm);
     }
     const textRenderer = this.entity.addComponent(TextRenderer);
-    const firstKeyframe: TypeTextKeyframe = layer?.t?.d?.k?.[0];
-    const firstKeyframeStart = firstKeyframe.s;
-    if (firstKeyframeStart) {
-      const { t: text, f: font, s: fontSize, fc: fontColor, lh: lineHeight } = firstKeyframeStart;
-      // 通过 font 设置 Font 对象
-      textRenderer.font = Font.createFromOS(engine, font);
-      // 通过 text 设置需要显示的文本
-      textRenderer.text = text;
-      // 通过 fontSize 设置字体大小
-      textRenderer.fontSize = fontSize;
-      // 通过 color 设置文本颜色
-      textRenderer.color.set(fontColor[0], fontColor[1], fontColor[2], 1);
-      // 通过 lineSpacing 设置行间距
-      textRenderer.lineSpacing = lineHeight;
+    const keyframes: TypeTextKeyframe[] = layer?.t?.d?.k;
+    if (keyframes.length === 1) {
+      // only one frame
+      const firstKeyframeStart = keyframes?.[0]?.s;
+      if (firstKeyframeStart) {
+        const { t: text, f: font, s: fontSize, fc: fontColor, lh: lineHeight } = firstKeyframeStart;
+        // set the Font object by font
+        textRenderer.font = Font.createFromOS(engine, font);
+        // set the text to be displayed by text
+        textRenderer.text = text;
+        // set the font size by fontSize
+        textRenderer.fontSize = fontSize;
+        // set the text color by color
+        textRenderer.color.set(fontColor[0], fontColor[1], fontColor[2], 1);
+        // set line spacing via lineSpacing
+        textRenderer.lineSpacing = lineHeight;
+      } else {
+        Logger.warn(`TextLottieElement: ${name}, No corresponding text data found`);
+      }
     } else {
-      Logger.warn(`TextLottieElement: ${name} 未找到对应文字数据`);
+      // TODO: multi keyframes
     }
 
     textRenderer.priority = (Number.MAX_SAFE_INTEGER - this.index * 1000000) / Number.MAX_SAFE_INTEGER;
-  }
-
-  destroy() {
-    super.destroy();
   }
 }
