@@ -1,5 +1,6 @@
 import CompLottieElement from "./element/CompLottieElement";
 import SpriteLottieElement from "./element/SpriteLottieElement";
+import TextLottieElement from "./element/TextLottieElement";
 import Tools from "./tools";
 import { Script, Vector2, ignoreClone, Entity, Layer, Engine, SpriteRenderer } from "@galacean/engine";
 import { LottieResource, TypeAnimationClip } from "./LottieResource";
@@ -124,7 +125,7 @@ export class LottieAnimation extends Script {
   }
 
   get autoPlay(): boolean {
-    return this._autoPlay
+    return this._autoPlay;
   }
 
   get frame(): number {
@@ -216,6 +217,11 @@ export class LottieAnimation extends Script {
           }
 
           element = new CompLottieElement(layer, this.engine, childEntity, layer.id);
+
+          break;
+
+        case 5:
+          element = new TextLottieElement(layer, this.engine, childEntity, layer.id);
 
           break;
       }

@@ -8,13 +8,13 @@ This is a [lottie](https://airbnb.design/lottie/) runtime created by [Galacean E
 
 ## Features
 - [x] Sprite element: transform and opacity animation.
+- [x] Text element
 - [x] 3D rotation: rotate element in 3D space.
 - [x] Animation clip: play animation clip.
 
 #### TODO
 - [ ] Sprite mask
 - [ ] Shape element
-- [ ] Text
 - [ ] Expression
 
 ## Usage
