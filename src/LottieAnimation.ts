@@ -32,6 +32,8 @@ export class LottieAnimation extends Script {
   private _resource: LottieResource;
   private _priority: number = 0;
   private _priorityDirty: boolean = true;
+  private _layer: Layer = Layer.Layer0;
+  private _layerDirty: boolean = true;
   private _clip: TypeAnimationClip;
   private _clipEndCallbacks: Object = {};
   private _autoPlay: boolean = false;
@@ -54,6 +56,7 @@ export class LottieAnimation extends Script {
 
       this._createElements(value);
       this._priorityDirty = true;
+      this._layerDirty = true;
     }
 
     // update the first frame
@@ -79,6 +82,17 @@ export class LottieAnimation extends Script {
 
   get priority(): number {
     return this._priority;
+  }
+
+  set layer(value: Layer) {
+    if (this._layer !== value) {
+      this._layer = value;
+      this._layerDirty = true;
+    }
+  }
+
+  get layer(): Layer {
+    return this._layer;
   }
 
   /**
@@ -158,12 +172,7 @@ export class LottieAnimation extends Script {
     this._frame = 0;
   }
 
-  /**
-   * Set layer of rendering
-   * @param entity The entity lottie component belongs to
-   * @param layer Layer of rendering
-   */
-  setLayer(layer: Layer, entity?: Entity) {
+  private _setLayer(layer: Layer, entity?: Entity) {
     if (!entity) {
       entity = this.entity;
     }
@@ -174,7 +183,7 @@ export class LottieAnimation extends Script {
     for (let i = children.length - 1; i >= 0; i--) {
       const child = children[i];
       child.layer = layer;
-      this.setLayer(layer, child);
+      this._setLayer(layer, child);
     }
   }
 
@@ -391,6 +400,11 @@ export class LottieAnimation extends Script {
         }
         renderer.priority = renderer.priority + priorityDiff;
       }
+    }
+
+    if (this._layerDirty) {
+      this._layerDirty = false;
+      this._setLayer(this.layer, this.entity);
     }
 
     const time = this.direction * this.speed * deltaTime * 1000;
