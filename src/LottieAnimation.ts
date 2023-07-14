@@ -2,13 +2,13 @@ import CompLottieElement from "./element/CompLottieElement";
 import SpriteLottieElement from "./element/SpriteLottieElement";
 import TextLottieElement from "./element/TextLottieElement";
 import Tools from "./tools";
-import { Script, Vector2, ignoreClone, Entity, Layer, Engine, SpriteRenderer } from "@galacean/engine";
+import { Script, Vector2, ignoreClone, Entity, Layer, Engine, Renderer } from "@galacean/engine";
 import { LottieResource, TypeAnimationClip } from "./LottieResource";
 import BaseLottieLayer from "./element/BaseLottieElement";
 
 export class LottieAnimation extends Script {
   private static _pivotVector: Vector2 = new Vector2();
-  private static _tempRenderers: Array<SpriteRenderer> = [];
+  private static _tempRenderers: Array<Renderer> = [];
 
   /** The number of units in world space that correspond to one pixel in the sprite. */
   /** Repeat times of the animation. */
@@ -33,6 +33,8 @@ export class LottieAnimation extends Script {
   private _resource: LottieResource;
   private _priority: number = 0;
   private _priorityDirty: boolean = true;
+  private _layer: Layer = Layer.Layer0;
+  private _layerDirty: boolean = true;
   private _clip: TypeAnimationClip;
   private _clipEndCallbacks: Object = {};
   private _autoPlay: boolean = false;
@@ -55,6 +57,7 @@ export class LottieAnimation extends Script {
 
       this._createElements(value);
       this._priorityDirty = true;
+      this._layerDirty = true;
     }
 
     // update the first frame
@@ -80,6 +83,17 @@ export class LottieAnimation extends Script {
 
   get priority(): number {
     return this._priority;
+  }
+
+  set layer(value: Layer) {
+    if (this._layer !== value) {
+      this._layer = value;
+      this._layerDirty = true;
+    }
+  }
+
+  get layer(): Layer {
+    return this._layer;
   }
 
   /**
@@ -159,12 +173,7 @@ export class LottieAnimation extends Script {
     this._frame = 0;
   }
 
-  /**
-   * Set layer of rendering
-   * @param entity The entity lottie component belongs to
-   * @param layer Layer of rendering
-   */
-  setLayer(layer: Layer, entity?: Entity) {
+  private _setLayer(layer: Layer, entity?: Entity) {
     if (!entity) {
       entity = this.entity;
     }
@@ -175,7 +184,7 @@ export class LottieAnimation extends Script {
     for (let i = children.length - 1; i >= 0; i--) {
       const child = children[i];
       child.layer = layer;
-      this.setLayer(layer, child);
+      this._setLayer(layer, child);
     }
   }
 
@@ -386,17 +395,22 @@ export class LottieAnimation extends Script {
       this._priorityDirty = false;
       const renderers = LottieAnimation._tempRenderers;
       renderers.length = 0;
-      this.entity.getComponentsIncludeChildren(SpriteRenderer, renderers);
-      // global priority 的差值
+      this.entity.getComponentsIncludeChildren(Renderer, renderers);
+      // the diff of global priority
       let priorityDiff = 0;
       for (let i = 0, l = renderers.length; i < l; ++i) {
         const renderer = renderers[i];
         if (i === 0) {
-          // this._priority 表示 global priority，Math.floor(renderer.priority) 取出当前 global priority
+          // this._priority represent global priority，Math.floor(renderer.priority) get current global priority
           priorityDiff = this._priority - Math.floor(renderer.priority);
         }
         renderer.priority = renderer.priority + priorityDiff;
       }
+    }
+
+    if (this._layerDirty) {
+      this._layerDirty = false;
+      this._setLayer(this.layer, this.entity);
     }
 
     const time = this.direction * this.speed * deltaTime * 1000;
