@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { LottieAnimation } from "../src";
-import { Camera, Entity, Vector3, WebGLEngine } from "@galacean/engine";
+import { Camera, Entity, Layer, Vector3, WebGLEngine } from "@galacean/engine";
 import { OrbitControl } from "@galacean/engine-toolkit-controls";
 import * as dat from 'dat.gui';
 import "./App.css";
@@ -96,6 +96,7 @@ async function init() {
 
 		const lottie: LottieAnimation = lottieEntity.getComponent(LottieAnimation);
 		lottie.isLooping = true;
+		lottie.layer = Layer.Layer1;
 		// lottie.speed = 0.5;
 		// destroy resource if need not clone
 		lottie.resource.destroy();
@@ -148,6 +149,7 @@ async function init() {
 
 	const cameraEntity = root.createChild("camera");
 	const camera = cameraEntity.addComponent(Camera);
+	camera.cullingMask = Layer.Layer1;
 	cameraEntity.transform.setPosition(0, 0, 10);
 	cameraEntity.transform.lookAt(new Vector3(0, 0, 0));
 	cameraEntity.addComponent(OrbitControl);

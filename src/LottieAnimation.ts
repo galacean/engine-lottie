@@ -2,13 +2,13 @@ import CompLottieElement from "./element/CompLottieElement";
 import SpriteLottieElement from "./element/SpriteLottieElement";
 import TextLottieElement from "./element/TextLottieElement";
 import Tools from "./tools";
-import { Script, Vector2, ignoreClone, Entity, Layer, Engine, SpriteRenderer } from "@galacean/engine";
+import { Script, Vector2, ignoreClone, Entity, Layer, Engine, SpriteRenderer, TextRenderer, Renderer } from "@galacean/engine";
 import { LottieResource, TypeAnimationClip } from "./LottieResource";
 import BaseLottieLayer from "./element/BaseLottieElement";
 
 export class LottieAnimation extends Script {
   private static _pivotVector: Vector2 = new Vector2();
-  private static _tempRenderers: Array<SpriteRenderer> = [];
+  private static _tempRenderers: Array<Renderer> = [];
 
   /** The number of units in world space that correspond to one pixel in the sprite. */
   /** Repeat times of the animation. */
@@ -392,10 +392,11 @@ export class LottieAnimation extends Script {
     }
 
     if (this._priorityDirty) {
+      debugger;
       this._priorityDirty = false;
       const renderers = LottieAnimation._tempRenderers;
       renderers.length = 0;
-      this.entity.getComponentsIncludeChildren(SpriteRenderer, renderers);
+      this.entity.getComponentsIncludeChildren(Renderer, renderers);
       // global priority 的差值
       let priorityDiff = 0;
       for (let i = 0, l = renderers.length; i < l; ++i) {
