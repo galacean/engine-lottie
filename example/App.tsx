@@ -71,7 +71,11 @@ async function init() {
 		],
 		"碎片": [
 			"https://mdn.alipayobjects.com/huamei_w1o8la/afts/file/A*GxWPRbeur0MAAAAAAAAAAAAADsB_AQ"
-		]
+		],
+		'福袋(金额文字)': [
+			"https://mdn.alipayobjects.com/marketing/afts/file/A*LmhJSp_Owt8AAAAAAAAAAAAADviWAQ",
+      "https://mdn.alipayobjects.com/marketing/afts/file/A*XnCbR7BvZGAAAAAAAAAAAAAADviWAQ"
+		],
 	}
 
 	let curLottie: LottieAnimation | null;
