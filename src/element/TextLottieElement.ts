@@ -35,10 +35,11 @@ export default class TextLottieElement extends BaseLottieElement {
         // set line spacing via lineSpacing
         textRenderer.lineSpacing = lineHeight;
       } else {
-        Logger.warn(`TextLottieElement: ${name}, No corresponding text data found`);
+        Logger.warn(`TextLottieElement: ${name}, No corresponding text data found.`);
       }
     } else {
       // TODO: multi keyframes
+      Logger.warn(`TextLottieElement: multi keyframes feature is not supported in this version.`);
     }
 
     textRenderer.priority = (Number.MAX_SAFE_INTEGER - this.index * 1000000) / Number.MAX_SAFE_INTEGER;
