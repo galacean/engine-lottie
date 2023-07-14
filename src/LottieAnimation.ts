@@ -392,17 +392,16 @@ export class LottieAnimation extends Script {
     }
 
     if (this._priorityDirty) {
-      debugger;
       this._priorityDirty = false;
       const renderers = LottieAnimation._tempRenderers;
       renderers.length = 0;
       this.entity.getComponentsIncludeChildren(Renderer, renderers);
-      // global priority 的差值
+      // the diff of global priority
       let priorityDiff = 0;
       for (let i = 0, l = renderers.length; i < l; ++i) {
         const renderer = renderers[i];
         if (i === 0) {
-          // this._priority 表示 global priority，Math.floor(renderer.priority) 取出当前 global priority
+          // this._priority represent global priority，Math.floor(renderer.priority) get current global priority
           priorityDiff = this._priority - Math.floor(renderer.priority);
         }
         renderer.priority = renderer.priority + priorityDiff;
