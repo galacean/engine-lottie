@@ -24,21 +24,26 @@ export class LottieAnimation extends Script {
   pixelsPerUnit: number = Engine._pixelsPerUnit;
 
   private _alpha: number = 1;
-  private _curFrame: number = 0;
 
   private _width: number;
   private _height: number;
-  private _isPlaying: boolean = false;
-  private _frame: number = 0;
+
   private _resource: LottieResource;
   private _priority: number = 0;
   private _priorityDirty: boolean = true;
   private _layer: Layer = Layer.Layer0;
   private _layerDirty: boolean = true;
   private _clip: TypeAnimationClip;
-  private _clipEndCallbacks: Object = {};
   private _autoPlay: boolean = false;
 
+  @ignoreClone
+  private _clipEndCallbacks: Object = {};
+  @ignoreClone
+  private _isPlaying: boolean = false;
+  @ignoreClone
+  private _curFrame: number = 0;
+  @ignoreClone
+  private _frame: number = 0;
   @ignoreClone
   private _root: CompLottieElement = null;
   @ignoreClone
