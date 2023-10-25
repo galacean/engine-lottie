@@ -299,9 +299,9 @@ export class LottieAnimation extends Script {
 
     if (transform.p) {
       const p = transform.p.v;
-      x = p[0];
-      y = p[1];
-      z = p[2];
+      x = p[0] ?? 0;
+      y = p[1] ?? 0;
+      z = p[2] ?? 0;
     } else {
       if (transform.x) {
         x = transform.x.v;
