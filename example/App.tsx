@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { LottieAnimation } from "../src";
 import { Camera, Entity, Layer, Vector3, WebGLEngine } from "@galacean/engine";
-import { OrbitControl } from "@galacean/engine-toolkit-controls";
+import { OrbitControl } from "@galacean/engine-toolkit";
 import * as dat from 'dat.gui';
 import "./App.css";
 
