@@ -50,8 +50,8 @@ export type TypeRes = {
 export type TypeText = {
   d: {
     k: TypeTextKeyframe[];
-  }
-}
+  };
+};
 
 // field explanation：https://lottiefiles.github.io/lottie-docs/text/#text-document
 export type TypeTextKeyframe = {
@@ -63,7 +63,7 @@ export type TypeTextKeyframe = {
     lh: number;
   };
   t: number;
-}
+};
 
 /**
  * @internal
@@ -80,6 +80,7 @@ export class LottieResource extends EngineObject {
   atlas: any;
   name: string;
   clips: { [name: string]: TypeAnimationClip };
+  refCount: number = 0;
 
   constructor(engine: Engine, res: TypeRes, atlas: any) {
     super(engine);
@@ -200,6 +201,9 @@ export class LottieResource extends EngineObject {
     this.layers = null;
     this.clips = null;
     this.comps = null;
+    this.atlas.destroy(true);
     this.atlas = null;
+
+    super.destroy();
   }
 }
