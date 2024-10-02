@@ -50,11 +50,20 @@ export class LottieAnimation extends Script {
   private _elements: BaseLottieLayer[];
 
   set resource(value: LottieResource) {
+    if (this._resource === value) {
+      return;
+    }
+
     if (this._resource) {
       this.pause();
       this._destroy();
+      this._resource.refCount--;
+      if (this._resource.refCount <= 0) {
+        this._resource.destroy();
+      }
     }
 
+    value.refCount++;
     this._resource = value;
     if (value) {
       this._width = value.width;
