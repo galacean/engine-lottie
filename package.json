@@ -39,7 +39,7 @@
     "typescript": "^4.8.4",
     "vite": "^4.3.9"
   },
-  "version": "1.1.0-beta.0",
+  "version": "1.1.0-beta.1",
   "description": "Lottie runtime of oasis engine",
   "name": "@galacean/engine-lottie",
   "repository": "https://github.com/galacean/engine-lottie.git",
