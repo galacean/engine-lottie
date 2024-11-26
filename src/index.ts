@@ -1,9 +1,9 @@
-import { Loader } from '@galacean/engine';
-import { LottieAnimation } from './LottieAnimation';
+import { Loader } from "@galacean/engine";
+import { LottieAnimation } from "./LottieAnimation";
 
-export { LottieAnimation } ;
-export { LottieLoader } from "./LottieLoader";
 export { EditorLottieLoader } from "./EditorLottieLoader";
+export { LottieLoader } from "./LottieLoader";
 export { LottieResource } from "./LottieResource";
+export { LottieAnimation };
 
 Loader.registerClass("LottieAnimation", LottieAnimation);

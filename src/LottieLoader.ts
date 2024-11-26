@@ -1,18 +1,19 @@
 import {
-  resourceLoader,
-  Loader,
   AssetPromise,
   AssetType,
-  LoadItem,
-  ResourceManager,
-  Texture2D,
+  Engine,
   Entity,
+  LoadItem,
+  Loader,
+  ResourceManager,
   Sprite,
-  Engine
+  Texture2D,
+  request,
+  resourceLoader
 } from "@galacean/engine";
 
-import { LottieResource, TypeRes } from "./LottieResource";
 import { LottieAnimation } from "./LottieAnimation";
+import { LottieResource, TypeRes } from "./LottieResource";
 
 class Base64Atlas {
   private sprites = {};
@@ -51,7 +52,7 @@ export class LottieLoader extends Loader<Entity> {
   // @ts-ignore
   load(item: LoadItem, resourceManager: ResourceManager): Promise<Entity> {
     const { urls } = item;
-    const jsonPromise = this.request(urls[0], { type: "json" });
+    const jsonPromise = request(urls[0], { type: "json" });
 
     // atlas
     if (urls[1]) {
