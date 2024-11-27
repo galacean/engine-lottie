@@ -63,9 +63,9 @@ export class LottieAnimation extends Script {
       }
     }
 
-    value.refCount++;
     this._resource = value;
     if (value) {
+      value.refCount++;
       this._width = value.width;
       this._height = value.height;
 
