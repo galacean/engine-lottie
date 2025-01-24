@@ -32,7 +32,6 @@
     "react-dom": "^16.14.0",
     "rollup": "^2.32.0",
     "rollup-plugin-glslify": "^1.2.0",
-
     "rollup-plugin-modify": "^3.0.0",
     "rollup-plugin-serve": "^1.1.0",
     "rollup-plugin-swc3": "^0.8.0",
