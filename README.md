@@ -4,7 +4,9 @@
 ![npm-size](https://img.shields.io/bundlephobia/minzip/@galacean/engine-lottie)
 ![npm-download](https://img.shields.io/npm/dm/@galacean/engine-lottie)
 
-This is a [lottie](https://airbnb.io/lottie) runtime created by [Galacean Engine](https://github.com/galacean/engine). It is high-performance owing to drawing all sprites in batch, which is different from svg or canvas renderer of [lottie-web](https://github.com/airbnb/lottie-web). See more info: [documentation](hhttps://galacean.antgroup.com/#/docs/latest/cn/lottie).
+This is a [lottie](https://airbnb.io/lottie) runtime created by [Galacean Engine](https://github.com/galacean/engine). It is high-performance owing to drawing all sprites in batch, which is different from svg or canvas renderer of [lottie-web](https://github.com/airbnb/lottie-web).
+
+See more info: [documentation](https://galacean.antgroup.com/engine/docs/graphics/2D/lottie/)
 
 ## Features
 - [x] Sprite element: transform and opacity animation.
