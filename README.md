@@ -19,29 +19,8 @@ This is a [lottie](https://airbnb.io/lottie) runtime created by [Galacean Engine
 
 ## Usage
 
-Before using the code below, you should transform original lottie JSON file ( images must be base64-encoding strings) to Galacean standard lottie files. It's convenient to complete the task with [tool-atlas-lottie](https://www.npmjs.com/package/@galacean/tool-atlas-lottie) which will generate a folder which contains three files: a processed lottie JSON file, an atlas file and an image.
+See: https://galacean.antgroup.com/engine/docs/graphics/2D/lottie/
 
-```typescript
-import { LottieAnimation } from "@galacean/engine-lottie";
-
-// Load lottie json、atlas file with engine's `resourceManager`
-engine.resourceManager.load({
-  urls: [
-    "https://gw.alipayobjects.com/os/bmw-prod/b46be138-e48b-4957-8071-7229661aba53.json",
-    "https://gw.alipayobjects.com/os/bmw-prod/6447fc36-db32-4834-9579-24fe33534f55.atlas"
-  ],
-  type: 'lottie'
-}).then((lottieEntity) => {
-  // Add lottie entity created to scene 
-  root.addChild(lottieEntity);
-
-  // Get `LottieAnimation` component and play the animation
-  const lottie = lottieEntity.getComponent(LottieAnimation);
-  lottie.isLooping = true;
-  lottie.speed = 1;
-  lottie.play();
-});
-```
 ## Install
 
 ```bash
