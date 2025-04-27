@@ -8,7 +8,6 @@ import {
   ResourceManager,
   Sprite,
   Texture2D,
-  request,
   resourceLoader
 } from "@galacean/engine";
 
@@ -52,7 +51,8 @@ export class LottieLoader extends Loader<Entity> {
   // @ts-ignore
   load(item: LoadItem, resourceManager: ResourceManager): Promise<Entity> {
     const { urls } = item;
-    const jsonPromise = request(urls[0], { type: "json" });
+    // @ts-ignore
+    const jsonPromise = resourceManager._request(urls[0], { type: "json" });
 
     // atlas
     if (urls[1]) {
