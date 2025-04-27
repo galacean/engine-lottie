@@ -1,4 +1,4 @@
-import { AssetPromise, AssetType, LoadItem, Loader, ResourceManager, request, resourceLoader } from "@galacean/engine";
+import { AssetPromise, AssetType, LoadItem, Loader, ResourceManager, Utils, resourceLoader } from "@galacean/engine";
 import { LottieResource, TypeRes } from "./LottieResource";
 
 /**
@@ -10,11 +10,13 @@ export class EditorLottieLoader extends Loader<LottieResource> {
   // @ts-ignore
   load(item: LoadItem, resourceManager: ResourceManager): AssetPromise<LottieResource> {
     return new AssetPromise((resolve) => {
-      request<any>(item.url, { type: "json" }).then((data) => {
+      // @ts-ignore
+      resourceManager._request<any>(item.url, { type: "json" }).then((data) => {
         const { jsonUrl, atlasUrl } = data;
-        const jsonPromise = request(jsonUrl, resourceManager);
+        // @ts-ignore
+        const jsonPromise = resourceManager._request(Utils.resolveAbsoluteUrl(item.url, jsonUrl), resourceManager);
         const atlasPromise = resourceManager.load({
-          url: atlasUrl,
+          url: Utils.resolveAbsoluteUrl(item.url, atlasUrl),
           type: AssetType.SpriteAtlas
         });
 
