@@ -31,7 +31,7 @@ export default class SpriteLottieElement extends BaseLottieElement {
       this.spriteRenderer = spriteRenderer;
 
       // local priority 范围控制在 （0, 1），同时为了尽可能避免精度问题，this.index * 1000000
-      spriteRenderer.priority =  (Number.MAX_SAFE_INTEGER - this.index * 1000000) / Number.MAX_SAFE_INTEGER;
+      spriteRenderer.priority = (Number.MAX_SAFE_INTEGER - this.index * 1000000) / Number.MAX_SAFE_INTEGER;
 
       this.width = atlasRegion.width * texture.width;
       this.height = atlasRegion.height * texture.height;
@@ -40,7 +40,6 @@ export default class SpriteLottieElement extends BaseLottieElement {
 
   destroy() {
     super.destroy();
-    this.sprite?.texture?.destroy();
     this.sprite = null;
     this.spriteRenderer = null;
   }
