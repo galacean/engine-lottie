@@ -6,7 +6,7 @@
     "bezier-easing": "^2.1.0"
   },
   "peerDependencies": {
-    "@galacean/engine": ">=1.1.0-beta.0"
+    "@galacean/engine": "1.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.22.5",
@@ -16,8 +16,7 @@
     "@babel/plugin-transform-object-assign": "^7.12.1",
     "@babel/preset-env": "^7.12.1",
     "@babel/preset-typescript": "^7.12.1",
-    "@galacean/engine": "^1.1.0-beta.0",
-    "@galacean/engine-toolkit": "^1.1.0-beta.0",
+    "@galacean/engine": "1.2.0",
     "@rollup/plugin-babel": "^5.2.1",
     "@rollup/plugin-commonjs": "^16.0.0",
     "@rollup/plugin-inject": "^4.0.2",
@@ -39,7 +38,7 @@
     "typescript": "^4.8.4",
     "vite": "^4.3.9"
   },
-  "version": "1.1.0-beta.1",
+  "version": "1.2.0",
   "description": "Lottie runtime of oasis engine",
   "name": "@galacean/engine-lottie",
   "repository": "https://github.com/galacean/engine-lottie.git",

@@ -198,11 +198,11 @@ export class LottieResource extends EngineObject {
   }
 
   destroy(): void {
+    this.atlas.destroy();
+    this.atlas = null;
     this.layers = null;
     this.clips = null;
     this.comps = null;
-    this.atlas.destroy(true);
-    this.atlas = null;
 
     super.destroy();
   }
