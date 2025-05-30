@@ -61,5 +61,6 @@
     "lint": "eslint src --fix --ext .ts,.tsx",
     "b:types": "tsc --emitDeclarationOnly"
   },
-  "types": "types/index.d.ts"
+  "types": "types/index.d.ts",
+  "packageManager": "pnpm@9.3.0"
 }
