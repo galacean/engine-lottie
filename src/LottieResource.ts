@@ -198,7 +198,8 @@ export class LottieResource extends EngineObject {
   }
 
   destroy(): void {
-    this.atlas.destroy();
+    // Maybe atlas is Base64Atlas
+    this.atlas.destroy?.();
     this.atlas = null;
     this.layers = null;
     this.clips = null;
