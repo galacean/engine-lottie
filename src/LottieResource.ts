@@ -156,7 +156,7 @@ export class LottieResource extends EngineObject {
 
     for (let i = 0, l = layers.length; i < l; i++) {
       const layer = layers[i];
-      layersMap[layer.ind ??= i] = layer;
+      layersMap[layer.ind ?? i] = layer;
     }
 
     for (let i = layers.length - 1; i >= 0; i--) {
@@ -164,7 +164,7 @@ export class LottieResource extends EngineObject {
       const { refId, parent } = layer;
       layer.offsetTime = startTime;
       layer.stretch = stretch;
-      layer.index = layer.ind * indFactor + indStart;
+      layer.index = (layer.ind ?? i) * indFactor + indStart;
       if (parent) {
         if (!layersMap[parent].layers) {
           layersMap[parent].layers = [];
@@ -182,7 +182,8 @@ export class LottieResource extends EngineObject {
         }
         const offsetTime = (layer.offsetTime || 0) + (layer.st || 0);
         const stretch = (layer.stretch || 1) * (layer.sr || 1);
-        const compIndFactor = (indFactor / (refLayers[refLayers.length - 1].ind + 1)) * indFactor;
+        const lastIndex = refLayers.length - 1;
+        const compIndFactor = (indFactor / ((refLayers[lastIndex].ind ?? lastIndex) + 1)) * indFactor;
         this._buildTree(refLayers, compsMap, offsetTime, stretch, layer.index, compIndFactor);
         if (layer.layers) {
           layer.layers.push(...refLayers);
