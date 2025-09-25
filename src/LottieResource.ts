@@ -104,7 +104,15 @@ export class LottieResource extends EngineObject {
       for (let i = 0, l = comps.length; i < l; i++) {
         const comp = comps[i];
         if (comp.id) {
+          // comps 内包含的 comp 是 prefab 的模型
           compsMap[comp.id] = comp;
+          const layers = comp.layers;
+          if (layers) {
+            // 预处理 comp 内的 layer，补全 ind 字段
+            for (let j = 0; j < layers.length; j++) {
+              layers[j].ind ??= j;
+            }
+          }
         }
       }
     }
@@ -148,7 +156,7 @@ export class LottieResource extends EngineObject {
 
     for (let i = 0, l = layers.length; i < l; i++) {
       const layer = layers[i];
-      layersMap[layer.ind] = layer;
+      layersMap[layer.ind ??= i] = layer;
     }
 
     for (let i = layers.length - 1; i >= 0; i--) {
